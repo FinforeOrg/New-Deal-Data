@@ -45,7 +45,7 @@ if(!$success){
 
 
 require_once("default_metatags.php");
-$g_view['page_heading'] = "Welcome to Data Central Exchange";
+$g_view['page_heading'] = "Welcome to Deal Data";
 $g_view['show_help'] = true;
 $g_view['content_view'] = "index_new_view.php";
 require("content_view.php");
