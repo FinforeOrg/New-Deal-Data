@@ -1,0 +1,252 @@
+.dtree {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #666;
+	white-space: nowrap ;
+}
+.dtree img {
+	border: 0px;
+	vertical-align: middle;
+}
+.dtree a {
+	color: #333;
+	text-decoration: none;
+}
+.dtree a.node, .dtree a.nodeSel {
+	white-space: nowrap;
+	padding: 1px 1px 1px 1px;
+}
+.dtree a.node:hover, .dtree a.nodeSel:hover {
+	color: #333;
+	text-decoration: underline;
+}
+.dtree a.nodeSel {
+	background-color: #c0d2ec;
+}
+.dtree .clip {
+	overflow: hidden;
+}
+.head { 
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	font-weight: bold;
+	color: #777777;
+	}
+.header { 
+	background-color: #993300;
+	font-weight: bold;
+	color: #FFFFFF;
+	}
+.header a:link { font-size: 10px; color: #FFFFFF; text-decoration: underline; }
+.header a:hover { font-size: 10px; color: #00FF00; text-decoration: underline; }
+.header a:visited { font-size: 10px; color: #FFFFFF; text-decoration: underline; }
+
+
+input {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+
+}
+select {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+
+}
+textarea {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+
+.c1 { background-color: #FFFFFF; }
+.c2 { background-color: #FFFFFF; }
+.c3 { background-color: #FFFFFF; color: #993300; }
+.c3 a { font-size: 10px; color: #993300; text-decoration: underline; }
+.c3 a:link { font-size: 10px; color: #993300; text-decoration: underline; }
+.c3 a:hover { font-size: 10px; color: #993300; text-decoration: none; }
+.c3 a:visited { font-size: 10px; color: #993300; text-decoration: underline; }
+.c4 { background-color: #993300; color: #FFFFFF; font-weight: bold;}
+
+.border { border: 1px solid #4192DE;}
+h2 { color: #888888;}
+
+.boxmain {
+background-color: #F4F6F8;
+border: 1px solid #93A5BC;
+}
+
+
+a:link {	font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; color: #7D431B; text-decoration: none;}
+a:hover  {	font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; color: #f3960b; text-decoration: underline;}
+a:active  { 	font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; color: #7D431B; text-decoration: none;}
+a:visited { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; COLOR: #7D431B;}
+
+a.menulink:link {	font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; font-weight: ; color: #7D431B; text-decoration: none;}
+a.menulink:hover  {	font-family: Verdana, Arial, Helvetica, sans-serif; font-weight: ; font-size: 10px; color: #f3960b; text-decoration: underline;}
+a.menulink:active  { 	font-family: Verdana, Arial, Helvetica, sans-serif; font-weight: ; font-size: 10px; color: #7D431B; text-decoration: none;}
+a.menulink:visited  {	font-family: Verdana, Arial, Helvetica, sans-serif; font-weight: ; COLOR: #B16C27; font-size: 10px; text-decoration: none;}
+
+TD {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+}
+.borderright {
+	border-right: 1px dashed #777777;
+}
+.verdana10white {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	font-weight: normal;
+	color: #FFFFFF;
+}
+.bordertop {
+	border-top: 1px solid red;
+
+}
+.borderbottom {
+	border-bottom: 1px dashed #e9e9eb;
+}
+.verdana12black {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #000000;
+}
+.verdana12black a {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #000000;
+	text-decoration: none;
+}
+.verdana12black a:hover {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #0000FF;
+	text-decoration: underline;
+}
+.verdana11bold {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #000000;
+	text-decoration: none;
+}
+.verdana11bold a {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #000000;
+	text-decoration: underline;
+}
+.verdana11bold a:hover {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #FF0000;
+	text-decoration: underline;
+}
+.verdana10 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	font-weight: normal;
+	color: #000000;
+	text-decoration: none;
+}
+.red
+{
+font-family:Arial, Helvetica, sans-serif;
+font-size:12px;
+color:#FF0000;
+
+}
+
+BODY {
+	FONT-SIZE: 10px; 
+	FONT-FAMILY: verdana, arial, helvetica, sans-serif; 
+	SCROLLBAR-DARKSHADOW-COLOR: #000000; 
+	SCROLLBAR-ARROW-COLOR: #704946; 
+	SCROLLBAR-BASE-COLOR: #EADACD; 
+	BACKGROUND-COLOR: #E0D7CF
+}
+#nevigation_bar a
+{
+font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 11px;
+color: #A5301B;
+text-decoration: none;
+}
+#nevigation_bar a:hover
+{
+font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 11px;
+color: #962C18;
+text-decoration: underline;
+}
+.err_txt{
+font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 11px;
+color:#FF0000;
+font-weight:bold;
+}
+.msg_txt{
+font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 11px;
+color:#0000FF;
+font-weight:bold;
+}
+/*************************autocomplete hint style**********************
+sng:6/apr/2010
+********/
+
+.suggestionsBox {
+	position: absolute;
+	width: 240px;
+	background-color: #ffffff;
+	border: 2px solid #cccccc;
+	color: #000000;
+	padding: 5px;
+	margin-top: 10px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	margin-left: 0px;
+	z-index:20;
+	
+}
+.suggestionList {
+	margin: 0px;
+	padding: 0px;
+}
+.suggestionList li {
+	margin: 0px 0px 3px 0px;
+	padding: 7px;
+	cursor: pointer;
+	list-style-type: none;	
+}
+.suggestionList li:hover {
+background-color: #cccccc;
+font-weight: bold;
+}
+/*************************autocomplete hint style**********************/
+/**********block show / hide******************/
+.opt_hide{
+	visibility:hidden;
+	height:0px;
+}
+.opt_show{
+	visibility:visible;
+	height:auto;
+}
+/************************/
+
+
+/** charts container style **/
+div.chart {
+    margin-top:20px; 
+    margin-left:20px; 
+    width:400px; 
+    height:300px; 
+    float:left; 
+    position:relative;
+}
+
+.jqplot-yaxis {
+    display:none;
+}
