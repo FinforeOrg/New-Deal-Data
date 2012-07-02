@@ -1,0 +1,9 @@
+<?php
+/***
+sng:27/july/2010
+***/
+require_once("../include/global.php");
+require_once("classes/class.member.php");
+//////////////////////////////////////////////
+$g_mem->cron_resend_favoured_activation_emails();
+?>
