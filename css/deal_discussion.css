@@ -1,0 +1,21 @@
+/* CSS Document */
+#deal_discussion_content{
+font-size:12px;
+}
+.deal_discussion_block{
+border-bottom:1px solid #CCCCCC;
+}
+.deal_discussion_posting{
+font-style:italic;
+padding:20px 0px 20px 0px;
+}
+.deal_discussion_reply{
+font-style:normal;
+padding:0px 0px 20px 50px;
+}
+.deal_discussion_toolbar{
+padding:5px 5px 5px 0px;
+text-align:right;
+background-color:#EEEEEE;
+margin-top:5px;
+}

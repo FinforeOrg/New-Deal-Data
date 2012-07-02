@@ -1,0 +1,57 @@
+    .accordion { list-style-type: none; padding: 0; margin: 0 0 30px; border: 1px solid #17a; border-top: none; border-left: none; }
+    .accordion ul { padding: 0; margin: 0; float: left; display: block; width: 100%; }
+    .accordion li { background: #E86200; cursor: pointer; list-style-type: none; padding: 0; margin: 0; float: left; display: block; width: 100%;}
+    .accordion li.active>a {}
+    .accordion li div { padding: 20px; background: #fff; display: block; clear: both; float: left; width: 360px;}
+    .accordion a { text-decoration: none; border-bottom: 1px solid #4df; font: bold 1.1em/2em Arial, sans-serif; color: #222; padding: 0 10px; display: block; cursor: pointer; }
+    
+    /* Level 2 */
+    .accordion li ul li { background: #fff; font-size: 0.9em; }
+    
+ /* share search */
+ 
+ #backgroundPopup{
+    display:none;
+    position:fixed;
+    _position:absolute; /* hack for internet explorer 6*/
+    height:100%;
+    width:100%;
+    top:0;
+    left:0;
+    background:#000000;
+    border:1px solid #cecece;
+    z-index:1;
+}
+#popupShare{
+    display:none;
+    position:fixed;
+    _position:absolute; /* hack for internet explorer 6*/
+    height:384px;
+    width:408px;
+    background:#FFFFFF;
+    border:2px solid #cecece;
+    z-index:2;
+    padding:12px;
+    font-size:13px;
+}
+#popupShare h1{
+    text-align:left;
+    color:#E86200;
+    font-size:22px;
+    font-weight:700;
+    border-bottom:1px dotted #D3D3D3;
+    padding-bottom:2px;
+    margin-bottom:20px;
+}
+#popupShareClose{
+    font-size:14px;
+    line-height:14px;
+    right:6px;
+    top:4px;
+    position:absolute;
+    color:#E86200;
+    font-weight:700;
+    display:block;
+    cursor: pointer;
+}
+   

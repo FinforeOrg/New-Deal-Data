@@ -1,0 +1,102 @@
+/* CSS Document */
+
+/* remove the list style */
+#nav {
+    margin:0;
+    padding:0;
+    list-style:none;
+}  
+     
+    /* make the LI display inline */
+    /* it's position relative so that position absolute */
+    /* can be used in submenu */
+    #nav li {
+        float:left;
+        display:block;
+        width:150px;
+		height:35px;
+        background:none;
+        position:relative;
+        z-index:500;
+        margin:0 1px;
+		padding: 0px 0px 0px 0px;
+    }
+	
+	#nav li.nav-separator{
+		float:left;
+        display:block;
+        width:10px;
+        background: url(../images/bg.gif) left top repeat-x #FFF;
+        position:relative;
+        z-index:0;
+        margin:0px;
+		text-align:center;
+		color:#CCCCCC;
+	}
+         
+    /* this is the parent menu */
+    #nav li a {
+        display:block;
+        padding:0px 0px 0px 0px;
+        font-weight:normal; 
+        height:23px;
+        text-decoration:none;
+        text-align:center;
+        color:#656565;
+    }
+ 
+    #nav li a:hover {
+        color:#E86200;
+    }
+     
+    /* you can make a different style for default selected value */
+    #nav a.selected {
+        color:#656565;
+    }
+     
+        /* submenu, it's hidden by default */
+        #nav ul {
+            position:absolute;
+            left:0;
+            display:none;
+            margin:4px 0 0 -1px;
+            padding:0;
+            list-style:none;
+			border:1px solid #CCCCCC;
+			background-color:#EEEEEE;
+			width:150px;
+        }
+         
+        #nav ul li {
+            width:150px;
+            float:left;
+			/*background-color:#CCCCCC;*/
+			text-align:left;
+			padding:0;
+			z-index:600;
+        }
+		#nav ul li a {
+			text-align:center;
+			text-decoration:none;
+			padding:0;
+        }
+         
+        /* display block will make the link fill the whole area of LI */
+        #nav ul a {
+            display:block; 
+            height:15px;
+            padding: 8px 5px;
+            color:#666;
+        }
+         
+        #nav ul a:hover {
+            text-decoration:underline; 
+        }
+ 
+/* fix ie6 small issue */
+/* we should always avoid using hack like this */
+/* should put it into separate file : ) */
+*html #nav ul {
+    margin:0 0 0 -2px;
+}
+

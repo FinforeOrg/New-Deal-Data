@@ -1,0 +1,781 @@
+@charset "utf-8";
+/* CSS Document */
+
+body{
+	margin: 0;
+	/**************************
+	sng:1/oct/2011
+	we are using a new menu, and need 44px height
+	background: url(../images/bg.gif) left top repeat-x #FFF;
+	*******************************/
+	background: url(../images/bg44.gif) left top repeat-x #FFF;
+}
+table{
+	width: 100%;
+	height: auto;
+	border: 0;
+}
+td{
+	font: normal 11px/18px Tahoma, Geneva, sans-serif;
+	color: #3b3b3b;
+	text-align: left;
+	vertical-align: top;
+}
+a{
+	color: #e86200;
+	text-decoration: underline;
+	outline: none;
+}
+a:hover{
+	text-decoration: none;
+	outline: none;
+}
+a.home{
+	background: url(../images/icon_home.gif) left center no-repeat;
+	padding: 0 10px 0 18px;
+}
+a.register{
+	background: url(../images/icon_register.gif) 10px center no-repeat;
+	padding: 0 10px 0 35px;
+}
+a.contact{
+	background: url(../images/icon_contact.gif) 10px center no-repeat;
+	padding: 0 0 0 25px;
+}
+img{
+	border: 0;
+	outline: none;
+}
+.centeralign{
+	text-align: center;
+}
+.rightalign{
+	text-align: right;
+}
+.middlealign{
+	vertical-align: middle;
+}
+.bottomalign{
+	vertical-align: bottom;
+}
+h1{
+	padding: 0;
+	margin: 0 0 5px 0;
+	font: normal 18px/18px Tahoma, Geneva, sans-serif;
+	color: #e86200;
+}
+.btn{
+	background: url(../images/btn.gif) center center no-repeat;
+	width: 72px;
+	height: 23px;
+	border: 0;
+	text-transform: uppercase;
+	font: normal 12px Arial, Helvetica, sans-serif;
+	color: #FFF;
+}
+.btn_auto{
+	/***************
+	sng:29/sep/2011
+	Now this acts as a marker so that jqueryUI button style can be added
+	background: url(../images/btn.gif) center center repeat-x;
+	
+	width: auto;
+	height: 23px;
+	border: 0;
+	
+	font: normal 12px Arial, Helvetica, sans-serif;
+	color: #FFF;
+	*/
+	/************
+	sng:11/nov/2011
+	text-transform: uppercase;
+	****************/
+}
+.link_as_button{
+	/**************
+	sng:11/nov/2011
+	text-transform: uppercase;
+	**************/
+}
+.btn_register{
+	background: url(../images/btn_register.gif) center center no-repeat;
+	width: 125px;
+	height: 23px;
+	border: 0;
+	font: normal 12px Arial, Helvetica, sans-serif;
+	color: #FFF;
+}
+
+
+table.maintable{
+	width: 898px;
+	margin: 0 auto;
+	float: none;
+	clear: both;
+}
+
+
+
+table.header{
+	height: 38px;
+}
+
+
+
+table.nav{
+	/*width: 440px;*/
+	/*
+	sng:10/nov/2010
+	we want more menu on left after log in.
+	We changed the right nav width to 270px
+	*/
+	width: 550px;
+}
+table.nav td{
+	font: normal 12px/38px Tahoma, Geneva, sans-serif;
+	color: #656565;
+	text-align: center;
+	vertical-align: middle;
+}
+table.nav a{
+	color: #656565;
+	text-decoration: none;
+	padding: 0 10px;
+}
+table.nav a:hover, table.nav a.here, table.nav a:hover.here{
+	color: #e86200;
+}
+
+
+
+table.rightnav{
+	float: right;
+	/*width: 270px;*/
+	/*
+	sng 27/mar/2010
+	we added more right links
+	*/
+	/*width: 400px;*/
+	/*
+	sng:10/nov/2010
+	We want more links in left than right
+	*/
+	width: 270px;
+}
+table.rightnav td{
+	color: #b3b3b3;
+	line-height: 38px;
+}
+table.rightnav a{
+	text-decoration: none;
+}
+table.rightnav a:hover{
+	text-decoration: underline;
+}
+
+
+
+table.banner{
+	height: 97px;
+	border-bottom: 1px solid #e86200;
+}
+table.banner td{
+	color: #747474;
+}
+
+
+
+table.search{
+	background: url(../images/searchbox.gif) left top repeat-x;
+	/*width: 436px;*/
+	width: 600px;
+	height: 44px;
+	margin: 25px 0 0 0;
+}
+table.searchinput{
+	/*width: 410px;*/
+	width: 560px;
+	height: 23px;
+	margin: 11px 12px 10px 14px;
+}
+table.input{
+	background: url(../images/search.gif) left center no-repeat;
+	/*width: 333px;*/
+	width: 390px;
+	height: 23px;
+}
+table.input input{
+	width: 295px;
+	height: 14px;
+	margin: 1px 0 0 30px;
+	border: 0;
+	background: none;
+	font-size: 11px;
+	color: #666;
+}
+
+
+
+table.content{
+	margin: 30px 0;
+}
+
+
+
+table.rank{
+	border-collapse: collapse;
+	width: 336px;
+}
+table.rank th{
+	text-align: left;
+	padding: 0 10px;
+	font: bold 11px/28px Tahoma, Geneva, sans-serif;
+	color: #FFF;
+	border: 1px solid #FFF;
+	background: #616161;
+}
+table.rank td{
+	text-align: left;
+	padding: 0 10px;
+	font: normal 11px/28px Tahoma, Geneva, sans-serif;
+	color: #3b3b3b;
+	border: 1px solid #c7c7c7;
+}
+
+
+
+table.register{
+	background: #FFF;
+	border: 1px solid #babab8;
+}
+table.register td{
+	padding: 5px;
+}
+table.registerinner{
+	background: #f5f5f3;
+}
+table.registercontent{
+}
+table.registercontent th{
+	padding: 0 10px;
+	
+	background: #e86200;
+	color: #FFF;
+	
+	/**********
+	background: #CCCCCC;
+	color: #000000;
+	************/
+	font: normal 14px/32px Tahoma, Geneva, sans-serif;
+	text-align: left;
+}
+table.registercontent td{
+	padding: 0;
+	font-size: 12px;
+}
+table.registercontent table{
+	margin: 10px 0;
+}
+
+
+
+table.footer{
+	height: 100px;
+	border-top: 1px solid #cecece;
+}
+table.footer td{
+	color: #b3b3b3;
+	text-align: center;
+	line-height: 30px;
+	padding: 20px 0 0 0;
+}
+table.footer a{
+	color: #6c6c6c;
+	padding: 0 10px;
+	text-decoration: none;
+}
+table.footer a:hover{
+	text-decoration: underline;
+}
+/****
+sng:2/jun/2010
+******/
+div#footer_tagline a{
+color: #b3b3b3;
+padding: 0px 0px 0px 0px;
+}
+div#footer_tagline a:hover{
+text-decoration: underline;
+}
+
+/* 23.3.10 */
+
+table.company{
+	border-collapse: collapse;
+}
+table.company th{
+	text-align: left;
+	/******************
+	sng:29/sep/2011
+	we put a pading on top/bottom also
+	padding: 0 8px;
+	*/
+	padding: 4px 8px 4px 8px;
+	border: 1px solid #999;
+}
+table.company td{
+	padding: 4px 8px 4px 8px;
+	border: 1px solid #999;
+}
+/*************************************************************
+sng:12/sep/2011
+grey table style
+********************/
+table.grey_table{
+	border-collapse: collapse;
+}
+table.grey_table th{
+	text-align: left;
+	padding: 0 8px;
+	border: 1px solid #F5F5F5;
+}
+table.grey_table td{
+	padding: 0 8px;
+	border: 1px solid #F5F5F5;
+	font: 11px/28px Tahoma,Arial,Helvetica,sans-serif;
+	color: #3B3B3B;
+}
+/***********************************************************************/
+.err_txt{
+font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 11px;
+color:#FF0000;
+font-weight:bold;
+}
+.msg_txt{
+font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 11px;
+color:#0000FF;
+font-weight:bold;
+}
+/*23.3.2010*/
+input.txtbox{
+ width: 250px;
+ height: 20px;
+ border: 1px solid #999;
+ background: #FFF;
+ font: normal 11px Tahoma, Geneva, sans-serif;
+ color: #333;
+ padding: 2px 3px;
+}
+select.txtbox{
+ width: 260px;
+ height: 25px;
+ border: 1px solid #999;
+ background: #FFF;
+ font: normal 11px Tahoma, Geneva, sans-serif;
+ color: #333;
+ padding: 2px 3px;
+}
+/*************************autocomplete hint style**********************
+sng:6/apr/2010
+********/
+
+.suggestionsBox {
+	position: absolute;
+	width: 240px;
+	background-color: #ffffff;
+	border: 2px solid #cccccc;
+	color: #000000;
+	padding: 5px;
+	margin-top: 10px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	margin-left: 0px;
+	/**********************
+	sng:19/dec/2011
+	so that this work in popup and jquery ui
+	**********************/
+	z-index:9999;
+}
+.suggestionList {
+	margin: 0px;
+	padding: 0px;
+}
+.suggestionList li {
+	margin: 0px 0px 3px 0px;
+	padding: 7px;
+	cursor: pointer;
+	list-style-type: none;
+	
+	
+}
+.suggestionList li:hover {
+background-color: #cccccc;
+font-weight: bold;
+}
+/*************************autocomplete hint style**********************/
+/*****tombstone display*********/
+.tombstone_display{
+	width:210px;
+	border:1px solid #CCCCCC;
+}
+.tombstone_company{
+	width:210px;
+	padding:5px;
+	height:210px;
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size:14px;
+	font-weight: bold;
+	text-align:center;
+	color:#CCCCCC;
+	vertical-align:middle;
+}
+.tombstone_deal{
+	width:210px;
+	padding:5px;
+	height:110px;
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size:14px;
+	font-weight: bold;
+	text-align:center;
+	color:#000000;
+	vertical-align:middle;
+}
+
+
+/*****tombstone display*********/
+.black_link{
+	color: #000000;
+	text-decoration: underline;
+	outline: none;
+	font-weight:bold;
+}
+
+/**********block show / hide******************/
+.opt_hide{
+	visibility:hidden;
+	height:0px;
+}
+.opt_show{
+	visibility:visible;
+	height:auto;
+}
+/************************/
+/********************************
+sng:1/sep/2010
+tooltip
+**********/
+.toolTip {
+	POSITION: relative; PADDING-RIGHT: 20px; BACKGROUND: url(../images/tooltip/information.png) no-repeat right 50%; COLOR: #3366ff; CURSOR: help
+}
+.toolTipWrapper {
+	POSITION: absolute; WIDTH: 175px; DISPLAY: none; COLOR: #000000; FONT-SIZE: 9pt; TOP: 20px; FONT-WEIGHT: bold; z-index:2;
+}
+.toolTipTop {
+	WIDTH: 175px; BACKGROUND: url(../images/tooltip/tooltip-bubble-top-grey.gif) no-repeat; HEIGHT: 30px
+}
+.toolTipMid {
+	PADDING-BOTTOM: 8px; PADDING-LEFT: 15px; PADDING-RIGHT: 15px; BACKGROUND: url(../images/tooltip/tooltip-bubble-mid-grey.gif) #a1d40a repeat-x 50% top; PADDING-TOP: 8px
+}
+.toolTipBtm {
+	BACKGROUND: url(../images/tooltip/tooltip-bubble-btm-grey.gif) no-repeat; HEIGHT: 13px
+}
+/**********end tooltip***************************/
+
+
+.pagination_here{
+font-weight:bold;
+}
+
+/**
+* One stop
+*/
+.zebraTable td, th{
+    padding:4px;
+    font-size:12px;
+    line-height: 16px;
+}
+.zebraTable th {
+    text-align: left;
+    background-color: #CCC;
+    border-bottom: 5px solid #FFF;
+}
+
+.zebraTable td {
+    border:1px solid #999999;
+    background-color: #E4E4E4;
+}
+
+.sub-subtype {
+    padding-left:30px;
+}
+
+.subtype {
+    padding-left:10px;
+}
+/*****************************
+sng:18/jan/2011
+******/
+.sortable-col:hover{
+background-color:#DDDDDD;
+cursor:pointer;
+}
+.sortable-col-selected{
+background-color:#DDDDDD;
+}
+/*********************************/
+
+.loading {
+    width: 100%;
+    background: url(/images/ajax-loader.gif) center center no-repeat;
+}
+/************************************************/
+.deal_page_h1{
+	width:75%;
+	text-align:left;
+	padding:10px 0 10px 0;
+	font: bold 20px/26px Arial, Helvetica, sans-serif;
+}
+.deal_page_h2{
+	width:75%;
+	text-align:left;
+	padding:10px 0 10px 0;
+	font: bold 16px/16px Arial, Helvetica, sans-serif;
+}
+/*********************************************************/
+/******************************************
+sng:14/jun/2011
+style for deal overview
+******/
+#deal_overview h1{
+font-size:12px;
+font-style:italic;
+font-weight:bold;
+color:#000000;
+}
+
+#deal_overview legend{
+font-size:12px;
+font-weight:bold;
+color:#000000;
+}
+
+#deal_overview p{
+font: 12px/18px Tahoma,Geneva,sans-serif;
+}
+/***************************************************************/
+/*******************************************************************
+sng:21/jun/2011
+style for deal detail page
+*****/
+#deal-detail p{
+	font: 12px/18px Tahoma,Geneva,sans-serif;
+}
+#deal-detail .left-label{
+	width:200px;
+	text-align:left;
+	vertical-align:top;
+	font: 12px/18px Tahoma,Geneva,sans-serif;
+}
+#deal-detail .middle-data{
+	width:200px;
+	vertical-align:top;
+	font: 12px/18px Tahoma,Geneva,sans-serif;
+	text-align:left;
+}
+#deal-detail .right-input{
+	width:300px;
+	text-align:left;
+	vertical-align:top;
+}
+#deal-detail .separation{
+	border-left:1px solid #CCCCCC;
+	width:10px;
+}
+#deal-detail .vseparation{
+	height: 15px;
+}
+#deal-detail .blockseparation{
+	height: 36px;
+}
+#deal-detail .txtinput{
+	border:1px solid #CCCCCC;
+	width:250px;
+	font: 12px/18px Tahoma,Geneva,sans-serif;
+	color:#000000;
+}
+#deal-detail .longtxtinput{
+	border:1px solid #CCCCCC;
+	width:400px;
+	font: 12px/18px Tahoma,Geneva,sans-serif;
+	color:#000000;
+}
+#deal-detail .shorttxtinput{
+	border:1px solid #CCCCCC;
+	width:100px;
+	font: 12px/18px Tahoma,Geneva,sans-serif;
+	color:#000000;
+}
+#deal-detail .txtareainput{
+	border:1px solid #CCCCCC;
+	width:400px;
+	height:200px;
+	font: 12px/18px Tahoma,Geneva,sans-serif;
+	color:#000000;
+}
+/***********************************************************************/
+div.chart {
+    margin-top:20px; 
+    margin-left:20px; 
+    width:400px; 
+    height:300px; 
+    float:left; 
+    position:relative;
+    z-index: 0;
+}
+
+.jqplot-yaxis {
+    display:none;
+}
+
+td.jqplot-table-legend > div {
+    display: none;
+}
+td.jqplot-table-legend {
+    text-align: center;
+}
+
+/********************************************************************************/
+#explanation{
+    display:none;
+    background-color:#EEEEEE;
+    padding:10px;
+    margin:10px;
+}
+/*******************************************************************
+sng:21/nov/2011
+style for company detail page
+*****/
+#company-detail p{
+	font: 12px/18px Tahoma,Geneva,sans-serif;
+}
+#company-detail h2{
+text-align:left;
+font: bold 16px/16px Arial, Helvetica, sans-serif;
+}
+#company-detail .vseparation{
+	height: 15px;
+}
+#company-detail .left-label{
+	width:200px;
+	text-align:left;
+	vertical-align:top;
+	font: 12px/18px Tahoma,Geneva,sans-serif;
+}
+#company-detail .middle-data{
+	width:200px;
+	vertical-align:top;
+	font: 12px/18px Tahoma,Geneva,sans-serif;
+	text-align:left;
+}
+#company-detail .separation{
+	border-left:1px solid #CCCCCC;
+	width:10px;
+}
+#company-detail .right-input{
+	width:300px;
+	text-align:left;
+	vertical-align:top;
+}
+#deal-detail .txtinput{
+	border:1px solid #CCCCCC;
+	width:250px;
+	font: 12px/18px Tahoma,Geneva,sans-serif;
+	color:#000000;
+}
+/***********************************************************************
+sng:20/mar/2012
+deal edit section snippets
+**************/
+.deal-edit-snippet
+{
+	width:840px;
+	overflow:auto;
+}
+.deal-edit-snippet td
+{
+	padding-top:5px;
+	padding-bottom:5px;
+}
+.deal-edit-snippet-header
+{
+	font-weight:bold;
+	font-size:12px;
+	text-align:center;
+	height: 40px;
+}
+
+.deal-edit-snippet-footer
+{
+	text-align:center;
+}
+
+.deal-edit-snippet-left-td
+{
+	border-right:1px solid #CCCCCC;
+	padding-right:20px;
+}
+
+.deal-edit-snippet-right-td
+{
+	border-left:1px solid #CCCCCC;
+	padding-left:20px;
+}
+.deal-edit-snippet-middle-td
+{
+	padding-left:20px;
+	padding-right:20px;
+}
+.deal-edit-snippet-textarea
+{
+	height:100px;
+	width:100%;
+	border: 1px solid #CCCCCC;
+}
+
+.deal-edit-snippet-textbox
+{
+	width:100%;
+	border: 1px solid #CCCCCC;
+}
+
+.deal-edit-snippet-textbox-short
+{
+	width:100px;
+	border: 1px solid #CCCCCC;
+}
+
+.deal-edit-snippet-dropdown
+{
+	width:100%;
+	border: 1px solid #CCCCCC;
+}
+.deal-edit-snippet-vertical-gap-20
+{
+	height:20px;
+}
+
+.deal-edit-snippet-mid-col
+{
+	border-left: 1px solid #CCCCCC;
+	padding-left:10px;
+	padding-right:10px;
+}
+
+.deal-edit-snippet-right-col
+{
+	border-left: 1px solid #CCCCCC;
+	padding-left:10px;
+	padding-right:10px;
+}

@@ -1,0 +1,94 @@
+/* CSS Document */
+img{
+border: none;
+outline: none;
+}
+.leaguechartsDiv{
+	width: 920px;
+	height: auto;
+	margin: 0;
+	border: solid 1px #dedede;
+	text-align: left;
+	font: normal 11px/18px Tahoma, Arial, Helvetica, sans-serif;
+	color: #3b3b3b;
+}
+.leaguechartsHeaderDiv{
+	width: 920px;
+	height: 28px;
+	margin: 0;
+	border-bottom: solid 1px #dedede;
+	
+}
+.leaguechartsHeaderDiv p{
+	font: bold 12px/28px Tahoma, Arial, Helvetica, sans-serif;
+	color: #3b3b3b;
+	background: url(../images/ss_leagueheader.gif) left top repeat-x;
+	padding: 0 0 0 10px !important;
+	padding: 0;
+	margin: 0;
+}
+
+.leaguechartsContent{
+	width: 920px;
+	min-height: 28px;
+	margin: 0;
+	border-bottom: solid 1px #f5f5f5;
+	padding:5px 0px 5px 10px;
+}
+.leaguechartsContentleft{
+	width: 688px;
+	min-height: 28px;
+	float: left;
+	margin: 0 0 0 10px;
+	text-align: left;
+	font: normal 11px/28px Tahoma, Arial, Helvetica, sans-serif;
+	color: #3b3b3b;
+}
+.leaguechartsContentleft a{
+text-decoration:underline;
+color: #e86200;
+}
+.leaguechartsContentleft a:hover{
+text-decoration:none;
+color: #e86200;
+}
+.leaguechartsContentRight{
+width: 203px;
+height: 28px;
+float: right;
+margin: 0 5px 0 0;
+}
+.leaguechartsContentRight ul{
+padding: 0;
+margin: 0;
+}
+.leaguechartsContentRight ul li{
+padding: 0;
+margin: 5px 0;
+list-style-type: none;
+float: right;
+border: none;
+}
+.leaguechartsContentRight ul li a{
+line-height: 13px;
+text-align: left;
+text-decoration: none;
+padding: 0 !important;
+color: #e86200;
+outline: none;
+border: none;
+
+}
+.leaguechartsContentRight ul li a span{
+*padding: 0 10px 0 5px !important;
+line-height: 13px;
+*margin: -5px 0;
+padding: 0 10px 0 0;
+}
+.leaguechartsContentRight ul li a:hover{
+line-height: 13px;
+text-align: left;
+text-decoration: none;
+padding: 0 !important;
+color: #e86200;
+}

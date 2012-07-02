@@ -1,0 +1,32 @@
+/* CSS Document */
+.loading {
+display: none;
+}
+.accordion {
+border: 1px solid #ccc;
+width:  100%;
+}
+.accordion li h3 a {
+background-color:#EEEEEE;
+color:#000000;
+border-top: 1px solid #CCCCCC;
+border-bottom: 1px solid #CCCCCC;
+display:                block;
+font-style:             normal;
+margin:                 0;
+padding:                5px 10px;
+}
+.accordion li.active h3 a {
+
+}
+.accordion li.locked h3 a {
+
+}
+.accordion li h3 {
+margin:         0;
+padding:        0;
+}
+.accordion .panel {
+padding:        10px;
+background-color:#FFFFFF;
+}
