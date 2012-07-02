@@ -1,0 +1,201 @@
+<?php
+
+//echo "<pre>";
+error_reporting(E_ALL);
+ini_set('display_errors',1);
+@session_start();
+
+
+$colors = array('cccccc' /* light gray */
+              , '52a3dc' /* light blue */
+              , '000000' /* black */ 
+              , '928d8d' /* dark gray */
+              , 'FFFFFF' /* white with border */);
+
+$color = $_POST['color'];
+if (!in_array($color,$colors)) 
+    die('Invalid request!. Please click the back button and try again.');
+    
+if (isset($_REQUEST['type']) && $_REQUEST['type'] == 'leagueTables') {
+    $data = $_SESSION['lastGeneratedRankings'];
+    $folder = '5';
+} else {
+   $data = $_SESSION['lastGeneratedGraphData']; 
+   $folder = '10';
+}
+
+/**
+* make sure data is 0 indexed
+*/
+
+
+if (!is_array($data)) {
+    die("Cannot get data. Did you press generate before downloading ?");
+}
+foreach ($data as $val) {
+    if ($_REQUEST['type'] == 'leagueTables') {
+        if ($val['short_name'] == "") {
+           $val['short_name'] = $val['name']; 
+        }
+    } else {
+        echo 'This service is temporarily unavailable.';
+        echo "<div style='display:none;'><pre>";
+        var_dump($data);
+        echo "</pre></div>";
+        exit();        
+    }
+    $newData[] = $val;
+
+}
+$data = $newData;
+
+/*
+/*
+$data = array(
+    0=>array('short_name' => '2010 Q1', 'value' => rand(1200,3265)),
+    1=>array('short_name' => '2010 Q2', 'value' => rand(1200,3265)),
+    2=>array('short_name' => '2010 Q3', 'value' => rand(1200,3265)),
+    3=>array('short_name' => '2010 Q4', 'value' => rand(1200,3265)),
+    4=>array('short_name' => '2010 Q5', 'value' => rand(1200,3265)),
+    5=>array('short_name' => '2010 Q6', 'value' => rand(1200,3265)),
+    6=>array('short_name' => '2010 Q7', 'value' => rand(1200,3265)),
+    7=>array('short_name' => '2010 Q8', 'value' => rand(1200,3265)),
+    8=>array('short_name' => '2010 Q9', 'value' => rand(1200,3265)),
+    9=>array('short_name' => '2010 Q10', 'value' => rand(1200,3265)),
+
+);
+*/
+
+
+//start editing data 
+$oldSheetContents = file_get_contents(dirname(__FILE__). '/excel/'.$folder.'/Microsoft_Office_Excel_Worksheet1/xl/worksheets/sheet1.xml');
+$oldSheetContents = file_get_contents(dirname(__FILE__). '/excel/'.$folder.'/Microsoft_Office_Excel_Worksheet1/xl/worksheets/sheet1.xml');
+$oldSharedStringContents = file_get_contents(dirname(__FILE__). '/excel/'.$folder.'/Microsoft_Office_Excel_Worksheet1/xl/sharedStrings.xml');
+$oldChartContents = file_get_contents(dirname(__FILE__). '/'.$folder.'/ppt/charts/chart1.xml');
+
+$newChartContents = $oldChartContents;
+$newSheetContents = $oldSheetContents;
+$newSharedStringContents = $oldSharedStringContents;
+
+$title = htmlentities(urldecode($_POST['pptTitle']));
+//$title = "Plm in plm";
+$newChartContents = str_replace('Your Title here',$title,$newChartContents);
+
+/**
+* Get the right color
+*/
+
+$newChartContents = str_replace("000000",$color,$newChartContents);
+if ($color = 'FFFFFF') {
+  $newChartContents =  str_replace('<a:ln><a:solidFill><a:srgbClr val="'.$color.'"/></a:solidFill></a:ln>','<a:ln><a:solidFill><a:srgbClr val="000000" /></a:solidFill></a:ln>',$newChartContents);
+}
+
+foreach ($data as $key=>$value) {
+    $newSheetContents = str_replace('label'.$key,$value['short_name'],$newSheetContents);
+    $newSharedStringContents = str_replace('label'.$key,$value['short_name'],$newSharedStringContents);
+    $newChartContents = str_replace('label'.$key,$value['short_name'],$newChartContents);
+    $newSheetContents = str_replace('33532'.$key,$value['value'],$newSheetContents);
+    $newChartContents = str_replace('33532'.$key,$value['value'],$newChartContents);
+    
+}
+
+$fpSheet = fopen(dirname(__FILE__). '/excel/'.$folder.'/Microsoft_Office_Excel_Worksheet1/xl/worksheets/sheet1.xml','w+');
+fwrite($fpSheet,$newSheetContents);
+fclose($fpSheet);
+
+$fpSharedStrings = fopen(dirname(__FILE__). '/excel/'.$folder.'/Microsoft_Office_Excel_Worksheet1/xl/sharedStrings.xml','w+');
+fwrite($fpSharedStrings,$newSharedStringContents);
+fclose($fpSharedStrings);
+
+
+$fpChart = fopen(dirname(__FILE__). '/'.$folder.'/ppt/charts/chart1.xml','w+');
+fwrite($fpChart,$newChartContents);
+fclose($fpChart); 
+ 
+ 
+Zip('excel' . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR .'Microsoft_Office_Excel_Worksheet1',$folder . DIRECTORY_SEPARATOR .'ppt' . DIRECTORY_SEPARATOR .'embeddings' . DIRECTORY_SEPARATOR .'Microsoft_Office_Excel_Worksheet1.xlsx');
+
+
+Zip("$folder",$presentationName);
+
+
+@unlink($folder . DIRECTORY_SEPARATOR .'ppt' . DIRECTORY_SEPARATOR .'embeddings' . DIRECTORY_SEPARATOR .'Microsoft_Office_Excel_Worksheet1.xlsx');
+$fpSheet = fopen(dirname(__FILE__). '' . DIRECTORY_SEPARATOR .'excel' . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR .'Microsoft_Office_Excel_Worksheet1' . DIRECTORY_SEPARATOR .'xl' . DIRECTORY_SEPARATOR .'worksheets' . DIRECTORY_SEPARATOR .'sheet1.xml','w+');
+fwrite($fpSheet, $oldSheetContents);
+fclose($fpSheet);
+
+$fpChart = fopen(dirname(__FILE__). '' . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR .'ppt' . DIRECTORY_SEPARATOR .'charts' . DIRECTORY_SEPARATOR .'chart1.xml','w+');
+fwrite($fpChart,$oldChartContents);
+fclose($fpChart);       
+ 
+$fpSharedStrings = fopen(dirname(__FILE__). '' . DIRECTORY_SEPARATOR .'excel' . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR .'Microsoft_Office_Excel_Worksheet1' . DIRECTORY_SEPARATOR .'xl' . DIRECTORY_SEPARATOR .'sharedStrings.xml','w+');
+fwrite($fpSharedStrings,$oldSharedStringContents);
+fclose($fpSharedStrings);
+
+
+header("Pragma: public"); // required
+header("Expires: 0");
+header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+header("Cache-Control: private",false); // required for certain browsers
+header("Content-Type: application/vnd.openxmlformats-officedocument.presentationml.presentation");
+// change, added quotes to allow spaces in filenames, by Rajkumar Singh
+header("Content-Disposition: attachment; filename=\"".basename($presentationName)."\";" );
+header("Content-Transfer-Encoding: binary");
+header("Content-Length: ".filesize($presentationName));
+readfile("$presentationName");
+@unlink($presentationName);   
+       
+       
+       
+function Zip($source, $destination)
+{
+    if (extension_loaded('zip') === true)
+    {
+        if (file_exists($source) === true)
+        {
+                $zip = new ZipArchive();
+
+                if ($zip->open($destination, ZIPARCHIVE::CREATE) === true)
+                {
+                        //$source = realpath($source);
+
+                        if (is_dir($source) === true)
+                        {
+
+                                $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($source), RecursiveIteratorIterator::LEAVES_ONLY);
+                                foreach ($files as $fullFileName => $file)
+                                {                               
+                                        $file = $fullFileName;
+                                        if (is_dir($file) === true)
+                                        {
+                                                $zip->addEmptyDir($emptyName =  str_replace($source , '', $file . '/'));
+                                        }
+
+                                        else if (is_file($file) === true)
+                                        {
+
+                                            $file2 = str_replace($source , '', $file);
+                                            if (substr($file2,0,1) == "/" OR substr($file2,0,1) == '\\')
+                                                $file2 = substr($file2,1,strlen($file2));
+                                            //echo $file2 . PHP_EOL;
+                                                $zip->addFromString($file2, file_get_contents($file));
+                                        }
+                                }
+                        }
+
+                        else if (is_file($source) === true)
+                        {
+                                $zip->addFromString(basename($source), file_get_contents($source));
+                        }
+                } else {
+                    echo "Cannot zip the $destination";
+                }
+
+                return $zip->close();
+        } else {
+            echo "Source ($source) Not found";
+        }
+    }
+
+    return false;
+}
