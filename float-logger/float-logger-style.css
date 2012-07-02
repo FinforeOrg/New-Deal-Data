@@ -1,0 +1,26 @@
+#float-logger {
+position: fixed;
+top: 0px;
+right: 0px;
+border: 1px solid #bbbbbb;
+padding: 6px;
+color: #000000;
+z-index: 999;
+font-family:Verdana, Arial, Helvetica, sans-serif;
+font-size: 12px;
+}
+/*****
+style specified in ID override style specified in class
+***/
+.float-logger-expand{
+background: white;
+width: 400px;
+height: 400px;
+overflow: auto;
+}
+.float-logger-collapsed{
+background: red;
+width: 10px;
+height: 10px;
+overflow: none;
+}
