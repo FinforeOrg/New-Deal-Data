@@ -1,0 +1,74 @@
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+  <tr>
+    <td width="48%">Price at end of first day's trading: </td>
+    <td>First day of trading:</td>
+  </tr>
+  <tr>
+    <td><label for="price_at_end_of_1st_day"></label>
+    <input type="text" name="price_at_end_of_1st_day" id="price_at_end_of_1st_day" class="std"></td>
+    <td><label for="first_day_of_trading"></label>
+    <input type="text" name="first_day_of_trading" id="first_day_of_trading" class="date"></td>
+  </tr>
+  <tr>
+    <td>Performance on first day (%):</td>
+    <td>Listed on which stock exchange:</td>
+  </tr>
+  <tr>
+    <td><label for="performance_on_first_day"></label>
+    <input type="text" name="performance_on_first_day" id="performance_on_first_day" class="std"></td>
+    <td><label for="performance_on_first_day"></label>
+    <input type="text" name="ipo_stock_exchange" id="ipo_stock_exchange" class="std"></td>
+  </tr>
+  <tr>
+    <td colspan="2">&nbsp;</td>
+  </tr>
+  <tr>
+    <td>Fee (Base):</td>
+    <td>Fee (incentive):</td>
+  </tr>
+  <tr>
+    <td><label for="fee_base"></label>
+    <input type="text" name="fee_base" id="fee_base" class="std"></td>
+    <td><label for="fee_incentive"></label>
+    <input type="text" name="fee_incentive" id="fee_incentive" class="std"></td>
+  </tr>
+  <!--/////////////////////////
+  sng:12/mar/2012
+  we will only use a single 'note' textarea
+  <tr>
+    <td colspan="2">
+        <div style="margin: 10px 60px;">
+             Enter additional information on this transaction:<br>
+            <textarea name="additional_information_details_ipo" cols="" rows="" style="width: 100%; height: 150px;"></textarea>
+        </div>    
+    </td>
+  </tr>
+  ///////////////////////////-->
+  <tr>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+<script>
+				 $( "#ipo_stock_exchange" ).autocomplete({
+        source: "ajax/sugest_a_deal_search_stock_exchange.php",
+        minLength: 1,
+        select: function( event, ui ) {
+			
+            
+        }
+    }).data( "autocomplete" )._renderItem = function( ul, item ) {
+            return $( "<li></li>" )
+                .data( "item.autocomplete", item )
+                .append( "<a>" + item.label+" </a>" )
+                .appendTo( ul );
+    };
+	</script>

@@ -1,0 +1,90 @@
+                    <table cellspacing="0" cellpadding="4" border="0" width="100%">
+                      <tbody><tr>
+                        <td>Deal Value  (in Local Currency Millions):</td>
+                        <td>Deal Size (in USD Millions):</td>
+                      </tr>
+                      <tr>
+                        <td><input type="text" id="deal_value" class="std special" name="deal_value"></td>
+                        <td><input type="text" class="std special" id="deal_size" name="deal_size"></td>
+                      </tr>
+                      <tr>
+                        <td width="48%">Local Currency:</td>
+                        <td>Local Currency per 1 USD:</td>
+                        </tr>
+                      <tr>
+                        <td><input type="text" class="std special" id="local_currency" name="local_currency"></td>
+                        <td><input type="text" class="std special" id="local_currency_rate" name="local_currency_rate"></td>
+                        </tr>
+                      <tr>
+                        <td colspan="2"><hr class="orange" /></td>
+                        </tr>
+                      <tr>
+                        <td>Number shares sold (millions):</td>
+                        <td>Current number of shares in issue (millions, if applicable):</td>
+                      </tr>
+                      <tr>
+                        <td> <input type="text" name="nr_shares_sold" id="nr_shares_sold" class="std"></td>
+                        <td>  <input type="text" name="nr_shares_in_issue" id="nr_shares_in_issue" class="std"> </td>
+                      </tr>
+					  <!--////////////////////////////////////
+					  sng:29/july/2011
+					  Client wants a Issue Price / Rights Price field here
+					  ///////////////////////////////////////////-->
+                      <tr>
+                        <td>Subscription Ratio:</td>
+                        <td>Issue Price / Rights Price:</td>
+                      </tr>
+                      <tr>
+                        <td><input type="text" name="subscription_ratio" id="subscription_ratio" class="std"></td>
+                        <td><input type="text" name="offer_price" id="offer_price" class="std"></td>
+                      </tr>
+					  <!--/////////////////////////
+					  sng:12/mar/2012
+					  we will only use a single 'note' textarea
+                      <tr>
+                        <td colspan="2"><div style="margin: 10px 60px;">Additional information on take-up of rights by existing shareholders:<br>
+                          <textarea style="width: 100%; height: 150px;" rows="" cols="" name="take_up_additional_info"></textarea>
+                        </div></td>
+                        </tr>
+						///////////////////////////-->
+                      <tr>
+                        <td>Free-float (%) post transaction:</td>
+                        <td>Price prior to announcement:</td>
+                      </tr>
+                      <tr>
+                        <td><input type="text" name="free_float_post_transaction" id="free_float_post_transaction" class="std"></td>
+                        <td><input type="text" name="price_prior_to_announcement" id="price_prior_to_announcement" class="std"></td>
+                      </tr>
+                      <tr>
+                        <td>&nbsp;</td>
+                        <td>Date prior to announcement:</td>
+                      </tr>
+                      <tr>
+                        <td>&nbsp;</td>
+                        <td><input type="text" name="date_prior_to_announcement" id="date_prior_to_announcement" class="date"></td>
+                      </tr>
+                      <tr>
+                        <td>Theoretical ex-Rights Price (TERP):</td>
+                        <td>Premium/ -Discount to TERP %:</td>
+                      </tr>
+                      <tr>
+                        <td><input type="text" name="terp" id="terp" class="std special"></td>
+                        <td><input type="text" name="premium_discount_to_terp" id="premium_discount_to_terp" class="std"></td>
+                      </tr>
+                    </tbody>
+                 </table>
+				 <script>
+				 $( "#local_currency" ).autocomplete({
+        source: "ajax/suggest_a_deal_search_currency.php",
+        minLength: 1,
+        select: function( event, ui ) {
+			
+            
+        }
+    }).data( "autocomplete" )._renderItem = function( ul, item ) {
+            return $( "<li></li>" )
+                .data( "item.autocomplete", item )
+                .append( "<a>" + item.label + " - "+item.name+" </a>" )
+                .appendTo( ul );
+    };
+	</script>

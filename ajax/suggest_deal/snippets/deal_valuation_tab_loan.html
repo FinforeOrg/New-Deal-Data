@@ -1,0 +1,37 @@
+                    <table cellspacing="0" cellpadding="4" border="0" width="100%">
+                      <tbody><tr>
+                        <td>Facility size  (in Local Currency Millions):</td>
+                        <td>Facility size  (in USD Millions):</td>
+                      </tr>
+                      <tr>
+                        <td><input type="text" id="facility_size_local" class="std special" name="deal_value"></td>
+                        <td><input type="text" class="std special" id="facility_size" name="deal_size"></td>
+                      </tr>
+                      <tr>
+                        <td width="48%">Local Currency:</td>
+                        <td>Local Currency per 1 USD:</td>
+                        </tr>
+                      <tr>
+                        <td><input type="text" class="std special" id="local_currency" name="local_currency"></td>
+                        <td><input type="text" class="std special" id="local_currency_rate" name="local_currency_rate"></td>
+                        </tr>
+                      <tr>
+                        <td colspan="2">&nbsp;</td>
+                      </tr>
+                    </tbody>
+                 </table>
+				 <script>
+				 $( "#local_currency" ).autocomplete({
+        source: "ajax/suggest_a_deal_search_currency.php",
+        minLength: 1,
+        select: function( event, ui ) {
+			
+            
+        }
+    }).data( "autocomplete" )._renderItem = function( ul, item ) {
+            return $( "<li></li>" )
+                .data( "item.autocomplete", item )
+                .append( "<a>" + item.label + " - "+item.name+" </a>" )
+                .appendTo( ul );
+    };
+	</script>

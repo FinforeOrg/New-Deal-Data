@@ -1,0 +1,196 @@
+<?php
+require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/include/global.php');
+require_once(dirname(dirname(dirname(dirname(__FILE__)))) . "/classes/class.company.php");
+$success = $g_company->get_all_sector_list($g_view['sector_list'],$g_view['sector_count']); 
+$success = $g_company->get_all_industry_list($g_view['industry_list'],$g_view['industry_count']); 
+?>
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+<!--/////////////////////////////////////////////////
+  sng:12/july/2011
+  When this button is clicked, a check mark is placed. However, when it is clicked again, the check mark remains (but the
+  server does not get the value, which is correct since I have unchecked it
+  We have created a function to deal with this.
+  Instead of togleButton(), we use toggle_single_button() and pass both the element and the id;
+  /////////////////////////////////////////////////////////-->
+<!--//////////////////////////////////////////////////////////
+sng:7/feb/2012
+we no longer need underlying security since we now add the security as a participant in the deal with proper role
+///////////////////////////////////////////////////////////////////////-->
+	
+  <tr>
+    <td>Year to Maturity:</td>
+    <td>End Date</td>
+  </tr>
+  <tr>
+    <td><input type="text" name="year_to_maturity" id="year_to_maturity" class="std special"></td>
+    <td><input type="text" name="end_date" id="end_date" class="date"></td>
+  </tr>
+  <tr>
+    <td>Coupon:</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><input type="text" name="coupon" id="coupon" class="std special"></td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>Current Rating:</td>
+    <td>Format:</td>
+  </tr>
+  <tr>
+    <td><input type="text" name="current_rating" id="current_rating" class="std special" value=""></td>
+    <td><input type="text" name="bond_format" id="bond_format" class="std special"></td>
+  </tr>
+  <tr>
+    <td>Guarantor: </td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><input type="text" name="guarantor" id="guarantor" class="std special" value=""></td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>Collateral:</td>
+    <td>Seniority:</td>
+  </tr>
+  <tr>
+    <td><input type="text" name="collateral" id="collateral" class="std special"></td>
+    <td><input type="text" name="seniority" id="seniority" class="std special"></td>
+  </tr>
+  <tr>
+    <td>Years to Call (if applicable)</td>
+    <td>Call Date:</td>
+  </tr>
+  <tr>
+    <td><input type="text" name="year_to_call" id="year_to_call" class="std special"></td>
+    <td><input type="text" name="call_date" id="call_date" class="date" value=""></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <!--/////////////////////////
+  sng:12/mar/2012
+  we will only use a single 'note' textarea
+  <tr>
+    <td colspan="2"><div style="margin: 10px 60px;"> Enter any additional information call / put options (if applicable) <br>
+      <textarea style="width: 100%; height: 150px;" rows="" cols="" name="additional_call_details"></textarea>
+    </div></td>
+  </tr>
+  ///////////////////////////-->
+  <tr>
+    <td>Redemption price (if applicable, as % of Issue Price):</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><input type="text" name="redemption_price" id="redemption_price" class="std special"></td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td colspan="2"><hr class="orange" /></td>
+  </tr>
+  <tr>
+    <td>Reference Price (if applicable):</td>
+    <td>Conversion Price  (if applicable):</td>
+  </tr>
+  <tr>
+    <td><input type="text" name="reference_price" id="reference_price" class="std"></td>
+    <td><input type="text" name="conversion_price" id="conversion_price" class="std"></td>
+  </tr>
+  <tr>
+    <td>Currency of Reference price (if different from deal currency)</td>
+    <td>Conversion Premium (%, if applicable):</td>
+  </tr>
+  <tr>
+    <td><input type="text" class="std" id="currency_reference_price" name="currency_reference_price"></td>
+    <td><input type="text" name="conversion_premium" id="conversion_premium" class="std"></td>
+  </tr>
+  <tr>
+    <td>Number Shares Underlying  (millions, if applicable):</td>
+    <td>Current number of shares in issue  (millions, if applicable):</td>
+  </tr>
+  <tr>
+    <td><input type="text" name="number_shares" id="number_shares" class="std"></td>
+    <td><input type="text" name="current_number_of_shares_in_issue" id="current_number_of_shares_in_issue" class="std"></td>
+  </tr>
+  <tr>
+    <td>Average Daily Trading Volume  (millions, if applicable):</td>
+    <td>Underlying shares versus ADTV  (millions, if applicable):</td>
+  </tr>
+  <tr>
+    <td><input type="text" name="avg_daily_trading_volume" id="avg_daily_trading_volume" class="std"></td>
+    <td><input type="text" name="shares_vs_adtv" id="shares_vs_adtv" class="std"></td>
+  </tr>
+  <tr>
+    <td>Fee (Gross):</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><input type="text" name="fee_gross" id="fee_gross" class="std special" value=""></td>
+    <td>&nbsp;</td>
+  </tr>
+  <!--/////////////////////////////////////////////////
+  sng:12/july/2011
+  When this button is clicked, a check mark is placed. However, when it is clicked again, the check mark remains (but the
+  server does not get the value, which is correct since I have unchecked it
+  We have created a function to deal with this.
+  Instead of togleButton(), we use toggle_single_button() and pass both the element and the id;
+  /////////////////////////////////////////////////////////-->
+  <tr>
+    <td colspan="2">
+      <input type="checkbox" name="divident_protection_mechanism" id="divident_protection_mechanism" class="button_checkbox">
+    <label for="divident_protection_mechanism" onclick="toggle_single_button(this,'divident_protection_mechanism');"> Dividend Protection Mechanism (please give details)</label></td>
+  </tr>
+   <!--/////////////////////////
+  sng:12/mar/2012
+  we will only use a single 'note' textarea
+  <tr>
+    <td colspan="2"><div style="margin: 10px 60px;"> Enter any additional informationon this transaction:<br>
+      <textarea style="width: 100%; height: 150px;" rows="" cols="" name="additional_information"></textarea>
+    </div></td>
+  </tr>
+  ///////////////////////////-->
+  <tr>
+    <td colspan="2">&nbsp;</td>
+  </tr>
+</table>
+<script language="text/javascript">
+/**********************************************************
+sng:20/oct/2011
+About underlying security
+For example, Vodafone could issue a convertible where the security is some other company (if it owns shares in the other company, e.g. Verizon Wireless). 
+Then IF the conversion happens the investor's convertible bond entitles them, not to Vodafone shares but to the shares that Vodafone owns in Verizon Wireless.
+This means, name of the underlying security is a company and we need the company auto suggest
+************************************************************/
+/************************************
+sng:7/feb/2012
+we no longer need underlying security since we now add the security as a participant in the deal with proper role
+****************************************/
+	
+$(function() {
+    /************************************
+	sng:7/feb/2012
+	we no longer need underlying security since we now add the security as a participant in the deal with proper role
+	****************************************/
+    
+	$('#divident_protection_mechanism').button()
+	
+	
+	$( "#currency_reference_price" ).autocomplete({
+        source: "ajax/suggest_a_deal_search_currency.php",
+        minLength: 1,
+        select: function( event, ui ) {
+			
+            
+        }
+    }).data( "autocomplete" )._renderItem = function( ul, item ) {
+            return $( "<li></li>" )
+                .data( "item.autocomplete", item )
+                .append( "<a>" + item.label + " - "+item.name+" </a>" )
+                .appendTo( ul );
+    };
+	
+});
+</script>
+
+

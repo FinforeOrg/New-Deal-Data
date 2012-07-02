@@ -1,0 +1,63 @@
+<table width="100%" border="0" cellpadding="4" cellspacing="0">
+  <tbody>
+    <tr>
+      <td width="48%">Subscription rate (%):</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td><input type="text" name="subscription_rate" id="subscription_rate" class="std"></td>
+      <td>&nbsp;</td>
+    </tr>
+	<!--/////////////////////////////////////////////////
+  sng:20/july/2011
+  When this button is clicked, a check mark is placed. However, when it is clicked again, the check mark remains (but the
+  server does not get the value, which is correct since I have unchecked it
+  We have created a function to deal with this.
+  Instead of togleButton(), we use toggle_single_button() and pass both the element and the id;
+  
+  Also, the num shares sold in rump and price of rump placement appears only if the rump placement is clicked
+  /////////////////////////////////////////////////////////-->
+    <tr>
+      <td colspan="2">
+        <input type="checkbox" name="rump_placement" id="rump_placement" class="button_checkbox">
+      <label for="rump_placement" onclick="toggle_single_button(this,'rump_placement')">Rump placement</label>
+	  <table width="100%" border="0" id="rump_placement_info" style="display:none">
+	  	<tr>
+		  <td style="width:48%;">Number shares sold in rump (million) (if applicable):</td>
+		  <td>Price of rump placement (if applicable):</td>
+		</tr>
+		<tr>
+		  <td><input type="text" name="nr_shares_sold_in_rump" id="nr_shares_sold_in_rump" class="std"></td>
+		  <td><input type="text" name="price_of_rump_placement" id="price_of_rump_placement" class="std"></td>
+		</tr>
+	  </table>
+	  </td>
+    </tr>
+    
+    <tr>
+      <td>Fee (Gross):</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td><input type="text" name="fee_gross" id="fee_gross" class="std"></td>
+      <td>&nbsp;</td>
+    </tr>
+	<!--/////////////////////////
+	  sng:12/mar/2012
+	  we will only use a single 'note' textarea
+    <tr>
+      <td colspan="2"><div style="margin: 10px 60px;"> Enter additional information on this transaction:<br>
+        <textarea style="width: 100%; height: 150px;" rows="" cols="" name="additional_information_details_ri"></textarea>
+      </div></td>
+    </tr>
+	///////////////////////////-->
+  </tbody>
+</table>
+
+<script language="text/javascript">
+$(function() {
+	$('#rump_placement').button().click(function(){
+		$('#rump_placement_info').toggle();
+	});
+});
+</script>

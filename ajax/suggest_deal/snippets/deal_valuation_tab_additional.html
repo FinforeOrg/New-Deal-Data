@@ -1,0 +1,88 @@
+                    <table cellspacing="0" cellpadding="4" border="0" width="100%">
+                      <tbody><tr>
+                        <td>Deal Value  (in Local Currency Millions):</td>
+                        <td>Deal Size (in USD Millions):</td>
+                      </tr>
+                      <tr>
+                        <td><input type="text" id="deal_value" class="std special" name="deal_value"></td>
+                        <td><input type="text" class="std special" id="deal_size" name="deal_size"></td>
+                      </tr>
+                      <tr>
+                        <td width="48%">Local Currency:</td>
+                        <td>Local Currency per 1 USD:</td>
+                        </tr>
+                      <tr>
+                        <td><input type="text" class="std special" id="local_currency" name="local_currency"></td>
+                        <td><input type="text" class="std special" id="local_currency_rate" name="local_currency_rate"></td>
+                        </tr>
+                      <tr>
+                        <td colspan="2"><hr class="orange" /></td>
+                        </tr>
+                      <tr>
+                        <td>Transaction Price:</td>
+                        <td>&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td><input type="text" name="transaction_price" id="transaction_price" class="std"/></td>
+                        <td>&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td>Number shares sold (millions):</td>
+                        <td>Primary shares sold (millions, if applicable):</td>
+                      </tr>
+                      <tr>
+                        <td><input type="text" name="number_shares_sold" id="number_shares_sold" class="std" /></td>
+                        <td><input type="text" name="primary_shares_sold" id="primary_shares_sold" class="std"/></td>
+                      </tr>
+                      <tr>
+                        <td>Secondary shares sold (millions, if applicable):</td>
+                        <td>No. of shares post-transactions (millions):</td>
+                      </tr>
+                      <tr>
+                        <td><input type="text" name="secondary_shares_sold" id="secondary_shares_sold" class="std"/></td>
+                        <td><input type="text" name="nr_shares_post_transaction" id="nr_shares_post_transaction"  class="std" /></td>
+                      </tr>
+                      <tr>
+                        <td>Free-float (%) post transaction:</td>
+                        <td>&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td><input type="text" name="free_float_post_transaction" id="free_float_post_transaction" class="std"/></td>
+                        <td>&nbsp;</td>
+                      </tr>
+					  <!--/////////////////////////
+					  sng:12/mar/2012
+					  we will only use a single 'note' textarea
+                      <tr>
+                        <td colspan="2">
+                            <div style="margin: 10px 60px;">Name of selling shareholders  (if applicable):<br>
+                                <textarea name="name_of_selling_shareholders" cols="" rows="" style="width: 100%; height: 150px;"></textarea>
+                            </div>                       
+                        </td>
+                        </tr>
+						///////////////////////////-->
+                      <tr>
+                        <td>Average Daily Trading Value (ADTV, millions):</td>
+                        <td>Shares sold versus ADTV:</td>
+                      </tr>
+                      <tr>
+                        <td><input type="text" name="avg_daily_trading_value" id="avg_daily_trading_value" class="std"></td>
+                        <td><input type="text" name="shares_sold_vs_adtv" id="shares_sold_vs_adtv" class="std"></td>
+                      </tr>
+                    </tbody>
+                 </table>
+				 <script>
+				 $( "#local_currency" ).autocomplete({
+        source: "ajax/suggest_a_deal_search_currency.php",
+        minLength: 1,
+        select: function( event, ui ) {
+			
+            
+        }
+    }).data( "autocomplete" )._renderItem = function( ul, item ) {
+            return $( "<li></li>" )
+                .data( "item.autocomplete", item )
+                .append( "<a>" + item.label + " - "+item.name+" </a>" )
+                .appendTo( ul );
+    };
+	</script>
