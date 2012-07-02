@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<error>
+  <status>401</status>
+  <timestamp>1279053205658</timestamp>
+  <error-code>0</error-code>
+  <message>[unauthorized]. The token used in the OAuth request is not valid</message>
+</error>
