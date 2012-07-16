@@ -131,13 +131,14 @@ function my_firm_cred_alert(){
 		
 			<ul id="menu"><!-- Begin Mega Menu -->
 
-				<li style="width:185px;"><a href="#" class="drop">Suggest a Deal</a><!-- Begin Item -->
+				<li style="width:185px;"><a href="#" class="drop">Suggest / Find a deal</a><!-- Begin Item -->
 					<div class="drop3columns dropcontent dropfirst" style="width:184px;"><!-- Begin Item Container -->
 						<div class="col_2">
 							<ul>
 								<li><a href="suggest_a_deal_simple.php">Simple Submission</a></li>
 								<li><a href="suggest_a_deal.php">Detailed Submission</a></li>
-								
+								<li><a href="company.php">Lookup a Company</a></li>
+								<li><a href="deal.php">Lookup a Deal</a></li>
 							</ul>
 						</div>
 					</div><!-- End Item Container -->
@@ -147,7 +148,7 @@ function my_firm_cred_alert(){
 					<div class="drop3columns dropcontent dropfirst" style="width:184px;"><!-- Begin Item Container -->
 						<div class="col_2">
 							<ul>
-								<li><a href="company.php">Lookup a Company</a></li>
+								
 								<li><a href="deal.php">Lookup a Deal</a></li>
 							</ul>
 						</div>
@@ -312,14 +313,14 @@ function my_firm_cred_alert(){
         <td colspan="2"><table width="100%" border="0" cellpadding="0" cellspacing="0" class="footer">
           <tr>
             <td><a href="index.php" >Home</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="<?php echo $g_http_path;?>/aboutus.php">About Us</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="<?php echo $g_http_path;?>/blog.php">News &amp; Demos </a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="<?php echo $g_http_path;?>/privacy.php">Privacy Policy</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="<?php echo $g_http_path;?>/legal.php"> Legal Notices</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="" id="site-contactus2">Contact Us</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="suggest_a_deal.php">Suggest A Deal</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="help.php">Help</a><br />
-            Copyright &copy; <?php echo date('Y');?> Finfore Limited<br />
+            Copyright &copy; <?php echo date('Y');?> deal-data.com<br />
 			<?php
 			/***************
 			sng:23/mar/2011
 			put help in footer
 			************/
 			?>
-			<div id="footer_tagline">Data-CX is a service provided by <a href="http://www.finfore.info" target="_blank" class="footer_tagline_a">Finfore Limited</a></div>
+			<div id="footer_tagline">Deal-data is a service provided by <a href="http://www.finfore.info" target="_blank" class="footer_tagline_a">Finfore Limited</a></div>
 			</td>
           </tr>
         </table></td>
