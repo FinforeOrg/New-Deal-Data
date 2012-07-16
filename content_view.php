@@ -144,12 +144,11 @@ function my_firm_cred_alert(){
 					</div><!-- End Item Container -->
 				</li><!-- End Item -->
 				
-				<li style="width:185px;"><a href="#" class="drop">Companies &amp; Deals</a><!-- Begin Item -->
+				<li style="width:185px;"><a href="#" class="drop">Productivity Tools</a><!-- Begin Item -->
 					<div class="drop3columns dropcontent dropfirst" style="width:184px;"><!-- Begin Item Container -->
 						<div class="col_2">
 							<ul>
-								
-								<li><a href="deal.php">Lookup a Deal</a></li>
+								<li><a href="watchlist.php">My Watchlist</a></li>
 							</ul>
 						</div>
 					</div><!-- End Item Container -->
