@@ -52,7 +52,7 @@ $(function(){
         'make_me_top_match_chart_view.php',
         'issuance_data_view.php',
         'ma_metrics_view.php',
-		'league_table.php'
+		'league_table_view.php'
     );
     if (in_array($g_view['content_view'], $pagesWithCharts)) { ?>
   <!--[if IE]><script language="javascript" type="text/javascript" src="js/jqplot/excanvas.min.js"></script><![endif]-->
