@@ -159,7 +159,7 @@ function my_firm_cred_alert(){
 						<div class="drop3columns dropcontent" style="width:156px;"><!-- Begin Item Container -->
 							<div class="col_2">
 								<ul>
-									<li><a href="index.php">League Tables</a></li>
+									<li><a href="league_table.php">League Tables</a></li>
 								</ul>
 							</div>
 						</div><!-- End Item Container -->
