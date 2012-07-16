@@ -377,7 +377,7 @@ function download(url, data, method){
   </tr>
 </table>
 </form> 
-<?php /********<link rel="stylesheet" href="css/savedSearches.css" type="text/css" media="screen" />********/ ?>
+<link rel="stylesheet" href="css/savedSearches.css" type="text/css" media="screen" />
 
 
 
