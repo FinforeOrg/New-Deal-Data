@@ -10,6 +10,17 @@ $g_view['has_verified_deal'] = false;
 <p>To the left, you can see a simple template, where any registered user, from a leading bank or advisory firm, may submit a notification of a new transaction. We capture the basic elements of the transaction and notify other deal participants of the submission. This allows cross-verification and avoids duplication of effort.</p>
 <p>To the right, you can see high level information of the latest deals submitted to Data CX. We provide this snapshot, to help an advisor avoid duplication of effort. It also allows the advisor check the details provided, in case there are corrections or additional information that merits inclusion.</p>
 </div>
+<?php
+/********************
+sng:16/july/2012
+Now we are embedding the league table view here
+**********************/
+?>
+<div>
+<?php
+require("embedded_league_table_view.php");
+?>
+</div>
 <table style="width:100%;" cellpadding="0" cellspacing="0">
 <tr>
 <td class="deal_page_h2" style="text-align:center; width:50%">Simple Submission Template</td>

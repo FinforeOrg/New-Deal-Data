@@ -1,6 +1,12 @@
 <?php
 require_once("include/global.php");
 require_once("classes/class.transaction.php");
+
+/***************
+sng:16/july/2012
+Now we embedd the league table here also
+*************/
+require("embedded_league_table.php");
 /****************************************************
 We get 5 most recent M&A deals, 5 most recent Equity deals, 5 most recent Debt deals
 *******************/
