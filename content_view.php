@@ -132,7 +132,7 @@ function my_firm_cred_alert(){
 			<ul id="menu"><!-- Begin Mega Menu -->
 
 				<li style="width:185px;"><a href="#" class="drop">Suggest / Find a deal</a><!-- Begin Item -->
-					<div class="drop3columns dropcontent dropfirst" style="width:184px;"><!-- Begin Item Container -->
+					<div class="drop3columns dropcontent dropfirst" style="width:183px;"><!-- Begin Item Container -->
 						<div class="col_2">
 							<ul>
 								<li><a href="suggest_a_deal_simple.php">Simple Submission</a></li>
@@ -144,8 +144,8 @@ function my_firm_cred_alert(){
 					</div><!-- End Item Container -->
 				</li><!-- End Item -->
 				
-				<li style="width:185px;"><a href="#" class="drop">Productivity Tools</a><!-- Begin Item -->
-					<div class="drop3columns dropcontent dropfirst" style="width:184px;"><!-- Begin Item Container -->
+				<li style="width:160px;"><a href="#" class="drop">Productivity Tools</a><!-- Begin Item -->
+					<div class="drop3columns dropcontent dropfirst" style="width:158px;"><!-- Begin Item Container -->
 						<div class="col_2">
 							<ul>
 								<li><a href="watchlist.php">My Watchlist</a></li>
@@ -154,8 +154,15 @@ function my_firm_cred_alert(){
 					</div><!-- End Item Container -->
 				</li><!-- End Item -->
 				
-				<li><a href="watchlist.php">My Watchlist</a><!-- Begin Item -->
-				</li><!-- End Item -->
+				<li style="width:158px;"><a href="#" class="drop">Pitchbook Pages</a><!-- Begin Item -->
+						<div class="drop3columns dropcontent" style="width:156px;"><!-- Begin Item Container -->
+							<div class="col_2">
+								<ul>
+									<li><a href="index.php">League Tables</a></li>
+								</ul>
+							</div>
+						</div><!-- End Item Container -->
+					</li><!-- End Item -->
 				
 				<li style="width:165px;"><a href="#" class="drop">Competitors</a><!-- Begin Item -->
 					<div class="drop3columns dropcontent dropfirst" style="width:164px;"><!-- Begin Item Container -->
