@@ -25,6 +25,7 @@ if (isset($_REQUEST['from']) && $_REQUEST['from'] == 'oneStop') {
 }
 
 require_once("default_metatags.php");
+$g_view['page_heading'] = "League Table";
 $g_view['content_view'] = "league_table_view.php";
 require("content_view.php");
 ?>

@@ -154,7 +154,7 @@ function download(url, data, method){
 };
 </script>
 
-<table width="100%" cellspacing="0" cellpadding="0" border="0">
+<?php /*?><table width="100%" cellspacing="0" cellpadding="0" border="0">
     <tbody>
         <tr>
             <td style="text-align: left;">
@@ -167,17 +167,17 @@ function download(url, data, method){
             <td style="text-align: right;"> 
                 <a href="top_firms.php">Details of the top banks and law firms</a>
             </td>
-			*********************************************/
+			*********************************************
 			?>
         </tr>
     </tbody>
-</table>
+</table><?php */?>
 <div style="display: none;">   <pre>  <?php var_dump($_POST)?></pre></div>
 <form method="post" id="leagueTableForm" action='league_table_detail.php'>
 <table width="100%" border="0" cellspacing="5" cellpadding="5" class="registercontent">
     <tr>
-        <th width="49%">Customize your league table</th>
-        <th id="chart_caption"> Top 5 Banks based on number of deals</th>
+        <th width="49%">Run a league table analysis</th>
+        <th id="chart_caption">Top 5 Banks based on number of deals</th>
     </tr>
   <tr>
     <td>
