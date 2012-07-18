@@ -277,7 +277,23 @@ table.registercontent table{
 	margin: 10px 0;
 }
 
-
+/*************
+sng:18/july/2012
+******/
+.th_orange{
+	padding: 0 10px;
+	
+	background: #e86200;
+	color: #FFF;
+	
+	/**********
+	background: #CCCCCC;
+	color: #000000;
+	************/
+	font: normal 14px/32px Tahoma, Geneva, sans-serif;
+	text-align: left;
+}
+/***************************/
 
 table.footer{
 	height: 100px;
