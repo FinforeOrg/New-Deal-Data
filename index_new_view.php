@@ -23,8 +23,8 @@ require("embedded_league_table_view.php");
 </div>
 <table style="width:100%;" cellpadding="0" cellspacing="0">
 <tr>
-<td class="th_orange" style="width:50%">Simple Submission Template</td>
-<td class="th_orange" style="width:50%">Recent Submissions</td>
+<td class="th_orange" style="width:49%">Simple Submission Template</td>
+<td class="th_orange">Recent Submissions</td>
 </tr>
 <td style="padding-right:20px;">
 <?php
