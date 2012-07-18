@@ -153,11 +153,11 @@ $(function() {
 	Do the deal type magick
 	****/
     //$( ".radio" ).buttonset().click(function(idx){console.log('asdasd');$( ".radio" ).buttonset('refresh')});  ;    
-    $( ".radio_subcat" ).buttonset().click(function(){
-        $( ".radio_subsubcat :radio" ).each(function(idx){
+    $( ".SS_radio_subcat" ).buttonset().click(function(){
+        $( ".SS_radio_subsubcat :radio" ).each(function(idx){
             $(this).removeAttr('checked');
         })
-        $( ".radio_subsubcat" ).buttonset('refresh')        
+        $( ".SS_radio_subsubcat" ).buttonset('refresh')        
     }).change(function(){
         //console.log($(this).find('input:checked').val())
         //_selectedSubCategory = $(this).find('input:checked').val();
@@ -166,26 +166,26 @@ $(function() {
         updateFormFields();
     }); 
        
-    $( ".radio_cat" ).buttonset().click(function(){
-        $( ".radio_subcat :radio" ).each(function(idx){
+    $( ".SS_radio_cat" ).buttonset().click(function(){
+        $( ".SS_radio_subcat :radio" ).each(function(idx){
             $(this).removeAttr('checked');
         })
-        $( ".radio_subcat" ).buttonset('refresh')
+        $( ".SS_radio_subcat" ).buttonset('refresh')
     }).change(function(){
         _lastClickedButton = $(this).find('input:checked').val();
         updateFormFields();
     });  
-    $( ".radio_subsubcat" ).buttonset().change(function(){
+    $( ".SS_radio_subsubcat" ).buttonset().change(function(){
         _lastClickedButton = $(this).find('input:checked').val();
         updateFormFields();
         //console.log($(this).find('input:checked').val())
     });;
     
     /** 
-    * Hadle the case when a hidden sub sub cat is checked 
+    * Handle the case when a hidden sub sub cat is checked 
     */
-    $('#cats :radio').click(function() {
-        $('#cats :checked').each(function(idx){
+    $('#LT_cats :radio').click(function() {
+        $('#LT_cats :checked').each(function(idx){
             if (!$(this).is(':visible')) {
                 $(this).removeAttr('checked');
             }
@@ -273,30 +273,30 @@ function notify_category_change(){
 	update_note_box_label();
 }
 
-function categoryChanged(category) {
+function SS_categoryChanged(category) {
 
-    $('div.radio_subcat:visible').hide();  
-    $('#subCatsForCat' + category).show();
-    $('div.radio_subsubcat:visible').hide();
+    $('div.SS_radio_subcat:visible').hide();  
+    $('#SS_subCatsForCat' + category).show();
+    $('div.SS_radio_subsubcat:visible').hide();
 	data_submission_alert();
 	//category changed, we need to select sub and sub sub category
-	_curr_cat = $('#deal_cat_name'+category).val();
+	_curr_cat = $('#SS_deal_cat_name'+category).val();
 	_curr_sub_cat = "";
 	_curr_sub_sub_cat = "";
 	notify_category_change();
 }
-function subCategoryChanged(subCategory) {
+function SS_subCategoryChanged(subCategory) {
 
-    $('div.radio_subsubcat:visible').hide();
-    $('#subSubCatsForCat' + subCategory).show();  
+    $('div.SS_radio_subsubcat:visible').hide();
+    $('#SS_subSubCatsForCat' + subCategory).show();  
 	//sub cat changed, we need to select sub sub category
-	_curr_sub_cat = $('#deal_subCat_name'+subCategory).val();
+	_curr_sub_cat = $('#SS_deal_subCat_name'+subCategory).val();
 	_curr_sub_sub_cat = "";
 	notify_category_change();
 }
-function subSubCategoryChanged(subSubCategory){
+function SS_subSubCategoryChanged(subSubCategory){
 
-	_curr_sub_sub_cat = $('#deal_subSubCat_name'+subSubCategory).val();
+	_curr_sub_sub_cat = $('#SS_deal_subSubCat_name'+subSubCategory).val();
 	notify_category_change();
 }
 /****************
@@ -545,7 +545,7 @@ function submit_data(){
 
 <tr>
 	<td>
-		<div class="radio_cat" style="font-size:10px;">
+		<div class="SS_radio_cat" style="font-size:10px;">
 		<?php
 		/*******************
 		sng:25/jan/2012
@@ -556,21 +556,26 @@ function submit_data(){
 		*************************/
 		if (!isset($_POST['deal_cat_name'])) {
 			//$_POST['deal_cat_name'] = 'M&A';
+			$_POST['deal_cat_name'] = "";
 		}
 		if (!isset($_POST['deal_subcat1_name'])) {
 			//$_POST['deal_subcat1_name'] = 'Pending';
+			$_POST['deal_subcat1_name'] = "";
+		}
+		if(!isset($_POST['deal_subcat2_name'])){
+			$_POST['deal_subcat2_name'] = "";
 		}
 		$i = 1;
 		foreach($categories as $categoryName=>$subCats) :?>   
-			<input type="radio" id="deal_cat_name<?php echo $i?>" name="deal_cat_name" value="<?php echo $categoryName?>" onClick="categoryChanged(<?php echo $i?>)" <?php if($_POST['deal_cat_name']==$categoryName){?>checked<?php }?>/><label for="deal_cat_name<?php echo $i?>"><?php echo $categoryName?></label>
+			<input type="radio" id="SS_deal_cat_name<?php echo $i?>" name="deal_cat_name" value="<?php echo $categoryName?>" onClick="SS_categoryChanged(<?php echo $i?>)" <?php if($_POST['deal_cat_name']==$categoryName){?>checked<?php }?>/><label for="SS_deal_cat_name<?php echo $i?>"><?php echo $categoryName?></label>
 		<?php $i++;endforeach?>
 		</div>
 		<?php 
 		$i = 1; $j = 1;
 		foreach($categories as $subCategoryName=>$subCats) :?>
-			<div class="radio_subcat" style="font-size:10px;margin-top:5px;display: <?php if($_POST['deal_cat_name']==$subCategoryName){?>block<?php } else {?> none <?php }?>;" id="subCatsForCat<?php echo $i?>">   
+			<div class="SS_radio_subcat" style="font-size:10px;margin-top:5px;display: <?php if($_POST['deal_cat_name']==$subCategoryName){?>block<?php } else {?> none <?php }?>;" id="SS_subCatsForCat<?php echo $i?>">   
 			<?php foreach  ($subCats as $subCatName => $subSubCats) : ?>
-				<input type="radio" id="deal_subCat_name<?php echo $j?>" name="deal_subcat1_name" value="<?php echo ($subCatName == 'All') ? ''  : $subCatName?>" onClick="subCategoryChanged(<?php echo $j?>)" <?php if($_POST['deal_subcat1_name']==$subCatName){?>checked<?php }?>/><label for="deal_subCat_name<?php echo $j?>"><?php echo $subCatName?></label>
+				<input type="radio" id="SS_deal_subCat_name<?php echo $j?>" name="deal_subcat1_name" value="<?php echo ($subCatName == 'All') ? ''  : $subCatName?>" onClick="SS_subCategoryChanged(<?php echo $j?>)" <?php if($_POST['deal_subcat1_name']==$subCatName){?>checked<?php }?>/><label for="SS_deal_subCat_name<?php echo $j?>"><?php echo $subCatName?></label>
 			<?php $j++;endforeach;?> 
 			</div>
 		<?php $i++; endforeach;?>
@@ -579,10 +584,10 @@ function submit_data(){
 		$i = 1;$j = 1;$k = 1;
 		foreach($categories as $subCategoryName=>$subCats) :?>
 			<?php foreach  ($subCats as $subCatName => $subSubCats) : ?>
-				<div class="radio_subsubcat <?php echo "parent_$k"?>" style="font-size:10px;margin-top:5px; display:<?php if($_POST['deal_cat_name']==$subCategoryName && $_POST['deal_subcat1_name']==$subCatName){?>block<?php } else {?> none <?php }?>;" id="subSubCatsForCat<?php echo $j?>">   
+				<div class="SS_radio_subsubcat <?php echo "parent_$k"?>" style="font-size:10px;margin-top:5px; display:<?php if($_POST['deal_cat_name']==$subCategoryName && $_POST['deal_subcat1_name']==$subCatName){?>block<?php } else {?> none <?php }?>;" id="SS_subSubCatsForCat<?php echo $j?>">   
 				<?php foreach ($subSubCats as $key=>$name) : ?>
 					<?php if ($name == 'n/a') continue ?>
-					<input type="radio" id="deal_subSubCat_name<?php echo $i?>" name="deal_subcat2_name" value="<?php echo $name?>" onClick="subSubCategoryChanged(<?php echo $i?>)" <?php if($_POST['deal_subcat2_name']==$name){?>checked<?php }?>/><label for="deal_subSubCat_name<?php echo $i?>"><?php echo $name?></label>
+					<input type="radio" id="SS_deal_subSubCat_name<?php echo $i?>" name="deal_subcat2_name" value="<?php echo $name?>" onClick="SS_subSubCategoryChanged(<?php echo $i?>)" <?php if($_POST['deal_subcat2_name']==$name){?>checked<?php }?>/><label for="SS_deal_subSubCat_name<?php echo $i?>"><?php echo $name?></label>
 				<?php $i++;endforeach; ?> 
 				</div>
 			<?php $j++;endforeach;?> 
