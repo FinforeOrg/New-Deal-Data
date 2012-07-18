@@ -1,5 +1,5 @@
 <?php
-include("include/global.php");
+require_once("include/global.php");
 require_once("classes/class.company.php");
 require_once("classes/class.misc.php");
 require_once("classes/class.transaction.php");

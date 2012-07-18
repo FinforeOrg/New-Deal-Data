@@ -4,7 +4,7 @@ sng:16/july/2012
 Now we again need the league table page. We also show the league table form in the home page.
 We use the embedded_league_table.php file to keep a single copy of the code
 ************************/
-include("include/global.php");
+require_once("include/global.php");
 /************
 support for embedded league table
 **************/
