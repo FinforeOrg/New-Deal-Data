@@ -1,7 +1,18 @@
 <?php
 /****
 it is assumed that $_POST has submitted data
+
+sng:18/july/2012 Otherwise we set to blank
 *********/
+if(!isset($_POST['deal_cat_name'])){
+	$_POST['deal_cat_name'] = "";
+}
+if(!isset($_POST['deal_subcat1_name'])){
+	$_POST['deal_subcat1_name'] = "";
+}
+if(!isset($_POST['sector'])){
+	$_POST['sector'] = "";
+}
 //////////////////
 //fetch Category names
 $g_view['cat_list'] = array();

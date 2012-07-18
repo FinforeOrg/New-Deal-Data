@@ -224,7 +224,7 @@ function my_firm_cred_alert(){
 	  put colspan=2 in all the other places
 	  **************/
 	  
-	  if(!$_SESSION['is_member']){
+	  if(!isset($_SESSION['is_member'])||!$_SESSION['is_member']){
 	  	?>
 		<td style="vertical-align:middle">
 		<a href="login.php" class="btn_auto">LOGIN</a>

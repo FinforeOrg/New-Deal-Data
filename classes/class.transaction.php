@@ -2345,7 +2345,7 @@ class transaction{
 		get the deals that have the matching company as participant. The distinct clause eliminate duplicates.
 		the right join restrict the other joins to the selected deal ids only
 		********************/
-		if($search_data['top_search_term']!=""){
+		if(isset($search_data['top_search_term'])&&($search_data['top_search_term']!="")){
 			$q.= "right join (select distinct trc.transaction_id from ".TP."transaction_companies as trc left join ".TP."company as com on(trc.company_id=com.company_id) where com.name like '".mysql_real_escape_string($search_data['top_search_term'])."%') as p on(t.id=p.transaction_id)";
             
         }
@@ -2363,13 +2363,13 @@ class transaction{
             $q.= " and part.partner_id='".$search_data['partner_id']."'";
         }
         /************************************************************************************/
-        if($search_data['deal_cat_name']!=""){
+        if(isset($search_data['deal_cat_name'])&&($search_data['deal_cat_name']!="")){
             $q.=" and t.deal_cat_name = '".$search_data['deal_cat_name']."'";
         }
-        if($search_data['deal_subcat1_name']!=""){
+        if(isset($search_data['deal_subcat1_name'])&&($search_data['deal_subcat1_name']!="")){
             $q.=" and t.deal_subcat1_name = '".$search_data['deal_subcat1_name']."'";
         }
-        if($search_data['deal_subcat2_name']!=""){
+        if(isset($search_data['deal_subcat2_name'])&&($search_data['deal_subcat2_name']!="")){
             $q.=" and t.deal_subcat2_name = '".$search_data['deal_subcat2_name']."'";
         }
         /******************************************
@@ -2380,7 +2380,7 @@ class transaction{
         //if($search_data['year']!=""){
         //    $q.=" and year(t.date_of_deal) = '".$search_data['year']."'";
         //}
-        if($search_data['year']!=""){
+        if(isset($search_data['year'])&&($search_data['year']!="")){
             $year_tokens = explode("-",$search_data['year']);
             $year_tokens_count = count($year_tokens);
             if($year_tokens_count == 1){
@@ -2404,7 +2404,7 @@ class transaction{
 		we show only deals whose value is 0.0
 		see deal_search_filter_form_view.php for the options
 		***/
-		if($search_data['deal_size']!=""){
+		if(isset($search_data['deal_size'])&&($search_data['deal_size']!="")){
 			if($search_data['deal_size']=="0.0"){
 				$q.=" and t.value_in_billion=0.0";
 			}else{
@@ -2414,12 +2414,15 @@ class transaction{
 		/*******************************************************************
 		sng: 20/jan/2012
 		Now we have value range id for deal search.
+		
+		sng:18/july/2012
+		I think this should be taken from $search_data
 		**********/
-		if($_POST['value_range_id']!=""){
-			if($_POST['value_range_id']=="0"){
+		if(isset($search_data['value_range_id'])&&($search_data['value_range_id']!="")){
+			if($search_data['value_range_id']=="0"){
 				$q.=" and t.value_in_billion=0.0 AND t.value_range_id=0";
 			}else{
-				$q.=" and t.value_range_id='".$_POST['value_range_id']."'";
+				$q.=" and t.value_range_id='".$search_data['value_range_id']."'";
 			}
         }
         /************************************************************************
@@ -2437,10 +2440,10 @@ class transaction{
             $q.=" and c.industry = '".$search_data['industry']."'";
         }
         ****/
-        if($search_data['sector']!=""){
+        if(isset($search_data['sector'])&&($search_data['sector']!="")){
             $q.=" and t.deal_sector like '%".$search_data['sector']."%'";
         }
-        if($search_data['industry']!=""){
+        if(isset($search_data['industry'])&&($search_data['industry']!="")){
             $q.=" and t.deal_industry like '%".$search_data['industry']."%'";
         }
 		/***********
@@ -2471,7 +2474,7 @@ class transaction{
         if country is specified, region is overridden
         **/
         $country_filter = "";
-        if($search_data['country']!=""){
+        if(isset($search_data['country'])&&($search_data['country']!="")){
             /*******************************************************
             sng:30/Nov/2010
             No more the country of the HQ of the company doing the deal. Now use deal_country (which is a csv)
@@ -2480,7 +2483,7 @@ class transaction{
             $country_filter = "t.deal_country LIKE '%".$search_data['country']."%'";
             /*******************************************/
         }else{
-            if($search_data['region']!=""){
+            if(isset($search_data['region'])&&($search_data['region']!="")){
                 //get the country names for this region name
                 $region_q = "select cm.name from ".TP."region_master as rm left join ".TP."region_country_list as rc on(rm.id=rc.region_id) left join ".TP."country_master as cm on(rc.country_id=cm.id) where rm.name='".$search_data['region']."'";
                 $region_q_res = mysql_query($region_q);

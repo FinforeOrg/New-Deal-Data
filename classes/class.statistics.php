@@ -1075,23 +1075,23 @@ class statistics{
         }
         $filter_trans = "";
         $filter_trans_clause = "";
-        if($stat_params['deal_cat_name']!=""){
+        if(isset($stat_params['deal_cat_name'])&&($stat_params['deal_cat_name']!="")){
             $filter_trans_clause.=" and deal_cat_name='".$stat_params['deal_cat_name']."'";
         }
-        if($stat_params['deal_subcat1_name']!=""){
+        if(isset($stat_params['deal_subcat1_name'])&&($stat_params['deal_subcat1_name']!="")){
             $filter_trans_clause.=" and deal_subcat1_name='".$stat_params['deal_subcat1_name']."'";
         }
-        if($stat_params['deal_subcat2_name']!=""){
+        if(isset($stat_params['deal_subcat2_name'])&&($stat_params['deal_subcat2_name']!="")){
             $filter_trans_clause.=" and deal_subcat2_name='".$stat_params['deal_subcat2_name']."'";
         }
         /***********************************************************
         sng:3/nov/2010
         Now when sector or industry is specified, we search in transaction table
         ***************/
-        if($stat_params['sector']!=""){
+        if(isset($stat_params['sector'])&&($stat_params['sector']!="")){
             $filter_trans_clause.=" and deal_sector like '%".$stat_params['sector']."%'";
         }
-        if($stat_params['industry']!=""){
+        if(isset($stat_params['industry'])&&($stat_params['industry']!="")){
             $filter_trans_clause.=" and deal_industry like '%".$stat_params['industry']."%'";
         }
         /*********************************************************************/
@@ -1099,7 +1099,7 @@ class statistics{
         sng:11/jun/2010
         The year can be in a range like 2009-2010 or it may be a single like 2009
         *******/
-        if($stat_params['year']!=""){
+        if(isset($stat_params['year'])&&($stat_params['year']!="")){
             /*****
             sng:29/sep/2010
             if use_deal_date is true, it means, date range id was sent.
@@ -1130,7 +1130,7 @@ class statistics{
         sng:23/july/2010
         The deal size can be blank or <=valuein billion or >=value in billion
         ********/
-        if($stat_params['deal_size']!=""){
+        if(isset($stat_params['deal_size'])&&($stat_params['deal_size']!="")){
             $filter_trans_clause.=" and value_in_billion".$stat_params['deal_size'];
         }
         /**************************************************************************************
@@ -1139,12 +1139,12 @@ class statistics{
         Same for region
         *********************/
         $country_filter = "";
-        if($stat_params['country']!=""){
+        if(isset($stat_params['country'])&&($stat_params['country']!="")){
             //country specified, we do not consider region
             $country_filter.="deal_country LIKE '%".$stat_params['country']."%'";
         }else{
             //country not specified, check for region
-            if($stat_params['region']!=""){
+            if(isset($stat_params['region'])&&($stat_params['region']!="")){
                 //get the country names for this region name
                 $region_q = "select cm.name from ".TP."region_master as rm left join ".TP."region_country_list as rc on(rm.id=rc.region_id) left join ".TP."country_master as cm on(rc.country_id=cm.id) where rm.name='".$stat_params['region']."'";
                 $region_q_res = mysql_query($region_q);
@@ -1218,7 +1218,7 @@ class statistics{
             $filter_trans .= sprintf(' and last_edited < "%s" ', $stat_params['max_date']); 
         }
         /////////////////////////////////////
-        if($stat_params['ranking_criteria'] == "num_deals"){
+        if(isset($stat_params['ranking_criteria'])&&($stat_params['ranking_criteria'] == "num_deals")){
             $q = "SELECT deals_banks.num_deals as stat_value, .
                     companies.company_id, 
                     companies.name,companies.short_name 
@@ -1234,7 +1234,7 @@ class statistics{
             $q.=" GROUP BY partner_id ORDER BY num_deals DESC LIMIT 0, 5) AS deals_banks LEFT JOIN (SELECT company_id, name, short_name FROM ".TP."company WHERE TYPE = '".$stat_params['partner_type']."') AS companies ON ( deals_banks.partner_id = companies.company_id )";
         }else{
             /////////////////////////////////////////
-            if($stat_params['ranking_criteria'] == "total_deal_value"){
+            if(isset($stat_params['ranking_criteria'])&&($stat_params['ranking_criteria'] == "total_deal_value")){
                 $q = "SELECT deals_assoc.total_deal_value AS stat_value, 
                         companies.company_id, companies.name, 
                         companies.short_name
@@ -1244,23 +1244,23 @@ class statistics{
                             LEFT JOIN ".TP."transaction AS t ON ( tp.transaction_id = t.id ) 
                             WHERE tp.partner_type = '".$stat_params['partner_type']."'";
                 $filter_trans_clause = "";
-                if($stat_params['deal_cat_name']!=""){
+                if(isset($stat_params['deal_cat_name'])&&($stat_params['deal_cat_name']!="")){
                     $filter_trans_clause.=" and deal_cat_name='".$stat_params['deal_cat_name']."'";
                 }
-                if($stat_params['deal_subcat1_name']!=""){
+                if(isset($stat_params['deal_subcat1_name'])&&($stat_params['deal_subcat1_name']!="")){
                     $filter_trans_clause.=" and deal_subcat1_name='".$stat_params['deal_subcat1_name']."'";
                 }
-                if($stat_params['deal_subcat2_name']!=""){
+                if(isset($stat_params['deal_subcat2_name'])&&($stat_params['deal_subcat2_name']!="")){
                     $filter_trans_clause.=" and deal_subcat2_name='".$stat_params['deal_subcat2_name']."'";
                 }
                 /***********************************************************
                 sng:3/nov/2010
                 Now when sector or industry is specified, we search in transaction table
                 ***************/
-                if($stat_params['sector']!=""){
+                if(isset($stat_params['sector'])&&($stat_params['sector']!="")){
                     $filter_trans_clause.=" and deal_sector like '%".$stat_params['sector']."%'";
                 }
-                if($stat_params['industry']!=""){
+                if(isset($stat_params['industry'])&&($stat_params['industry']!="")){
                     $filter_trans_clause.=" and deal_industry like '%".$stat_params['industry']."%'";
                 }
                 /*********************************************************************/
@@ -1268,7 +1268,7 @@ class statistics{
                 sng:11/jun/2010
                 The year can be in a range like 2009-2010 or it may be a single like 2009
                 *******/
-                if($stat_params['year']!=""){
+                if(isset($stat_params['year'])&&($stat_params['year']!="")){
                     /*****
                     sng:29/sep/2010
                     if use_deal_date is true, it means, date range id was sent.
@@ -1299,7 +1299,7 @@ class statistics{
                 sng:23/july/2010
                 The deal size can be blank or <=valuein billion or >=value in billion
                 ********/
-                if($stat_params['deal_size']!=""){
+                if(isset($stat_params['deal_size'])&&($stat_params['deal_size']!="")){
                     $filter_trans_clause.=" and value_in_billion".$stat_params['deal_size'];
                 }
                 /**************************************************************************************
@@ -1308,12 +1308,12 @@ class statistics{
                 Same for region
                 *********************/
                 $country_filter = "";
-                if($stat_params['country']!=""){
+                if(isset($stat_params['country'])&&($stat_params['country']!="")){
                     //country specified, we do not consider region
                     $country_filter.="deal_country LIKE '%".$stat_params['country']."%'";
                 }else{
                     //country not specified, check for region
-                    if($stat_params['region']!=""){
+                    if(isset($stat_params['region'])&&($stat_params['region']!="")){
                         //get the country names for this region name
                         $region_q = "select cm.name from ".TP."region_master as rm left join ".TP."region_country_list as rc on(rm.id=rc.region_id) left join ".TP."country_master as cm on(rc.country_id=cm.id) where rm.name='".$stat_params['region']."'";
                         $region_q_res = mysql_query($region_q);
@@ -1397,7 +1397,7 @@ class statistics{
                 /////////////////////////////////////////////////////////////////////////
                 //die($q);
             }else{
-                if($stat_params['ranking_criteria'] == "total_adjusted_deal_value"){
+                if(isset($stat_params['ranking_criteria'])&&($stat_params['ranking_criteria'] == "total_adjusted_deal_value")){
                     $q = "SELECT deals_assoc.total_adjusted_deal_value as stat_value, 
                             companies.company_id, companies.name, 
                             companies.short_name 
