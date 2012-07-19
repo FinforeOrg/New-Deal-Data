@@ -109,11 +109,14 @@ function toggle_help(){
 /*****************************
 sng:9/nov/2011
 If the user is not logged in, we show alert saying that the user needs to login
+
+sng:19/july/2012
+Let us create a general alert function
 ********************************/
 ?>
 <script>
-function my_firm_cred_alert(){
-	apprise("Please login to access your firm's credentials. Alternatively, use the Competitors' Credentials function to find your firm and view your credentials.",{'textOk':'OK'});
+function content_view_alert(alert_txt){
+	apprise(alert_txt,{'textOk':'OK'});
 	return false;
 }
 </script>
@@ -159,21 +162,38 @@ function my_firm_cred_alert(){
 						<div class="drop3columns dropcontent" style="width:156px;"><!-- Begin Item Container -->
 							<div class="col_2">
 								<ul>
+									<?php
+									/******************
+									Although we have league table in the home page, there are other things there. So we take the member
+									to dedicated league table page
+									***************/
+									?>
 									<li><a href="league_table.php">League Tables</a></li>
 									<?php
-								/************
-								sng:9/nov/2011
-								*************/
-								if(!$_SESSION['is_member']){
+									/************
+									sng:9/nov/2011
+									*************/
+									if(!$_SESSION['is_member']){
+										?>
+										<li><a href="#" onclick="return content_view_alert('Please login to access your firm\'s credentials. Alternatively, use the Competitors\' Credentials function to find your firm and view your credentials.');">Credentials Slides</a></li>
+										<?php
+									}else{
+										/*****************
+										sng:7/apr/2011
+										other that banker and lawyers, nobody can see credential slides of their firm
+										*******************/
+										if(($_SESSION['member_type']=="banker")||($_SESSION['member_type']=="lawyer")){
+											?>
+											<li><a href="showcase_firm.php?id=<?php echo $_SESSION['company_id']?>&from=savedSearches">Credentials Slides</a></li>
+											<?php
+										}else{
+											?>
+											<li><a href="#" onclick="return content_view_alert('Only bankers and lawyers has credential slides for their firm.');">Credentials Slides</a></li>
+											<?php
+										}
+									}
 									?>
-									<li><a href="#" onclick="return my_firm_cred_alert();">Credentials Slides</a></li>
-									<?php
-								}else{
-									?>
-									<li><a href="showcase_firm.php?id=<?php echo $_SESSION['company_id']?>&from=savedSearches">Credentials Slides</a></li>
-									<?php
-								}
-								?>
+									<li><a href="issuance_data.php">Deal Volumes</a></li>
 								</ul>
 							</div>
 						</div><!-- End Item Container -->
