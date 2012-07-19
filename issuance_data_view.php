@@ -1,17 +1,5 @@
-
 <?php
 require_once("league_table_filter_support_js.php");
-?>
-<?php
-/****************************
-sng:1/oct/2011
-we now put these in container view
-<script src="js/jquery-ui-1.8.9.custom.min.js" type="text/javascript"></script>  
-<script src="js/jquery.ui.selectmenu.js" type="text/javascript"></script>
-<link rel="stylesheet" href="css/custom-theme/jquery-ui-1.8.9.custom.css" />
-<link rel="stylesheet" href="css/custom-theme/jquery-ui-1.8.9.custom_orange.css" />
-<link rel="stylesheet" href="css/custom-theme/jquery.ui.selectmenu.css" />
-*************************************/
 ?>
 <?php
 /*********************************
@@ -344,18 +332,6 @@ which also allow to show the help button
 		  /*******************************
 		  sng:22/sep/2011
 		  we do not use the year parameter for issuance data
-            <td>
-                <select name="year" id="year" style="width: 200px;">
-                    <option value="">Refine by Year</option>
-                    <?php $curr_year = date("Y");
-                    for($predate=2;$predate>0;$predate--):?>
-                        <option value="<?php echo $curr_year-$predate;?>" <?php if($_POST['year']==$curr_year-$predate){?>selected="selected"<?php }?>><?php echo $curr_year-$predate;?> A</option>
-                        <?php endfor;?>
-                    <option value="<?php echo $curr_year;?>" <?php if($_POST['year']==$curr_year){?>selected="selected"<?php } else {if (!isset($_POST['year'])) echo 'selected="selected"';}?>><?php echo $curr_year;?> YTD</option>
-                    <option value="<?php echo $curr_year-1;?>-<?php echo $curr_year;?>"><?php echo $curr_year-1;?>-<?php echo $curr_year;?> YTD</option>
-                </select>             
-            </td>
-            <td>and</td>
 			****************************************/
 			?>
             <td colspan="3" style="text-align:center">  
@@ -443,22 +419,6 @@ which also allow to show the help button
 </div>
 <script type="text/javascript">
 function saveVolumesSearch() {
-	/*************************
-	sng:8/jan/2011
-	We will use jQuery instead of prototype
-	data = $('issuance_table_filter').serialize(true);
-    new Ajax.Request('saved_searches.php?action=saveSearch&type=volumes', {
-        method: 'post',
-        parameters: data,
-        onSuccess: function(transport){
-            received = eval("(" + transport.responseText + ")");
-            alert(received.message);
-            if (received.newLocation != undefined ) {
-                window.location.href = received.newLocation;
-            }        
-        }
-    });
-	********************/
 	jQuery.ajax({
 		url: "saved_searches.php?action=saveSearch&type=volumes",
 		type: "POST",
@@ -475,20 +435,7 @@ function saveVolumesSearch() {
 }
 
 function updateVolumesSearch(id) {
-	/***********
-	sng:8/jan/2011
-	We will use jquery
-    data = $("issuance_table_filter").serialize();
-    new Ajax.Request("saved_searches.php?action=updateSearch&type=volumes&id="+id, {
-        method: 'post',
-        parameters: data,
-        onSuccess: function(transport){
-            received = eval("(" + transport.responseText + ")");
-            alert(received.message);
-            post_chart_data();     
-        }
-    });
-	**/
+	
 	jQuery.ajax({
 		url: "saved_searches.php?action=updateSearch&type=volumes&id="+id,
 		type: "POST",
