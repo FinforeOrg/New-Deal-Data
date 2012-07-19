@@ -6,13 +6,16 @@ sng: 3/jun/2010
 we show a home page chart by default
 ********/
 include("include/global.php");
-/**********
+/**************************************************************
 sng:23/nov/2010
 This now require login
-*******/
+
+sng:19/jul/2012
+This is now open to all
+*******
 $_SESSION['after_login'] = "issuance_data.php";
 require_once("check_mem_login.php");
-
+***********************************************************/
 require_once("classes/class.transaction.php");
 require_once("classes/class.country.php");
 require_once("classes/class.company.php");
@@ -29,28 +32,17 @@ if (isset($_REQUEST['token'])) {
 require("league_table_filter_support.php");
 ////////////////////////////////////////////
 require_once("default_metatags.php");
-//////////////////////
-/***
-sng:1/jun/2010
-we put header and links, so we will not use the default
-***/
-//$g_view['page_heading'] = "League Table";
-/////////////////////////////////////////////////////////
-$g_view['num_issuance_chart_to_fetch'] = 1;
-$g_view['issuance_chart'] = array();
-$g_view['num_issuance_chart_found'] = 0;
+
 /********************************
 sng:7/jan/2011
 If the page comes from issuance_data_detail_view, $_POST['myaction'] is set to gen_chart. In that case, we do not
 get the random chart data and the count is 0 and no default chart is displayed
+
+sng:19/july/2012
+We no longer show any pre generated chart
 *************/
-if(!isset($_POST['myaction'])||($_POST['myaction']!="gen_chart")){
-	$success = $g_stat->front_get_random_issuance_charts($g_view['num_issuance_chart_to_fetch'],$g_view['issuance_chart'],$g_view['num_issuance_chart_found']);
-	if(!$success){
-		die("Cannot get issuance chart data");
-	}
-}
-//////////////////////////////////
+
+
 /***************************************
 sng:5/jan/2011
 By default, client wants default groupings to be half year

@@ -350,7 +350,7 @@ which also allow to show the help button
               <button onclick="return false;" id="generate"> Generate </button>
               <?php
                 if(!$g_account->is_site_member_logged()):?>
-                <button onclick="window.location.href = '/index.php';return false;"> Login to view details </button> <button onclick="window.location.href = '/index.php';return false;"> Login to download to PowerPoint </button>
+                <button onclick="window.location.href = 'login.php';return false;"> Login to view details </button> <button onclick="window.location.href = 'login.php';return false;"> Login to download to PowerPoint </button>
               <?php else :?>
                 <input type="submit" id="submit" value="Show details" />
                 <?php if ($savedSearches->searchBelongsToTheCurrentUser(base64_decode($_GET['token']))) : ?>
