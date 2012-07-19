@@ -160,6 +160,20 @@ function my_firm_cred_alert(){
 							<div class="col_2">
 								<ul>
 									<li><a href="league_table.php">League Tables</a></li>
+									<?php
+								/************
+								sng:9/nov/2011
+								*************/
+								if(!$_SESSION['is_member']){
+									?>
+									<li><a href="#" onclick="return my_firm_cred_alert();">Credentials Slides</a></li>
+									<?php
+								}else{
+									?>
+									<li><a href="showcase_firm.php?id=<?php echo $_SESSION['company_id']?>&from=savedSearches">Credentials Slides</a></li>
+									<?php
+								}
+								?>
 								</ul>
 							</div>
 						</div><!-- End Item Container -->
@@ -169,20 +183,7 @@ function my_firm_cred_alert(){
 					<div class="drop3columns dropcontent dropfirst" style="width:164px;"><!-- Begin Item Container -->
 						<div class="col_3">
 							<ul>
-								<?php
-								/************
-								sng:9/nov/2011
-								*************/
-								if(!$_SESSION['is_member']){
-									?>
-									<li><a href="#" onclick="return my_firm_cred_alert();">My Firm's Credentials</a></li>
-									<?php
-								}else{
-									?>
-									<li><a href="showcase_firm.php?id=<?php echo $_SESSION['company_id']?>&from=savedSearches">My Firms' Credentials</a></li>
-									<?php
-								}
-								?>
+								
 								
 								<li><a href="competitor_credentials.php">Competitors' Credentials</a></li>
 							</ul>
