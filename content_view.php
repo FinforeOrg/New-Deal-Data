@@ -152,7 +152,29 @@ function content_view_alert(alert_txt){
 					<div class="drop3columns dropcontent dropfirst" style="width:158px;"><!-- Begin Item Container -->
 						<div class="col_2">
 							<ul>
+								<li><a href="saved_searches.php">My Saved Searches</a></li>
 								<li><a href="watchlist.php">My Watchlist</a></li>
+								<?php
+								/*****************
+								sng:7/apr/2011
+								other that banker and lawyers, nobody can see 1stop or make me top
+								*******************/
+								if(($_SESSION['member_type']=="banker")||($_SESSION['member_type']=="lawyer")){
+									?>
+									<li><a href="oneStop.php">1Stop for Meetings</a></li>
+									<li><a href="make_me_top.php">Make Me Top</a></li>
+									
+									<li><a href="leagueTableComparisonHistory.php">LT Forensics</a></li>
+									<?php
+								}else{
+									?>
+									<li><a href="#" onclick="return content_view_alert('Only for bankers and lawyers.');">1Stop for Meetings</a></li>
+									<li><a href="#" onclick="return content_view_alert('Only for bankers and lawyers.');">Make Me Top</a></li>
+									
+									<li><a href="#" onclick="return content_view_alert('Only for bankers and lawyers.');">LT Forensics</a></li>
+									<?php
+								}
+								?>
 							</ul>
 						</div>
 					</div><!-- End Item Container -->
