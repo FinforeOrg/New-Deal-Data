@@ -44,8 +44,11 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == "XMLHttpRequest") {
 				   /**********
 				   sng:5/aug/2011
 				   since the index.php is showing the league table chart, let us send there
+				   
+				   sng:21/jul/2012
+				   now we have our own league table page so let us send there
 				   ****/
-                    $link = "index.php?token=" . base64_encode($insertedId).$extra;
+                    $link = "league_table.php?token=" . base64_encode($insertedId).$extra;
                    break;
                    case 'leagueDetail' :
                     $link = "league_table_detail.php?token=" . base64_encode($insertedId).$extra;
