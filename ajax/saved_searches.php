@@ -36,14 +36,16 @@ function shareSearch()
 	
 	sng:21/jul/2012
 	Now we have our own league table page
+	Also, use the global variable to set the URL
     **************/
+	global $g_http_path;
     $links = array(
-        'deal'=>'http://www.deal-data.com/deal_search.php?token='.$savedSearchToken,
-        'tombstone'=>'http://www.deal-data.com/showcase_firm.php?id='. $_SESSION['company_id'] . '&from=savedSearches&token='.$savedSearchToken,
-        'league'=>'http://www.deal-data.com/league_table.php?token='.$savedSearchToken,
-        'leagueDetail'=>'http://www.deal-data.com/league_table_detail.php?token='.$savedSearchToken,
-        'volumes'=>'http://www.deal-data.com/issuance_data.php?token='.$savedSearchToken,
-        'volumesDetail'=>'http://www.deal-data.com/issuance_data_detail.php?token='.$savedSearchToken,
+        'deal'=>$g_http_path.'/deal_search.php?token='.$savedSearchToken,
+        'tombstone'=>$g_http_path.'/showcase_firm.php?id='. $_SESSION['company_id'] . '&from=savedSearches&token='.$savedSearchToken,
+        'league'=>$g_http_path.'/league_table.php?token='.$savedSearchToken,
+        'leagueDetail'=>$g_http_path'/league_table_detail.php?token='.$savedSearchToken,
+        'volumes'=>$g_http_path'/issuance_data.php?token='.$savedSearchToken,
+        'volumesDetail'=>$g_http_path.'/issuance_data_detail.php?token='.$savedSearchToken,
     );
     $template = file_get_contents('./shareSearchEmailTemplate.html') or print("Cannot open template");
     $template = str_replace(
