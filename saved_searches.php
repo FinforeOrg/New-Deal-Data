@@ -9,7 +9,12 @@ require_once("classes/class.savedSearches.php");
 require_once("classes/class.account.php");
 //////////////////////////////////////////////
 $savedSearches = new SavedSearches();
-
+/************
+sng:21/jul/2012
+if accessing via ajax, we check for login an if not, send json message.
+if accessing directly, we redirect to login page.
+Since redirection will break ajax, we do not put redirection code here, but we put it after the ajax condition block
+******************/
 if ($_SERVER['HTTP_X_REQUESTED_WITH'] == "XMLHttpRequest") {
     //header("Content-type: application/x-javascript;\n");
     if(!$g_account->is_site_member_logged()){
@@ -98,6 +103,12 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == "XMLHttpRequest") {
     exit(0);    
 } 
 
+/*******************
+sng:21/jul/2012
+If it comes here, it means direct access, so we check and redirect
+*******************/
+$_SESSION['after_login'] = "saved_searches.php";
+require_once("check_mem_login.php");
     
 $mySavedSearches = array('tombstone'=>false,"league"=>false, 'deal' => false, 'leagueDetail'=>array(), 'volumesDetail');
 if(!$g_account->is_site_member_logged()){

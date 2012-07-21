@@ -3,9 +3,13 @@ require_once("include/global.php");
 require_once("classes/class.savedSearches.php");
 require_once("classes/class.account.php");
 
-$_SESSION['after_login'] = "watchlist.php";
-require_once("check_mem_login.php");
 
+/************
+sng:21/jul/2012
+if accessing via ajax, we check for login an if not, send json message.
+if accessing directly, we redirect to login page.
+Since redirection will break ajax, we do not put redirection code here, but we put it after the ajax condition block
+******************/
 $savedSearches = new SavedSearches();
 if ($_SERVER['HTTP_X_REQUESTED_WITH'] == "XMLHttpRequest") {
     //header("Content-type: application/x-javascript;\n");
@@ -36,6 +40,12 @@ if ($_SERVER['HTTP_X_REQUESTED_WITH'] == "XMLHttpRequest") {
     }
     exit(0);    
 } 
+/*******************
+sng:21/jul/2012
+If it comes here, it means direct access, so we check and redirect
+*******************/
+$_SESSION['after_login'] = "watchlist.php";
+require_once("check_mem_login.php");
 
 require_once("classes/class.deal_support.php");
 $deal_support = new deal_support();
