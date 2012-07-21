@@ -122,7 +122,13 @@
             <td><?php echo str_replace(date('y'), date('y') .'YTD', $res['date']); ?></td>
             <td><?php echo $res['rank_label']?></td>
             <td><?php echo $res[$res['rankingCritKey']] ?></td>
-            <td> <form action="/index.php?from=oneStop" method="post" target="_blank" style="padding: 0;margin:0;"><input type="hidden" name="data" value="<?php echo $res['dataForPost']?>" /> <input type="submit" class="btn_auto" value="Chart"  /> </form></td>
+			<?php
+			/***********
+			sng:21/jul/2012
+			Now we have our own league table page
+			***********/
+			?>
+            <td> <form action="league_table.php?from=oneStop" method="post" target="_blank" style="padding: 0;margin:0;"><input type="hidden" name="data" value="<?php echo $res['dataForPost']?>" /> <input type="submit" class="btn_auto" value="Chart"  /> </form></td>
             <td> <input type="checkbox" name="download_pptx_chart[]" onclick="verifyChartCheckboxes(this);" value="<?php echo $res['dataForPost']; ?>" /> 
         </tr>
     <?php endforeach ?>
@@ -196,7 +202,8 @@ if (sizeOf($thirdTableResults)) {
         foreach($labels as $label) {
             $lbl[] = "'$label'";
         }
-        $labels = implode(', ', $lbl );
+        $labels = implode(', ', $lbl );
+
         //$labels = implode(', ', array_keys($value['data']));  ?>
         <div id="chart<?php echo $key+1?>" style="margin-top:20px; margin-left:20px; width:47%; height:300px; float:left">
             <input type="checkbox" name="download_pptx_volume_chart[]" style="float: right; z-index: 9999; position: relative;" onclick="verifyVolumeChartCheckboxes(this);" value="<?php echo $value['dataForPost']?>"/>

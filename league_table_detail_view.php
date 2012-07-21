@@ -60,8 +60,12 @@ $(function() {
     });
     //$('button').button().click(function(event){event.preventDefault()});
     $('#submit').button();
+	/****************
+	sng:21/jul/2012
+	now we have our own league table page
+	**************/
     $('#chartButton').button().click(function(event){
-         $("#league_table_filter").attr('action','index.php').submit();    
+         $("#league_table_filter").attr('action','league_table.php').submit();    
     });
     $('#updateButton').button().click(function(event){
          $("#league_table_filter").attr('action','league_table_detail.php').attr('target','_self').submit();    

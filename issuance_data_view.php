@@ -74,7 +74,7 @@ function  post_chart_data() {
 </script>
 <script type="text/javascript">
 function goto_login(){
-	window.location.href = "index.php";
+	window.location.href = "login.php";
 }
 </script>
 <script type="text/javascript">

@@ -100,9 +100,12 @@ function saveLeagueTableNotification(notificationElement) {
 						/**********
 				   sng:5/aug/2011
 				   since the index.php is showing the league table chart, let us send there
+				   
+				   sng:21/jul/2012
+				   now we have our own league table page
 				   ****/
 				   ?>
-						<li><a href="index.php?token=<?php echo base64_encode($key)?>"><img src="images/ss_view.gif" alt="" width="15" height="15" align="left" hspace="5px" vspace="2" /><span>View</span></a></li>
+						<li><a href="league_table.php?token=<?php echo base64_encode($key)?>"><img src="images/ss_view.gif" alt="" width="15" height="15" align="left" hspace="5px" vspace="2" /><span>View</span></a></li>
 						</ul>
 		  			</div>
 					</div>
@@ -115,7 +118,13 @@ function saveLeagueTableNotification(notificationElement) {
 
 			<?php endif ?>
 			<div class="leaguechartsContent">
-			<a class="link_as_button" href="index.php">Add league table chart</a>
+			<?php
+			/**********
+			sng:21/jul/2012
+			Now we have our own league table page
+			***********/
+			?>
+			<a class="link_as_button" href="league_table.php">Add league table chart</a>
 			</div>
 		
 		<div class="leaguechartsHeaderDiv"><p>League Tables Details</p></div>
@@ -286,7 +295,13 @@ Notify Me <?php echo sprintf("(Current Rank: %d)", $mySavedSearches['currentRank
 			</div>
             <?php endif ?>
 			<div class="leaguechartsContent">
-			<a class="link_as_button" href="index.php">Add deal search</a>
+			<?php
+			/***************
+			sng:21/jul/2012
+			Now we have our own league table page
+			********/
+			?>
+			<a class="link_as_button" href="league_table.php">Add deal search</a>
 			</div>
 		
 		<div style="height: 20px; width:100%; clear:both;"> &nbsp; </div>

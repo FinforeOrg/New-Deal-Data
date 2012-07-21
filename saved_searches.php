@@ -115,7 +115,7 @@ require_once("check_mem_login.php");
     
 $mySavedSearches = array('tombstone'=>false,"league"=>false, 'deal' => false, 'leagueDetail'=>array(), 'volumesDetail');
 if(!$g_account->is_site_member_logged()){
-   $err  = "You need to <a href='index.php' >Sign in</a> order to view this page";
+   $err  = "You need to <a href='login.php' >Sign in</a> order to view this page";
 }
     
 if ($_SESSION['mem_id']) {

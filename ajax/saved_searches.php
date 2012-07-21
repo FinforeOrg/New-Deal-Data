@@ -33,11 +33,14 @@ function shareSearch()
     /********
     sng:5/aug/2011
     index.php now perform the job of league_table.com
+	
+	sng:21/jul/2012
+	Now we have our own league table page
     **************/
     $links = array(
         'deal'=>'http://www.deal-data.com/deal_search.php?token='.$savedSearchToken,
         'tombstone'=>'http://www.deal-data.com/showcase_firm.php?id='. $_SESSION['company_id'] . '&from=savedSearches&token='.$savedSearchToken,
-        'league'=>'http://www.deal-data.com/index.php?token='.$savedSearchToken,
+        'league'=>'http://www.deal-data.com/league_table.php?token='.$savedSearchToken,
         'leagueDetail'=>'http://www.deal-data.com/league_table_detail.php?token='.$savedSearchToken,
         'volumes'=>'http://www.deal-data.com/issuance_data.php?token='.$savedSearchToken,
         'volumesDetail'=>'http://www.deal-data.com/issuance_data_detail.php?token='.$savedSearchToken,
