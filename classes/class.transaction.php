@@ -4398,15 +4398,156 @@ LIMIT ".$start_offset." , ".$num_to_fetch;
     
     sng:10/jul/2010
     This function has to support filter conditions
-	
-	sng:
     *****/
     public function front_get_all_deals_of_firm_paged($firm_id,$filter_arr,$start_offset,$num_to_fetch,&$data_arr,&$data_count){
-        return false;
-		/*************
-		sng:2/mar/2012
-		Not used anywhere
-		*****************/
+        global $g_mc;
+        $q = "select c.company_id,c.name,t.id,t.value_in_billion,t.date_of_deal,t.deal_cat_name,t.deal_subcat1_name,t.deal_subcat2_name,target_company_name from ".TP."transaction_partners as p left join ".TP."transaction as t on(p.transaction_id=t.id) left join ".TP."company as c on(t.company_id=c.company_id) where partner_id='".$firm_id."'";
+        
+        //filter on transaction types
+        if($filter_arr['deal_cat_name']!=""){
+            $q.=" and deal_cat_name='".$filter_arr['deal_cat_name']."'";
+        }
+        if($filter_arr['deal_subcat1_name']!=""){
+            $q.=" and deal_subcat1_name='".$filter_arr['deal_subcat1_name']."'";
+        }
+        if($filter_arr['deal_subcat2_name']!=""){
+            $q.=" and deal_subcat2_name='".$filter_arr['deal_subcat2_name']."'";
+        }
+        /***
+        The year can be in a range like 2009-2010 or it may be a single like 2009
+        *******/
+        if($filter_arr['year']!=""){
+            $year_tokens = explode("-",$filter_arr['year']);
+            $year_tokens_count = count($year_tokens);
+            if($year_tokens_count == 1){
+                //singleton year
+                $q.=" and year(date_of_deal)='".$year_tokens[0]."'";
+            }
+            if($year_tokens_count == 2){
+                //range year
+                $q.=" and year(date_of_deal)>='".$year_tokens[0]."' AND year(date_of_deal)<='".$year_tokens[1]."'";
+            }
+        }
+        /***
+        sng:23/july/2010
+        filter deal_size. The value is either blank or like >=deal value in billion or <=deal value in billion
+        ***/
+        if($filter_arr['deal_size']!=""){
+            $q.=" and value_in_billion".$filter_arr['deal_size'];
+        }
+        /*********************************************************************************
+        sng:4/dec/2010
+        we no longer use the country of the company. We use the deal_country or transaction.
+        Same for sector and industry
+        ****************/
+        $country_filter = "";
+        if($filter_arr['country']!=""){
+            //country specified, we do not consider region
+            $country_filter.="deal_country LIKE '%".$filter_arr['country']."%'";
+        }else{
+            //country not specified, check for region
+            if($filter_arr['region']!=""){
+                //get the country names for this region name
+                $region_q = "select cm.name from ".TP."region_master as rm left join ".TP."region_country_list as rc on(rm.id=rc.region_id) left join ".TP."country_master as cm on(rc.country_id=cm.id) where rm.name='".$filter_arr['region']."'";
+                $region_q_res = mysql_query($region_q);
+                if(!$region_q_res){
+                    return false;
+                }
+                
+                $region_q_res_cnt = mysql_num_rows($region_q_res);
+                $region_clause = "";
+                if($region_q_res_cnt > 0){
+                    while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
+                        $region_clause.="|deal_country LIKE '%".$region_q_res_row['name']."%'";
+                    }
+                    $region_clause = substr($region_clause,1);
+                    $region_clause = str_replace("|"," OR ",$region_clause);
+                    $country_filter = "(".$region_clause.")";
+                }
+            }
+        }
+
+        if($country_filter!=""){
+            $q.=" and ".$country_filter;
+        }
+        
+        if($filter_arr['sector']!=""){
+            $q.=" and deal_sector like '%".$filter_arr['sector']."%'";
+        }
+        if($filter_arr['industry']!=""){
+            $q.=" and deal_industry like '%".$filter_arr['industry']."%'";
+        }
+        /**********************************************************************************/
+        ///////////////////////////////////////////
+        //filter on company of the transaction
+        $company_filter = "";
+        $company_filter_clause = "";
+        /***************************************************************************************
+        sng:4/dec/2010
+        we no longer use the country of the company. We use the deal_country or transaction.
+        Same for sector and industry
+        
+        if($filter_arr['country']!=""){
+            $company_filter_clause.=" and hq_country='".$filter_arr['country']."'";
+        }else{
+            //hq country not specified, so we can check for region
+            if($filter_arr['region']!=""){
+                $company_filter_clause.=" and hq_country IN (SELECT cm.name FROM ".TP."region_master AS rm LEFT JOIN ".TP."region_country_list AS rcl ON ( rm.id = rcl.region_id ) LEFT JOIN ".TP."country_master AS cm ON ( rcl.country_id = cm.id ) WHERE rm.name = '".$filter_arr['region']."')";
+            }
+        }
+        
+        if($filter_arr['sector']!=""){
+            $company_filter_clause.=" and sector='".$filter_arr['sector']."'";
+        }
+        
+        if($filter_arr['industry']!=""){
+            $company_filter_clause.=" and industry='".$filter_arr['industry']."'";
+        }
+        ********************************************************************************************/
+        if($company_filter_clause != ""){
+            $company_filter.=" and t.company_id IN (select company_id from ".TP."company where 1=1".$company_filter_clause.")";
+        }
+        
+        //////////////////////
+
+        if($company_filter!=""){
+            $q.=$company_filter;
+        }
+        
+        $q.=" order by t.date_of_deal desc, t.id DESC limit ".$start_offset.",".$num_to_fetch;
+        //echo $q;
+        $res = mysql_query($q);
+        if(!$res){
+            //echo mysql_error();
+            return false;
+        }
+        //////////////////////
+        $data_count = mysql_num_rows($res);
+        if(0==$data_count){
+            return true;
+        }
+        ////////////////////
+        for($i=0;$i<$data_count;$i++){
+            $data_arr[$i] = mysql_fetch_assoc($res);
+            $data_arr[$i]['name'] = $g_mc->db_to_view($data_arr[$i]['name']);
+            $data_arr[$i]['target_company_name'] = $g_mc->db_to_view($data_arr[$i]['target_company_name']);
+            //set bankers and law firms
+            $transaction_id = $data_arr[$i]['id'];
+            $data_arr[$i]['banks'] = array();
+            $data_cnt = 0;
+            $success = $this->get_all_partner($transaction_id,"bank",$data_arr[$i]['banks'],$data_cnt);
+            if(!$success){
+                return false;
+            }
+            ///////////////////////////
+            $data_arr[$i]['law_firms'] = array();
+            $data_cnt = 0;
+            $success = $this->get_all_partner($transaction_id,"law firm",$data_arr[$i]['law_firms'],$data_cnt);
+            if(!$success){
+                return false;
+            }
+        }
+        return true;
     }
     
     /***************************
