@@ -68,6 +68,7 @@ $(function() {
     $('#submit').button();
     $('#downloadToPowerpoint').button();
     $('#searchCompetitor').button();
+	/**********
     $('#generate').button().click(function(data){
         var myData = $('#leagueTableForm').serialize()
         $("#chart1").html('');
@@ -83,6 +84,7 @@ $(function() {
             }
         );
     });
+	*************/
     $(".loading").hide();
     $("div.toHide").show();
     $('#tombstone_search_frm input[type="button"]').button();
