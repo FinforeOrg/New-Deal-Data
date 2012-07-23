@@ -103,6 +103,15 @@
         <form id="chart2form">
             <?php foreach ($_POST as $key => $value) :?>
                 <?php if (!in_array($key, array('last_alert_date_max', 'max_date', 'last_alert_date_max', 'myaction'))) :?>
+					<?php
+					/***********
+					sng:23/jul/2012
+					we need to send deal size condition via ajax post, but sanitizer will remove it. So we encode it
+					**************/
+					if($key == 'deal_size'){
+						$value = base64_encode($value);
+					}
+					?>
                     <input type="hidden" name="<?php echo $key?>" value="<?php echo $value?>" />
                 <?php endif ?>
             <?php endforeach ?>
@@ -120,7 +129,7 @@
     <script type="text/javascript" class="code">
         $(document).ready(function() {
             $.post(
-                '/ajax/league_table_creator.php?version=2&chartName=chart1',
+                'ajax/league_table_creator.php?version=2&chartName=chart1',
                 $('#chart1form').serialize(),
                 function(returned) {
                     $("#chart1 .loading").hide();
@@ -128,7 +137,7 @@
                 }
             );
             $.post(
-                '/ajax/league_table_creator.php?version=2&chartName=chart2',
+                'ajax/league_table_creator.php?version=2&chartName=chart2',
                 $('#chart2form').serialize(),
                 function(returned) {
                     $("#chart2 div.loading").hide();
