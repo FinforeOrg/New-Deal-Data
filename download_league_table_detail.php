@@ -21,6 +21,13 @@ if(!$g_account->is_site_member_logged()){
 	exit;
 }
 /////////////////////////////////////////
+/************
+sng:23/jul/2012
+We cannot send conditions like >=23. The sanitizer will erase it. We base64_encode it in the forms and decode it here
+*****************/
+if(isset($_POST['deal_size'])){
+	$_POST['deal_size'] = base64_decode($_POST['deal_size']);
+}
 require_once("classes/class.statistics.php");
 $g_view['start_offset'] = 0;
 $g_view['num_to_download'] = 100;

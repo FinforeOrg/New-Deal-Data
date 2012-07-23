@@ -170,7 +170,13 @@ function goto_suggest_deal(){
 				?>
 				
 				<input type="hidden" name="year" value="<?php echo $_POST['year'];?>" />
-				<input type="hidden" name="deal_size" value="<?php echo $_POST['deal_size'];?>" />
+				<?php
+				/************
+				sng:23/jul/2012
+				we cannot send condition like >=2 so we encode it
+				***************/
+				?>
+				<input type="hidden" name="deal_size" value="<?php echo base64_encode($_POST['deal_size']);?>" />
 				<!--
 				pagination offset is also sent by query string
 				-->

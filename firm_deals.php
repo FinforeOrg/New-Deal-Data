@@ -19,6 +19,13 @@ $success = $g_company->get_company($g_view['firm_id'],$g_view['company_data']);
 if(!$success){
 	die("Cannot get company data");
 }
+/************
+sng:23/jul/2012
+We cannot send conditions like >=23. The sanitizer will erase it. We base64_encode it in the forms and decode it here
+*****************/
+if(isset($_POST['deal_size'])){
+	$_POST['deal_size'] = base64_decode($_POST['deal_size']);
+}
 ////////////////////////////////////////////
 //get the latest deals
 //pagination support

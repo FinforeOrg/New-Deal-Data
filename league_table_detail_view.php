@@ -217,10 +217,16 @@ and the code in the view page triggers a chart creation.
           <option value="<?php echo $curr_year-1;?>-<?php echo $curr_year;?>" <?php if(!empty($_POST['year']) && $_POST['year']==($curr_year-1)."-".$curr_year){?>selected="selected"<?php }?>><?php echo $curr_year-1;?>-<?php echo $curr_year;?> YTD</option>
         </select></td>
         <td>and</td>
+		<?php
+			/************
+			sng:23/jul/2012
+			we cannot send condition like >=2 so we encode it
+			***************/
+			?>
         <td><select name="deal_size" id="deal_size" style="width: 200px;">
           <option value="">Refine by Deal Size</option>
           <?php for($j=0;$j<$g_view['deal_size_filter_list_count'];$j++):?>
-          <option value="<?php echo $g_view['deal_size_filter_list'][$j]['condition'];?>" <?php if($_POST['deal_size']==$g_view['deal_size_filter_list'][$j]['condition']){?>selected="selected"<?php } else { if ($g_view['deal_size_filter_list'][$j]['condition'] == '>=0.100') echo "selected='selected'"; }?> ><?php echo $g_view['deal_size_filter_list'][$j]['caption'];?></option>
+          <option value="<?php echo base64_encode($g_view['deal_size_filter_list'][$j]['condition']);?>" <?php if($_POST['deal_size']==$g_view['deal_size_filter_list'][$j]['condition']){?>selected="selected"<?php } else { if ($g_view['deal_size_filter_list'][$j]['condition'] == '>=0.100') echo "selected='selected'"; }?> ><?php echo $g_view['deal_size_filter_list'][$j]['caption'];?></option>
           <?php  endfor; ?>
         </select></td>
       </tr>
@@ -341,8 +347,15 @@ if(0==$g_view['data_count']){
         <?php
     }
     ?>
+	
     <input type="hidden" name="year" value="<?php echo $_POST['year'];?>" />
-    <input type="hidden" name="deal_size" value="<?php echo $_POST['deal_size'];?>" />
+	<?php
+	/************
+	sng:23/jul/2012
+	we cannot send condition like >=2 so we encode it
+	***************/
+	?>
+    <input type="hidden" name="deal_size" value="<?php echo base64_encode($_POST['deal_size']);?>" />
     <input type="hidden" name="ranking_criteria" value="<?php echo $_POST['ranking_criteria'];?>" />
     <input type="hidden" name="start" id="pagination_helper_start" value="0" />
     
@@ -389,7 +402,13 @@ if(0==$g_view['data_count']){
     }
     ?>
     <input type="hidden" name="year" value="<?php echo $_POST['year'];?>" />
-    <input type="hidden" name="deal_size" value="<?php echo $_POST['deal_size'];?>" />
+	<?php
+	/************
+	sng:23/jul/2012
+	we cannot send condition like >=2 so we encode it
+	***************/
+	?>
+    <input type="hidden" name="deal_size" value="<?php echo base64_encode($_POST['deal_size']);?>" />
     <!--
     pagination offset is also sent by query string
     -->
@@ -437,16 +456,7 @@ function updateLeagueDetailSearch(id){
          },
          'json'
     )    
-/*    new Ajax.Request('saved_searches.php?action=updateSearch&type=leagueDetail&id=' + id, {
-        method: 'post',
-        parameters: $('league_table_filter').serialize(true),
-        onSuccess: function(transport){
-            
-        },
-        onFailure: function(){
-             alert("There was an error in your request. Please try again later");
-        }
-    });    */
+
 }
 
 function saveLeagueDetailSearch(){
@@ -462,19 +472,7 @@ function saveLeagueDetailSearch(){
          },
          'json'
     )
-/*    new Ajax.Request('saved_searches.php?action=saveSearch&type=leagueDetail', {
-        method: 'post',
-        parameters: $('league_table_filter').serialize(true),
-        onSuccess: function(transport){
-            json = transport.responseText.evalJSON(true)
-            alert(json.message)
-            if (json.newLocation.length)
-            window.location.href = json.newLocation;
-        },
-        onFailure: function(){
-             alert("There was an error in your request. Please try again later");
-        }
-    });*/
+
 }
 
 </script>

@@ -17,8 +17,17 @@ $g_view['chart_data']['stat_count'] = 0;
 $g_view['chart_data']['stat_data'] = array();
 $g_view['chart_data']['ranking_criteria'] = $_POST['ranking_criteria'];
 
+/***********
+sng:23/jul/2012
+We cannot send conditions like >=23. The sanitizer will erase it. We base64_encode it in the forms and decode it here
+*****************/
+if(isset($_POST['deal_size'])){
+	$_POST['deal_size'] = base64_decode($_POST['deal_size']);
+}
+
 $chart = new leagueTableChart($_POST);
 $chart->setName((!isset($_REQUEST['chartName']) ? 'chart1' : $_REQUEST['chartName']));
 $chart->getHtml();
 
 exit();
+?>

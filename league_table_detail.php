@@ -17,6 +17,13 @@ $savedSearches = new SavedSearches();
 if (isset($_REQUEST['token'])) {
     $savedSearches->loadIntoPost($_REQUEST['token']);
 }
+/************
+sng:23/jul/2012
+We cannot send conditions like >=23. The sanitizer will erase it. We base64_encode it in the forms and decode it here
+*****************/
+if(isset($_POST['deal_size'])){
+	$_POST['deal_size'] = base64_decode($_POST['deal_size']);
+}
 ///////////////////////////////////////////////
 //support for filters
 require("league_table_filter_support.php");
