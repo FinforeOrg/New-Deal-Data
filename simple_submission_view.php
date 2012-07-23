@@ -675,6 +675,7 @@ for($j=0;$j<$g_view['value_range_items_count'];$j++){
 <input type="radio" name="value_range_id" value="0" id="value_range_id<?php echo $j;?>"><label for="value_range_id<?php echo $j;?>" onclick="togleButton(this);">Undisclosed</label>
 
 </div>
+Note: Deals with no exact size are excluded from the league tables that use size and adjusted size
 </td>
 </tr>
 <tr>
