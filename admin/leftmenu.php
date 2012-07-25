@@ -177,11 +177,13 @@
 		block_level = child_level;
 		child_level = block_level+1;
 		
+		/**************
         d.add(block_level,0,'Ghost Member','');
         d.add(child_level,block_level,'List','ghost_member_list.php');child_level++;
          
         block_level = child_level;
 		child_level = block_level+1;
+		***************/
         
         d.add(block_level,0,'Cleanup','');
         d.add(child_level,block_level,'List m&amp;a targets with %','misc_list_deal_target_company_name_with_percent.php');child_level++;
@@ -217,10 +219,39 @@
         
         block_level = child_level;
 		child_level = block_level+1;
+		
+		d.add(block_level,0,'One Stop','');
+        d.add(child_level,block_level,'Options','oneStopOptions.php');  child_level++;
+		
+		block_level = child_level;
+		child_level = block_level+1;
+		
+		d.add(block_level,0,'MMT Presets','');
+        d.add(child_level,block_level,'Deal type list','preset_deal_type_list.php');child_level++;
+        d.add(child_level,block_level,'Sector Industry list','preset_sector_industry_list.php');child_level++;
+        d.add(child_level,block_level,'Country list','preset_country_list.php');child_level++;
+        d.add(child_level,block_level,'Deal size list','preset_deal_size_list.php');child_level++;
+        d.add(child_level,block_level,'Deal date list','preset_deal_date_list.php');child_level++;
+		
+		block_level = child_level;
+		child_level = block_level+1;
+		
+		d.add(block_level,0,'MMT Top Search Options','');
+        d.add(child_level,block_level,'Deal type','top_search_option_deal_type_list.php');child_level++;
+        d.add(child_level,block_level,'Sector Industry','top_search_option_sector_industry_list.php');child_level++;
+        d.add(child_level,block_level,'Country','top_search_option_country_list.php');child_level++;
+		
+		block_level = child_level;
+		child_level = block_level+1;
+		
+		d.add(block_level,0,'MMT Top Search Requests','');
+        d.add(child_level,block_level,'Running','top_search_request_list.php?status=in_progress');child_level++;
+        d.add(child_level,block_level,'Finished','top_search_request_list.php?status=finished');child_level++;
         
+		/**************************************
         d.add(block_level,0,'Hits','');
         d.add(child_level,block_level,'Show hits','hits.php');  child_level++;
-        
+        **********************************/
                       
         document.write(d);
 
