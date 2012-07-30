@@ -2338,7 +2338,64 @@ class transaction{
 		*************************************/
         /*$q = "SELECT t.id as deal_id,t.company_id,value_in_billion,t.value_range_id,vrm.short_caption as fuzzy_value_short_caption,vrm.display_text as fuzzy_value,date_of_deal,deal_cat_name,deal_subcat1_name,deal_subcat2_name,target_company_name,seller_company_name,c.name as company_name,c.hq_country,c.sector,c.industry FROM ".TP."transaction AS t LEFT JOIN ".TP."company AS c ON ( t.company_id = c.company_id ) LEFT JOIN ".TP."transaction_value_range_master as vrm ON (t.value_range_id=vrm.value_range_id)";*/
 		
-		$q = "SELECT t.id as deal_id,value_in_billion,t.value_range_id,t.admin_verified,vrm.short_caption as fuzzy_value_short_caption,vrm.display_text as fuzzy_value,date_of_deal,deal_cat_name,deal_subcat1_name,deal_subcat2_name,target_company_name,seller_company_name FROM ".TP."transaction AS t  LEFT JOIN ".TP."transaction_value_range_master as vrm ON (t.value_range_id=vrm.value_range_id)";
+		/******************
+		sng:27/july/2012
+		If filter by company attrib is required, we do that first
+		
+		Remember that if country is specified, that gets priority and region is plain ignored
+		******************/
+		$filter_by_company_attrib = "";
+		if(isset($search_data['country'])&&($search_data['country']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="hq_country='".mysql_real_escape_string($search_data['country'])."'";
+		}else{
+			/**********
+			might check region
+			***********/
+		}
+		
+		/********************
+		sng: 27/jul/2012
+		same for sector and industry
+		***************/
+		if(isset($search_data['sector'])&&($search_data['sector']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="sector='".mysql_real_escape_string($search_data['sector'])."'";
+		}
+		
+		if(isset($search_data['industry'])&&($search_data['industry']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="industry='".mysql_real_escape_string($search_data['industry'])."'";
+		}
+		
+		/***********************
+		sng: 27/jul/2012
+		Now we insert the snippets
+		*******************/
+		$q = "SELECT t.id as deal_id,value_in_billion,t.value_range_id,t.admin_verified,vrm.short_caption as fuzzy_value_short_caption,vrm.display_text as fuzzy_value,date_of_deal,deal_cat_name,deal_subcat1_name,deal_subcat2_name,target_company_name,seller_company_name FROM ";
+		
+		if($filter_by_company_attrib != ""){
+			$q.="(SELECT DISTINCT transaction_id FROM ".TP."transaction_companies WHERE company_id IN(SELECT company_id FROM ".TP."company WHERE TYPE='company' AND ".$filter_by_company_attrib.")) AS fca LEFT JOIN ";
+		}
+		
+		$q.="".TP."transaction AS t ";
+		
+		if($filter_by_company_attrib != ""){
+			$q.="ON (fca.transaction_id=t.id) ";
+		}
+		
+		$q.=" LEFT JOIN ".TP."transaction_value_range_master as vrm ON (t.value_range_id=vrm.value_range_id)";
+		
+		/*******************************
+		sng:27/jul/2012
+		end of snippets
+		*********************************/
 		
 		/***************
 		sng:3/feb/2012
@@ -2426,30 +2483,14 @@ class transaction{
 			}
         }
         /************************************************************************
-        sng:2/dec/2010
-        No more sector or industry of the company, we now search for these in deal_sector, deal_industry in transaction table
-        if($search_data['sector']!=""){
-            $q.=" and c.sector = '".$search_data['sector']."'";
-        }
-        /***
-        10/jul/2010
-        Logged in members can filter by industry also
-        **/
-        /**
-        if($search_data['industry']!=""){
-            $q.=" and c.industry = '".$search_data['industry']."'";
-        }
+        sng:27/july/2012
+        We now check the sector and industry of the deal participating company and not the deal_sector csv value or deal_industry csv value
+		If we need to filter deal by company attrib then we create that filtered list first and then join with transaction.
+		That means, the code is way top
         ****/
-        if(isset($search_data['sector'])&&($search_data['sector']!="")){
-            $q.=" and t.deal_sector like '%".$search_data['sector']."%'";
-        }
-        if(isset($search_data['industry'])&&($search_data['industry']!="")){
-            $q.=" and t.deal_industry like '%".$search_data['industry']."%'";
-        }
-		/***********
-		sng:13/sep/2011
-		The above works because all sector and industry names are different. We do not have sector= abc and sector =abcd
-        /******************************************************************************/
+        
+        
+		
         /***
         sng:12/may/2010
         we magic quote the company name
@@ -2469,64 +2510,13 @@ class transaction{
 		if($search_data['top_search_term']!=""){}
         ***/
         
-        /***
-        country and region
-        if country is specified, region is overridden
-        **/
-        $country_filter = "";
-        if(isset($search_data['country'])&&($search_data['country']!="")){
-            /*******************************************************
-            sng:30/Nov/2010
-            No more the country of the HQ of the company doing the deal. Now use deal_country (which is a csv)
-            $country_filter = "c.hq_country='".$search_data['country']."'";
-            ***********/
-            $country_filter = "t.deal_country LIKE '%".$search_data['country']."%'";
-            /*******************************************/
-        }else{
-            if(isset($search_data['region'])&&($search_data['region']!="")){
-                //get the country names for this region name
-                $region_q = "select cm.name from ".TP."region_master as rm left join ".TP."region_country_list as rc on(rm.id=rc.region_id) left join ".TP."country_master as cm on(rc.country_id=cm.id) where rm.name='".$search_data['region']."'";
-                $region_q_res = mysql_query($region_q);
-                if(!$region_q_res){
-                    return false;
-                }
-                
-                /*****************************************************************
-                sng:30/Nov/2010
-                No more the country of the HQ of the company doing the deal. Now use deal_country (which is a csv)
-                So now that we have got the individual countries of the region. let us create a OR clause and
-                for each country of the region, try to match it in deal_country. Since any one country from the region needs to
-                match, we use a OR
-                So say, region is BRIC. Then country filter is 
-                (deal_country like '%Brazil%' OR deal_country like '%Russia%' OR deal_country like '%India%' OR deal_country like '%China%')
-                
-                $region_country_csv = "";
-                $region_q_res_cnt = mysql_num_rows($region_q_res);
-                
-                if($region_q_res_cnt > 0){
-                    while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
-                        $region_country_csv.=",'".$region_q_res_row['name']."'";
-                    }
-                    $region_country_csv = substr($region_country_csv,1);
-                    $country_filter = "c.hq_country IN(".$region_country_csv.")";
-                }
-                ****/
-                $region_q_res_cnt = mysql_num_rows($region_q_res);
-                $region_clause = "";
-                if($region_q_res_cnt > 0){
-                    while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
-                        $region_clause.="|t.deal_country LIKE '%".$region_q_res_row['name']."%'";
-                    }
-                    $region_clause = substr($region_clause,1);
-                    $region_clause = str_replace("|"," OR ",$region_clause);
-                    $country_filter = "(".$region_clause.")";
-                }
-                /************************************************************************/
-            }
-        }
-        if($country_filter!=""){
-            $q.=" and ".$country_filter;
-        }
+        /***************************
+		sng:27/july/2012
+        We now check the country of the deal participating company and not the deal_country csv value
+		If we need to filter deal by company attrib then we create that filtered list first and then join with transaction.
+		That means, the code is way top
+        ********************/
+        
         
         if ($lastIdForAlerts) {
             $q.=" and t.id > $lastIdForAlerts" ;
@@ -4478,41 +4468,7 @@ LIMIT ".$start_offset." , ".$num_to_fetch;
             $q.=" and deal_industry like '%".$filter_arr['industry']."%'";
         }
         /**********************************************************************************/
-        ///////////////////////////////////////////
-        //filter on company of the transaction
-        $company_filter = "";
-        $company_filter_clause = "";
-        /***************************************************************************************
-        sng:4/dec/2010
-        we no longer use the country of the company. We use the deal_country or transaction.
-        Same for sector and industry
-        
-        if($filter_arr['country']!=""){
-            $company_filter_clause.=" and hq_country='".$filter_arr['country']."'";
-        }else{
-            //hq country not specified, so we can check for region
-            if($filter_arr['region']!=""){
-                $company_filter_clause.=" and hq_country IN (SELECT cm.name FROM ".TP."region_master AS rm LEFT JOIN ".TP."region_country_list AS rcl ON ( rm.id = rcl.region_id ) LEFT JOIN ".TP."country_master AS cm ON ( rcl.country_id = cm.id ) WHERE rm.name = '".$filter_arr['region']."')";
-            }
-        }
-        
-        if($filter_arr['sector']!=""){
-            $company_filter_clause.=" and sector='".$filter_arr['sector']."'";
-        }
-        
-        if($filter_arr['industry']!=""){
-            $company_filter_clause.=" and industry='".$filter_arr['industry']."'";
-        }
-        ********************************************************************************************/
-        if($company_filter_clause != ""){
-            $company_filter.=" and t.company_id IN (select company_id from ".TP."company where 1=1".$company_filter_clause.")";
-        }
-        
-        //////////////////////
-
-        if($company_filter!=""){
-            $q.=$company_filter;
-        }
+       
         
         $q.=" order by t.date_of_deal desc, t.id DESC limit ".$start_offset.",".$num_to_fetch;
         //echo $q;
