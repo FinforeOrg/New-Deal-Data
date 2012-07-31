@@ -2343,36 +2343,85 @@ class transaction{
 		If filter by company attrib is required, we do that first
 		
 		Remember that if country is specified, that gets priority and region is plain ignored
+		
+		sng:31/jul/2012
+		There is also the case where the company is given. In that case, restrict the search to deals by that company only
+		(since now we no longer use country attribute of deal or sector or industry but use the country/sector/industry of the participating companies, we ignore
+		these attributes)
 		******************/
 		$filter_by_company_attrib = "";
-		if(isset($search_data['country'])&&($search_data['country']!="")){
+		
+		if(isset($search_data['top_search_term'])&&($search_data['top_search_term']!="")){
 			if($filter_by_company_attrib != ""){
 				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
 			}
-			$filter_by_company_attrib.="hq_country='".mysql_real_escape_string($search_data['country'])."'";
-		}else{
-			/**********
-			might check region
-			***********/
+			$filter_by_company_attrib.="name like '".mysql_real_escape_string($search_data['top_search_term'])."%'";
+			
+            
+        }else{
+			if(isset($search_data['country'])&&($search_data['country']!="")){
+				if($filter_by_company_attrib != ""){
+					$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+				}
+				$filter_by_company_attrib.="hq_country='".mysql_real_escape_string($search_data['country'])."'";
+			}else{
+				/**********
+				might check region. Associated with a region is one or more countries
+				We can use IN clause, that is hq_country IN (select country names for the given region), but it seems that
+				it is much faster if we first get the country names and then create the condition with OR, that is
+				(hq_country='Brazil' OR hq_country='Russia') etc
+				***********/
+				if(isset($search_data['region'])&&($search_data['region']!="")){
+					//get the country names for this region name
+					$region_q = "SELECT ctrym.name FROM ".TP."region_master AS rgnm LEFT JOIN ".TP."region_country_list AS rcl ON ( rgnm.id = rcl.region_id ) LEFT JOIN ".TP."country_master AS ctrym ON ( rcl.country_id = ctrym.id )
+WHERE rgnm.name = '".mysql_real_escape_string($search_data['region'])."'";
+					$region_q_res = mysql_query($region_q);
+					if(!$region_q_res){
+						
+                    	return false;
+                	}
+					$region_q_res_cnt = mysql_num_rows($region_q_res);
+					$region_clause = "";
+					if($region_q_res_cnt > 0){
+						while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
+                        	$region_clause.="|hq_country='".mysql_real_escape_string($region_q_res_row['name'])."'";
+                    	}
+						$region_clause = substr($region_clause,1);
+						$region_clause = str_replace("|"," OR ",$region_clause);
+						$region_clause = "(".$region_clause.")";
+					}
+					if($region_clause!=""){
+						if($filter_by_company_attrib != ""){
+							$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+						}
+						$filter_by_company_attrib.=$region_clause;
+					}
+				}
+			}
+			
+			/********************
+			sng: 27/jul/2012
+			same for sector and industry
+			***************/
+			if(isset($search_data['sector'])&&($search_data['sector']!="")){
+				if($filter_by_company_attrib != ""){
+					$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+				}
+				$filter_by_company_attrib.="sector='".mysql_real_escape_string($search_data['sector'])."'";
+			}
+			
+			if(isset($search_data['industry'])&&($search_data['industry']!="")){
+				if($filter_by_company_attrib != ""){
+					$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+				}
+				$filter_by_company_attrib.="industry='".mysql_real_escape_string($search_data['industry'])."'";
+			}
+			/*************************************************/
 		}
 		
-		/********************
-		sng: 27/jul/2012
-		same for sector and industry
-		***************/
-		if(isset($search_data['sector'])&&($search_data['sector']!="")){
-			if($filter_by_company_attrib != ""){
-				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
-			}
-			$filter_by_company_attrib.="sector='".mysql_real_escape_string($search_data['sector'])."'";
-		}
 		
-		if(isset($search_data['industry'])&&($search_data['industry']!="")){
-			if($filter_by_company_attrib != ""){
-				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
-			}
-			$filter_by_company_attrib.="industry='".mysql_real_escape_string($search_data['industry'])."'";
-		}
+		
+		
 		
 		/***********************
 		sng: 27/jul/2012
@@ -2401,11 +2450,14 @@ class transaction{
 		sng:3/feb/2012
 		get the deals that have the matching company as participant. The distinct clause eliminate duplicates.
 		the right join restrict the other joins to the selected deal ids only
+		
+		sng:31/jul/2012
+		There is also the case where the company is given. In that case, restrict the search to deals by that company only 
+		since now we no longer use country attribute of deal or sector or industry but use the country/sector/industry of the participating companies)
+		
+		Since we have filter by company attrib, put this way up
 		********************/
-		if(isset($search_data['top_search_term'])&&($search_data['top_search_term']!="")){
-			$q.= "right join (select distinct trc.transaction_id from ".TP."transaction_companies as trc left join ".TP."company as com on(trc.company_id=com.company_id) where com.name like '".mysql_real_escape_string($search_data['top_search_term'])."%') as p on(t.id=p.transaction_id)";
-            
-        }
+		
 		
         if(isset($search_data['partner_id'])&&($search_data['partner_id']!="")){
             $q.=" left join ".TP."transaction_partners as part on(t.id=part.transaction_id)";
