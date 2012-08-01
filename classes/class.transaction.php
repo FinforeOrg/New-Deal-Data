@@ -4096,85 +4096,92 @@ LIMIT ".$start_offset." , ".$num_to_fetch;
         }
         return true;
     }
-    /**n
+    /**
     * @desc Get tombstones for specific firms based on POST
     * 
     * @param integer $firmId
     * @param integer $start
     * @param integer $end
     */
-    /**********
-    sng:9/oct/2010
-    the sector and industry is not a property of transaction. It is property of the company that is doing the deals.
-    So when we select sector and industry, we are searching for deals done by companies in that sector and industry.
-	
+    /*********************
 	sng:12/nov/2011
-	There is only one code, showcase_firm.php that use the min/max query to show the size slider.
-	Since I am removing it, no need to clutter this class. 
-    ***************/
+	showcase_firm.php used the min/max query to show the size slider.
+	Here we will use size range dropdown and no longer need the min/max. Since showcase_firm.php
+	is the only one to use $onlyMinMax argument (and since we are removing that from showcase_firm.php), we may as well
+	remove this from the function
+	*************************/
     public function getTombstonesForFirm($firmId, $start = 0, $end = 60) {
         $tablePrefix = TP;
         $ret = array();
         
-        /***
-        country and region
-        if country is specified, region is overridden
-        **/
-        $country_filter = "";
-        if($_POST['country'] != ""){
-            /*******************************************************
-            sng:30/Nov/2010
-            No more the country of the HQ of the company doing the deal. Now use deal_country (which is a csv)
-            $country_filter = "c.hq_country='".$search_data['country']."'";
-            ***********/
-            $country_filter = " AND t.deal_country LIKE '%".$_POST['country']."%'";
-            /*******************************************/
-        }else{
-            if($_POST['region'] != ""){
-                //get the country names for this region name
-                $region_q = "select cm.name from ".TP."region_master as rm left join ".TP."region_country_list as rc on(rm.id=rc.region_id) left join ".TP."country_master as cm on(rc.country_id=cm.id) where rm.name='".$_POST['region']."'";
-                $region_q_res = mysql_query($region_q);
-                //echo "<div style='display:none'><pre>$region_q</pre></div>"; 
-                if(!$region_q_res){
-                    return false;
-                }
-
-                $region_q_res_cnt = mysql_num_rows($region_q_res);
-                $region_clause = "";
-                if($region_q_res_cnt > 0){
-                    while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
-                        $region_clause.="|t.deal_country LIKE '%".$region_q_res_row['name']."%'";
-                    }
-                    $region_clause = substr($region_clause,1);
-                    $region_clause = str_replace("|"," OR ",$region_clause);
-                    $country_filter = "(".$region_clause.")";
-                }
-                $country_filter = " AND  $country_filter";
-                 //echo "<div style='display:none'><pre>$country_filter</pre></div>";  
-                /************************************************************************/
-            }
-        }
-        
-        //echo "<div style='display:none'><pre>$country_filter</pre></div>";
-                
-        /****
-        sng:9/oct/2010
-        We have 'and' for both country and region/countries now, so this is not needed
-        if($country_filter!=""){
-            $country_filter = " and ".$country_filter;
-        }
-        ****/
-        /*****
-        sng:9/oct/2010
-        Now that we have the companies filtered by country/region, let us check the sector and industry
-        **********/
-        if($_POST['sector']!=""){
-            $country_filter .= " and t.deal_sector like '%".$_POST['sector']."%'";
-        }
-        
-        if($_POST['industry']!=""){
-            $country_filter .= " and t.deal_industry like '%".$_POST['industry']."%'";
-        }
+		/******************
+		sng:1/aug/2012
+		
+		Now we no longer use the deal_country, deal_sector, deal_industry csv fields. We check the hq_country, sector, industry fields of
+		the participating companies and use only those deal records (in other words, we are now filtering using attributes of the companies and
+		if that is required, we check it first)
+		
+		If country is specified, region is ignored 
+        *************************/
+		$filter_by_company_attrib = "";
+		if(isset($_POST['country'])&&($_POST['country']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="hq_country='".mysql_real_escape_string($_POST['country'])."'";
+		}else{
+			/**********
+			might check region. Associated with a region is one or more countries
+			We can use IN clause, that is hq_country IN (select country names for the given region), but it seems that
+			it is much faster if we first get the country names and then create the condition with OR, that is
+			(hq_country='Brazil' OR hq_country='Russia') etc
+			***********/
+			if(isset($_POST['region'])&&($_POST['region']!="")){
+				//get the country names for this region name
+				$region_q = "SELECT ctrym.name FROM ".TP."region_master AS rgnm LEFT JOIN ".TP."region_country_list AS rcl ON ( rgnm.id = rcl.region_id ) LEFT JOIN ".TP."country_master AS ctrym ON ( rcl.country_id = ctrym.id )
+WHERE rgnm.name = '".mysql_real_escape_string($_POST['region'])."'";
+				$region_q_res = mysql_query($region_q);
+				if(!$region_q_res){
+					
+					return false;
+				}
+				$region_q_res_cnt = mysql_num_rows($region_q_res);
+				$region_clause = "";
+				if($region_q_res_cnt > 0){
+					while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
+						$region_clause.="|hq_country='".mysql_real_escape_string($region_q_res_row['name'])."'";
+					}
+					$region_clause = substr($region_clause,1);
+					$region_clause = str_replace("|"," OR ",$region_clause);
+					$region_clause = "(".$region_clause.")";
+				}
+				if($region_clause!=""){
+					if($filter_by_company_attrib != ""){
+						$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+					}
+					$filter_by_company_attrib.=$region_clause;
+				}
+			}
+		}
+			
+		/********************
+		sng: 27/jul/2012
+		same for sector and industry
+		***************/
+		if(isset($_POST['sector'])&&($_POST['sector']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="sector='".mysql_real_escape_string($_POST['sector'])."'";
+		}
+			
+		if(isset($_POST['industry'])&&($_POST['industry']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="industry='".mysql_real_escape_string($_POST['industry'])."'";
+		}
+		
 
         /**
         * Post data is not received as we want to so we take care of translating
@@ -4184,15 +4191,9 @@ LIMIT ".$start_offset." , ".$num_to_fetch;
         sng:9/oct/2010
         These are for transaction attribute. Sector and industry are part of company and the query clause are in $country_filter.
         So we remove these two from here
-        ****
-        $translations = array(
-          'deal_cat_name' => 'deal_cat_name',
-          'deal_subcat1_name' => 'deal_subcat1_name',
-          'deal_subcat2_name' => 'deal_subcat2_name',
-          'sector' => 'target_sector',
-          'industry' => 'target_industry',
-          'year' => 'date_of_deal',
-        );
+		
+		sng:1/aug/2012
+		now we have check the hq_country, sector, industry of the participating companies so no need to put those here
         ***/
         $translations = array(
           'deal_cat_name' => 'deal_cat_name',
@@ -4214,7 +4215,7 @@ LIMIT ".$start_offset." , ".$num_to_fetch;
         }
         
         $where = "";
-        $where .= $country_filter;
+        
         foreach ($dataReceived as $field=>$value) {
             if ($field != 'date_of_deal')
                 $where .= " AND $field = '$value'";
@@ -4232,7 +4233,7 @@ LIMIT ".$start_offset." , ".$num_to_fetch;
             }
         }
         
-        //$where .= $country_filter;
+        
 		/**********
 		sng:12/nov/2011
 		if tie, show the deal entered later
@@ -4259,12 +4260,7 @@ LIMIT ".$start_offset." , ".$num_to_fetch;
 			/********************************
 			sng:12/nov/2011
 			We now use a checkbox and send value of y via show_favourites
-            if($_POST['number_of_deals'] == "all:favorites"){
-                $favoriteList = $this->get_favorite_tombstones($_SESSION['mem_id'], true);
-                if ($favoriteList)
-                    $where .= " AND t.id IN  ($favoriteList)";
-            }
-			************************************/ 
+			************************************/
         }
 		if(isset($_POST['show_favourites'])&&('y'==$_POST['show_favourites'])){
 			$favoriteList = $this->get_favorite_tombstones($_SESSION['mem_id'], true);
@@ -4279,15 +4275,12 @@ LIMIT ".$start_offset." , ".$num_to_fetch;
 		
 		sng:12/nov/2011
 		Now we send deal_size whose values are like >=xxx (in billion) etc
+		
+		sng: 1/aug/2012
+		We no loger use the min/max slider so no longer use minimumTransactionValue and maximumTransactionValue
+		Let us remove it
 		**********/
-         /**else {
-            
-            * 2011-02-04 iMihai
-            * We wanna hide the undisclosed transactions
-            
-            $where .= " AND value_in_billion >  0";
-        }
-        */ 
+        
 		/****************************************************************
 		sng:12/nov/2011
 		filter by deal_size. The value is either blank or like >=deal value in billion or <=deal value in billion
@@ -4318,26 +4311,37 @@ LIMIT ".$start_offset." , ".$num_to_fetch;
 			}
         }
         /******************end sng:3/feb/2011**********************************************************/
+		
+		/*********
+		sng:1/aug/2012
+		
+		Put the snippets
+		******************/
+		
+		$q = "SELECT p.transaction_id from {$tablePrefix}transaction_partners AS p ";
+		
+		if($filter_by_company_attrib != ""){
+			$q.="LEFT JOIN (SELECT DISTINCT transaction_id FROM ".TP."transaction_companies WHERE company_id IN(SELECT company_id FROM ".TP."company WHERE TYPE='company' AND ".$filter_by_company_attrib.")) AS fca ON (p.transaction_id=fca.transaction_id) ";
+		}
+		
 		/************
 		sng:2/mar/2012
 		We only get active deals
 		***************/
-        $q = "SELECT transaction_id from {$tablePrefix}transaction_partners AS p 
-                LEFT JOIN {$tablePrefix}transaction as t on(p.transaction_id=t.id) 
-                LEFT JOIN {$tablePrefix}company AS c ON ( t.company_id = c.company_id )
-                WHERE t.is_active='y' AND partner_id='$firmId' $where  
-                $order
-                limit $start,$end  ";
-        //echo "<div style='display:none'><pre> $q </pre></div>";        
-        
-        //$q = sprintf($q,$firmId,$start, $end);
-        //echo "<div style='display:none'><pre> $q $start $end</pre></div>";
-        //echo "<div style='display:none'> <pre> " . $q . "</pre></div>";
-        //echo "<div style='display:none'> <pre> " . $minMaxQ . "</pre></div>";
-        //echo "<div style='display:none'><pre>$q</pre></div>";
+		$q.="LEFT JOIN {$tablePrefix}transaction as t on";
+		
+		if($filter_by_company_attrib != ""){
+			$q.="(fca.transaction_id=t.id) ";
+		}else{
+			$q.="(p.transaction_id=t.id) ";
+		}
+		
+		$q.="LEFT JOIN {$tablePrefix}company AS c ON ( t.company_id = c.company_id ) WHERE t.is_active='y' AND partner_id='$firmId' $where $order limit $start,$end  ";
+		
         $res = mysql_query( $q );
         $_SESSION['tombToken'] = base64_encode($q);
         if(!$res){
+			
             return false;
         }
         while ($row = mysql_fetch_assoc($res)) {
