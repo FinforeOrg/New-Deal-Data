@@ -80,6 +80,13 @@ if (isset($_GET['from']) && $_GET['from'] == 'savedSearches') {
     if (isset($_GET['token'])) {
         $savedSearches->loadIntoPost($_GET['token']);
     }
+	/************
+	sng:3/aug/2012
+	The base64_decode of deal_size should be last
+	***************/
+	if (isset($_POST['data'])) {
+       oneStop::loadIntoPost($_POST['data']);
+    }
 	/**********************
 	sng:12/nov/2011
 	We cannot send data like >= in POST. The sanitiser will erase it.
@@ -88,9 +95,7 @@ if (isset($_GET['from']) && $_GET['from'] == 'savedSearches') {
 	************************/
 	$_POST['deal_size'] = base64_decode($_POST['deal_size']);
 	
-    if (isset($_POST['data'])) {
-       oneStop::loadIntoPost($_POST['data']);
-    }
+    
     $g_view['data'] = array();
     $g_view['data_count'] = 0;
     
