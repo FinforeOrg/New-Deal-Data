@@ -13,6 +13,13 @@ $g_view['issuance_data']['max_value'] = 0;
 $g_view['issuance_data']['stat_count'] = 0;
 $g_view['issuance_data']['stat_data'] = array();
 
+/**********************
+sng:3/aug/2012
+We cannot send data like >= in POST. The sanitiser will erase it.
+So we base64 encoded the view file
+and we decode it here again
+************************/
+$_POST['deal_size'] = base64_decode($_POST['deal_size']);
 $success = $g_stat->generate_issuance_data($_POST,$g_view['issuance_data']['stat_data'],$g_view['issuance_data']['max_value'],$g_view['issuance_data']['stat_count']);
 if(!$success){
 	//treat it as no data

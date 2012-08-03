@@ -273,12 +273,18 @@ and the code in the view page triggers a chart creation.
       <tr>
         <td colspan="3">
 <table>
+<?php
+		  /*******************************
+			sng:3/aug/2012
+			we cannot send condition like >=2 so we encode it
+			****************************************/
+			?>
                     <tr>
                         <td style="width: 30%">&nbsp;</td>
                         <td><select name="deal_size" id="deal_size" style="width: 200px;">
                           <option value="">Refine by Deal Size</option>
                           <?php for($j=0;$j<$g_view['deal_size_filter_list_count'];$j++):?>
-                          <option value="<?php echo $g_view['deal_size_filter_list'][$j]['condition'];?>" <?php if($_POST['deal_size']==$g_view['deal_size_filter_list'][$j]['condition']){?>selected="selected"<?php } else { if ($g_view['deal_size_filter_list'][$j]['condition'] == '>=0.100') echo "selected='selected'"; }?> ><?php echo $g_view['deal_size_filter_list'][$j]['caption'];?></option>
+                          <option value="<?php echo base64_encode($g_view['deal_size_filter_list'][$j]['condition']);?>" <?php if($_POST['deal_size']==$g_view['deal_size_filter_list'][$j]['condition']){?>selected="selected"<?php } else { if ($g_view['deal_size_filter_list'][$j]['condition'] == '>=0.100') echo "selected='selected'"; }?> ><?php echo $g_view['deal_size_filter_list'][$j]['caption'];?></option>
                           <?php  endfor; ?>
                         </select></td>
                     </tr>

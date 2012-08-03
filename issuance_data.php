@@ -27,6 +27,13 @@ $savedSearches = new SavedSearches();
 if (isset($_REQUEST['token'])) {
     $savedSearches->loadIntoPost($_REQUEST['token']);
 }
+/**********************
+sng:3/aug/2012
+We cannot send data like >= in POST. The sanitiser will erase it.
+So we base64 encoded the view file
+and we decode it here again
+************************/
+$_POST['deal_size'] = base64_decode($_POST['deal_size']);
 //////////////////
 //sng: 21/apr/2010
 require("league_table_filter_support.php");
