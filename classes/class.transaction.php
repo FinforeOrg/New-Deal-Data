@@ -2430,7 +2430,7 @@ WHERE rgnm.name = '".mysql_real_escape_string($search_data['region'])."'";
 		$q = "SELECT t.id as deal_id,value_in_billion,t.value_range_id,t.admin_verified,vrm.short_caption as fuzzy_value_short_caption,vrm.display_text as fuzzy_value,date_of_deal,deal_cat_name,deal_subcat1_name,deal_subcat2_name,target_company_name,seller_company_name FROM ";
 		
 		if($filter_by_company_attrib != ""){
-			$q.="(SELECT DISTINCT transaction_id FROM ".TP."transaction_companies WHERE company_id IN(SELECT company_id FROM ".TP."company WHERE TYPE='company' AND ".$filter_by_company_attrib.")) AS fca LEFT JOIN ";
+			$q.="(SELECT DISTINCT transaction_id from ".TP."transaction_companies as fca_tc left join ".TP."company as fca_c on(fca_tc.company_id=fca_c.company_id) where fca_c.type='company' AND ".$filter_by_company_attrib.") AS fca LEFT JOIN ";
 		}
 		
 		$q.="".TP."transaction AS t ";
@@ -2638,6 +2638,7 @@ WHERE rgnm.name = '".mysql_real_escape_string($search_data['region'])."'";
         add another tie breaker - the order in which the deals were entered
         /*******************************************************/
         $q.=" limit ".$start_offset.",".$num_to_fetch;
+		
         //echo "<div style='display:none'><pre>$q</pre></div>";
         $res = mysql_query($q);
         if(!$res){
@@ -4320,8 +4321,15 @@ WHERE rgnm.name = '".mysql_real_escape_string($_POST['region'])."'";
 		
 		$q = "SELECT p.transaction_id from {$tablePrefix}transaction_partners AS p ";
 		
+		 /************
+		 sng:8/aug/2012
+		We use a join instead of IN clause for filter by company attribute
+		
+		Not LEFT join because assume that transaction_partners has T!, T2, T3 and fca has T1, T2. Left join will match T1, T2 and also T3 (with NULL
+		on right)
+		****************/
 		if($filter_by_company_attrib != ""){
-			$q.="LEFT JOIN (SELECT DISTINCT transaction_id FROM ".TP."transaction_companies WHERE company_id IN(SELECT company_id FROM ".TP."company WHERE TYPE='company' AND ".$filter_by_company_attrib.")) AS fca ON (p.transaction_id=fca.transaction_id) ";
+			$q.="INNER JOIN (SELECT DISTINCT transaction_id from ".TP."transaction_companies as fca_tc left join ".TP."company as fca_c on(fca_tc.company_id=fca_c.company_id) where fca_c.type='company' AND ".$filter_by_company_attrib.") AS fca ON (p.transaction_id=fca.transaction_id) ";
 		}
 		
 		/************
@@ -4341,7 +4349,7 @@ WHERE rgnm.name = '".mysql_real_escape_string($_POST['region'])."'";
         $res = mysql_query( $q );
         $_SESSION['tombToken'] = base64_encode($q);
         if(!$res){
-			
+			echo mysql_error();
             return false;
         }
         while ($row = mysql_fetch_assoc($res)) {
@@ -4447,7 +4455,98 @@ WHERE rgnm.name = '".mysql_real_escape_string($_POST['region'])."'";
     *****/
     public function front_get_all_deals_of_firm_paged($firm_id,$filter_arr,$start_offset,$num_to_fetch,&$data_arr,&$data_count){
         global $g_mc;
-        $q = "select c.company_id,c.name,t.id,t.value_in_billion,t.date_of_deal,t.deal_cat_name,t.deal_subcat1_name,t.deal_subcat2_name,target_company_name from ".TP."transaction_partners as p left join ".TP."transaction as t on(p.transaction_id=t.id) left join ".TP."company as c on(t.company_id=c.company_id) where partner_id='".$firm_id."'";
+		
+		/******************
+		sng:8/aug/2012
+		
+		Now we no longer use the deal_country, deal_sector, deal_industry csv fields. We check the hq_country, sector, industry fields of
+		the participating companies and use only those deal records (in other words, we are now filtering using attributes of the companies and
+		if that is required, we check it first)
+		
+		If country is specified, region is ignored 
+        *************************/
+		$filter_by_company_attrib = "";
+		if(isset($filter_arr['country'])&&($filter_arr['country']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="hq_country='".mysql_real_escape_string($filter_arr['country'])."'";
+		}else{
+			/**********
+			might check region. Associated with a region is one or more countries
+			We can use IN clause, that is hq_country IN (select country names for the given region), but it seems that
+			it is much faster if we first get the country names and then create the condition with OR, that is
+			(hq_country='Brazil' OR hq_country='Russia') etc
+			***********/
+			if(isset($filter_arr['region'])&&($filter_arr['region']!="")){
+				//get the country names for this region name
+				$region_q = "SELECT ctrym.name FROM ".TP."region_master AS rgnm LEFT JOIN ".TP."region_country_list AS rcl ON ( rgnm.id = rcl.region_id ) LEFT JOIN ".TP."country_master AS ctrym ON ( rcl.country_id = ctrym.id )
+WHERE rgnm.name = '".mysql_real_escape_string($filter_arr['region'])."'";
+				$region_q_res = mysql_query($region_q);
+				if(!$region_q_res){
+					
+					return false;
+				}
+				$region_q_res_cnt = mysql_num_rows($region_q_res);
+				$region_clause = "";
+				if($region_q_res_cnt > 0){
+					while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
+						$region_clause.="|hq_country='".mysql_real_escape_string($region_q_res_row['name'])."'";
+					}
+					$region_clause = substr($region_clause,1);
+					$region_clause = str_replace("|"," OR ",$region_clause);
+					$region_clause = "(".$region_clause.")";
+				}
+				if($region_clause!=""){
+					if($filter_by_company_attrib != ""){
+						$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+					}
+					$filter_by_company_attrib.=$region_clause;
+				}
+			}
+		}
+			
+		if(isset($filter_arr['sector'])&&($filter_arr['sector']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="sector='".mysql_real_escape_string($filter_arr['sector'])."'";
+		}
+			
+		if(isset($filter_arr['industry'])&&($filter_arr['industry']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="industry='".mysql_real_escape_string($filter_arr['industry'])."'";
+		}
+		
+		/**********
+		sng:8/aug/2012
+		Now add the snippets
+		
+		We use a join instead of IN clause for filter by company attribute
+		
+		Not LEFT join because assume that transaction_partners has T!, T2, T3 and fca has T1, T2. Left join will match T1, T2 and also T3 (with NULL
+		on right)
+		************/
+        $q = "select c.company_id,c.name,t.id,t.value_in_billion,t.date_of_deal,t.deal_cat_name,t.deal_subcat1_name,t.deal_subcat2_name,target_company_name from ".TP."transaction_partners as p ";
+		
+		if($filter_by_company_attrib != ""){
+			$q.="INNER JOIN (SELECT DISTINCT transaction_id from ".TP."transaction_companies as fca_tc left join ".TP."company as fca_c on(fca_tc.company_id=fca_c.company_id) where fca_c.type='company' AND ".$filter_by_company_attrib.") AS fca ON (p.transaction_id=fca.transaction_id) ";
+		}
+		
+		$q.="left join ".TP."transaction as t on";
+		
+		if($filter_by_company_attrib != ""){
+			$q.="(fca.transaction_id=t.id) ";
+		}else{
+			$q.="(p.transaction_id=t.id) ";
+		}
+		/************
+		sng:8/aug/2012
+		We only get active deals
+		***************/
+		$q.="left join ".TP."company as c on(t.company_id=c.company_id) where t.is_active='y' AND partner_id='".$firm_id."'";
         
         //filter on transaction types
         if($filter_arr['deal_cat_name']!=""){
@@ -4485,44 +4584,14 @@ WHERE rgnm.name = '".mysql_real_escape_string($_POST['region'])."'";
         sng:4/dec/2010
         we no longer use the country of the company. We use the deal_country or transaction.
         Same for sector and industry
+		
+		sng:8/aug/2012
+		Now we have participating companies for a deal and we now check the country/sector/industry of participating
+		companies and the deals done by those companies instead of checking the deal_country, deal_sector, deal_industry (all csv) of transaction table
+		
+		The check is way up since we require a join
         ****************/
-        $country_filter = "";
-        if($filter_arr['country']!=""){
-            //country specified, we do not consider region
-            $country_filter.="deal_country LIKE '%".$filter_arr['country']."%'";
-        }else{
-            //country not specified, check for region
-            if($filter_arr['region']!=""){
-                //get the country names for this region name
-                $region_q = "select cm.name from ".TP."region_master as rm left join ".TP."region_country_list as rc on(rm.id=rc.region_id) left join ".TP."country_master as cm on(rc.country_id=cm.id) where rm.name='".$filter_arr['region']."'";
-                $region_q_res = mysql_query($region_q);
-                if(!$region_q_res){
-                    return false;
-                }
-                
-                $region_q_res_cnt = mysql_num_rows($region_q_res);
-                $region_clause = "";
-                if($region_q_res_cnt > 0){
-                    while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
-                        $region_clause.="|deal_country LIKE '%".$region_q_res_row['name']."%'";
-                    }
-                    $region_clause = substr($region_clause,1);
-                    $region_clause = str_replace("|"," OR ",$region_clause);
-                    $country_filter = "(".$region_clause.")";
-                }
-            }
-        }
-
-        if($country_filter!=""){
-            $q.=" and ".$country_filter;
-        }
         
-        if($filter_arr['sector']!=""){
-            $q.=" and deal_sector like '%".$filter_arr['sector']."%'";
-        }
-        if($filter_arr['industry']!=""){
-            $q.=" and deal_industry like '%".$filter_arr['industry']."%'";
-        }
         /**********************************************************************************/
        
         
