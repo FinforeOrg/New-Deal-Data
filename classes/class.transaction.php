@@ -4608,6 +4608,13 @@ WHERE rgnm.name = '".mysql_real_escape_string($filter_arr['region'])."'";
             return true;
         }
         ////////////////////
+		/*********************
+		sng:8/aug/2012
+		Now we have one or more participants for a deal
+		*******************/
+		require_once("classes/class.transaction_company.php");
+		$g_trans_comp = new transaction_company();
+		
         for($i=0;$i<$data_count;$i++){
             $data_arr[$i] = mysql_fetch_assoc($res);
             $data_arr[$i]['name'] = $g_mc->db_to_view($data_arr[$i]['name']);
@@ -4627,6 +4634,15 @@ WHERE rgnm.name = '".mysql_real_escape_string($filter_arr['region'])."'";
             if(!$success){
                 return false;
             }
+			/****************
+			sng:8/aug/2012
+			get the deal participants, just the names
+			************/
+			$data_arr[$i]['participants'] = NULL;
+			$success = $g_trans_comp->get_deal_participants($transaction_id,$data_arr[$i]['participants']);
+			if(!$success){
+				return false;
+			}
         }
         return true;
     }

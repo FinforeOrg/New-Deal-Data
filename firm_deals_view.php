@@ -49,7 +49,16 @@ function goto_suggest_deal(){
 					for($j=0;$j<$total;$j++){
 						?>
 						<tr>
-						<td><a href="company.php?show_company_id=<?php echo $g_view['deal_data'][$j]['company_id'];?>"><?php echo $g_view['deal_data'][$j]['name'];?></a></td>
+						<td>
+						<?php
+						/**************
+						sng:8/aug/2012
+						We now have multiple companies per deal
+						<a href="company.php?show_company_id=<?php echo $g_view['deal_data'][$j]['company_id'];?>"><?php echo $g_view['deal_data'][$j]['name'];?></a>
+						***********/
+						echo Util::deal_participants_to_csv_with_links($g_view['deal_data'][$j]['participants']);
+						?>
+						</td>
 						<td><?php echo $g_view['deal_data'][$j]['date_of_deal'];?></td>
 						<td>
 						<?php 
