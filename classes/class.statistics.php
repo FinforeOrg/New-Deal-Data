@@ -867,8 +867,62 @@ class statistics{
 		those deals in which the matching companies were participants
 		
 		We do not need IN clause. We can now use the WHERE clause to filter
+		Also, if we have company attributes, we do an INNER join to get only the deals that are in both
         ***************************************************************************************/
-        
+        $filter_by_company_attrib = "";
+		if(isset($stat_params['country'])&&($stat_params['country']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="hq_country='".mysql_real_escape_string($stat_params['country'])."'";
+		}else{
+			/**********
+			might check region. Associated with a region is one or more countries
+			We can use IN clause, that is hq_country IN (select country names for the given region), but it seems that
+			it is much faster if we first get the country names and then create the condition with OR, that is
+			(hq_country='Brazil' OR hq_country='Russia') etc
+			***********/
+			if(isset($stat_params['region'])&&($stat_params['region']!="")){
+				//get the country names for this region name
+				$region_q = "SELECT ctrym.name FROM ".TP."region_master AS rgnm LEFT JOIN ".TP."region_country_list AS rcl ON ( rgnm.id = rcl.region_id ) LEFT JOIN ".TP."country_master AS ctrym ON ( rcl.country_id = ctrym.id )
+WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
+				$region_q_res = mysql_query($region_q);
+				if(!$region_q_res){
+					
+					return false;
+				}
+				$region_q_res_cnt = mysql_num_rows($region_q_res);
+				$region_clause = "";
+				if($region_q_res_cnt > 0){
+					while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
+						$region_clause.="|hq_country='".mysql_real_escape_string($region_q_res_row['name'])."'";
+					}
+					$region_clause = substr($region_clause,1);
+					$region_clause = str_replace("|"," OR ",$region_clause);
+					$region_clause = "(".$region_clause.")";
+				}
+				if($region_clause!=""){
+					if($filter_by_company_attrib != ""){
+						$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+					}
+					$filter_by_company_attrib.=$region_clause;
+				}
+			}
+		}
+			
+		if(isset($stat_params['sector'])&&($stat_params['sector']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="sector='".mysql_real_escape_string($stat_params['sector'])."'";
+		}
+			
+		if(isset($stat_params['industry'])&&($stat_params['industry']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="industry='".mysql_real_escape_string($stat_params['industry'])."'";
+		}
         /*************************
         sng:26/nov/2010
         Now the grouping can be quarterly, year halfly or yearly
@@ -883,8 +937,17 @@ class statistics{
         if($month_div == "y"){
             $q.="year( date_of_deal )  AS D";
         }
-        
-        $q.=" FROM ".TP."transaction where 1=1";
+        /**************
+		sng:9/aug/2012
+		Now do the snippets
+		**************/
+        $q.=" FROM ".TP."transaction as t ";
+		
+		if($filter_by_company_attrib!=""){
+			$q.="INNER JOIN (SELECT DISTINCT transaction_id from ".TP."transaction_companies as fca_tc left join ".TP."company as fca_c on(fca_tc.company_id=fca_c.company_id) where fca_c.type='company' AND ".$filter_by_company_attrib.") AS fca ON (t.id=fca.transaction_id) ";
+		}
+		
+		$q.="where 1=1";
 		
         if($filter_trans_clause!=""){
             $q.=$filter_trans_clause;
@@ -894,7 +957,7 @@ class statistics{
         
         $q.=" having D!='".$exclude_term."' order by D";
         /********************************************************/
-        echo $q;die();
+        //echo $q;die();
 
         $res = mysql_query($q);
         if(!$res){
