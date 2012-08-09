@@ -865,10 +865,10 @@ class statistics{
         sng:9/aug/2012
         We now have participating companies and we check country/sector/industry of the companies and consider only
 		those deals in which the matching companies were participants
+		
+		We do not need IN clause. We can now use the WHERE clause to filter
         ***************************************************************************************/
-        if($filter_trans_clause != ""){
-            $filter_trans = "id IN (select id from ".TP."transaction where 1=1".$filter_trans_clause.")";
-        }
+        
         /*************************
         sng:26/nov/2010
         Now the grouping can be quarterly, year halfly or yearly
@@ -885,15 +885,16 @@ class statistics{
         }
         
         $q.=" FROM ".TP."transaction where 1=1";
-        if($filter_trans!=""){
-            $q.=" and ".$filter_trans;
+		
+        if($filter_trans_clause!=""){
+            $q.=$filter_trans_clause;
         }
         
         $q.=" GROUP BY D";
         
         $q.=" having D!='".$exclude_term."' order by D";
         /********************************************************/
-        //echo $q;die();
+        echo $q;die();
 
         $res = mysql_query($q);
         if(!$res){
