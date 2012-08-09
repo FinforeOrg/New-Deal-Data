@@ -856,96 +856,16 @@ class statistics{
             $filter_trans_clause.=" and value_in_billion".$stat_params['deal_size'];
         }
         
-        /**************************************************************************************
-        sng:1/dec/2010
-        Now when country is present, we check the transaction::deal_country field
-        Same for region
-        *********************/
-        $country_filter = "";
-        if($stat_params['country']!=""){
-            //country specified, we do not consider region
-            $country_filter.="deal_country LIKE '%".$stat_params['country']."%'";
-        }else{
-            //country not specified, check for region
-            if($stat_params['region']!=""){
-                //get the country names for this region name
-                $region_q = "select cm.name from ".TP."region_master as rm left join ".TP."region_country_list as rc on(rm.id=rc.region_id) left join ".TP."country_master as cm on(rc.country_id=cm.id) where rm.name='".$stat_params['region']."'";
-                $region_q_res = mysql_query($region_q);
-                if(!$region_q_res){
-                    return false;
-                }
-                
-                /*****************
-                sng:1/Dec/2010
-                No more the country of the HQ of the company doing the deal. Now use deal_country (which is a csv)
-                So now that we have got the individual countries of the region. let us create a OR clause and
-                for each country of the region, try to match it in deal_country. Since any one country from the region needs to
-                match, we use a OR
-                So say, region is BRIC. Then country filter is 
-                (deal_country like '%Brazil%' OR deal_country like '%Russia%' OR deal_country like '%India%' OR deal_country like '%China%')
-                
-                ****/
-                $region_q_res_cnt = mysql_num_rows($region_q_res);
-                $region_clause = "";
-                if($region_q_res_cnt > 0){
-                    while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
-                        $region_clause.="|deal_country LIKE '%".$region_q_res_row['name']."%'";
-                    }
-                    $region_clause = substr($region_clause,1);
-                    $region_clause = str_replace("|"," OR ",$region_clause);
-                    $country_filter = "(".$region_clause.")";
-                }
-            }
-        }
-        if($country_filter!=""){
-            $filter_trans_clause.=" and ".$country_filter;
-        }
-        /*********************************************************************************************/
-        /*****************************************************************************************
-        sng:3/dec/2010
-        Now when sector or industry is present, we search that in transaction::deal_sector, or transaction::deal_industry
-        ********************/
-        if($stat_params['sector']!=""){
-            $filter_trans_clause.= " and deal_sector like '%".$stat_params['sector']."%'";
-        }
-        if($stat_params['industry']!=""){
-            $filter_trans_clause.= " and deal_industry like '%".$stat_params['industry']."%'";
-        }
-        /***************************************************************************************************************/
-        //////////////////////////
-        //filter by condition on company
-        $company_filter_clause = "";
-        /****************************************************************
-        sng:3/dec/2010
-        Now when sector or industry is present, we search that in transaction::deal_sector, or transaction::deal_industry
-        if($stat_params['sector']!=""){
-            $company_filter_clause.=" and sector='".$stat_params['sector']."'";
-        }
         
-        if($stat_params['industry']!=""){
-            $company_filter_clause.=" and industry='".$stat_params['industry']."'";
-        }
-        *********************************************************************************************/
         /*************************************************************************************
         sng:1/dec/2010
         Now when country is present, we check the transaction::deal_country field
         Same for region
-        so we do not check the company of the country doing the deal
         
-        if($stat_params['country']!=""){
-            //country specified, we do not consider region
-            $company_filter_clause.=" and hq_country='".$stat_params['country']."'";
-        }else{
-            //country not specified, check for region
-            if($stat_params['region']!=""){
-                $company_filter_clause.=" and hq_country IN(select name from ".TP."region_country_list as rc left join ".TP."country_master as c on(rc.country_id=c.id) where region_id IN (select id from ".TP."region_master where name='".$stat_params['region']."'))";
-            }
-        }
+        sng:9/aug/2012
+        We now have participating companies and we check country/sector/industry of the companies and consider only
+		those deals in which the matching companies were participants
         ***************************************************************************************/
-        if($company_filter_clause!=""){
-            $filter_trans_clause.=" and company_id in (SELECT company_id from ".TP."company where 1=1".$company_filter_clause.")";
-        }
-        
         if($filter_trans_clause != ""){
             $filter_trans = "id IN (select id from ".TP."transaction where 1=1".$filter_trans_clause.")";
         }
