@@ -1162,37 +1162,8 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
             $filter_trans_clause.=" and ".$country_filter;
         }
         /*********************************************************************************************/
-        //////////////////////////
-        //filter by condition on company
-        $company_filter_clause = "";
-        /*************************************************************************
-        sng:3/dec/2010
-        Now we search for sector and industry in transaction table instead of company
-        if($stat_params['sector']!=""){
-            $company_filter_clause.=" and sector='".$stat_params['sector']."'";
-        }
-        if($stat_params['industry']!=""){
-            $company_filter_clause.=" and industry='".$stat_params['industry']."'";
-        }
-        *********************************/
-        /**********************************************
-        sng:1/dec/2010
-        Now when country is present, we check the transaction::deal_country field
-        Same for region
-        so we do not check the company of the country doing the deal
-        if($stat_params['country']!=""){
-            //country specified, we do not consider region
-            $company_filter_clause.=" and hq_country='".$stat_params['country']."'";
-        }else{
-            //country not specified, check for region
-            if($stat_params['region']!=""){
-                $company_filter_clause.=" and hq_country IN(select name from ".TP."region_country_list as rc left join ".TP."country_master as c on(rc.country_id=c.id) where region_id IN (select id from ".TP."region_master where name='".$stat_params['region']."'))";
-            }
-        }
-        *******************************************************/
-        if($company_filter_clause!=""){
-            $filter_trans_clause.=" and company_id in (SELECT company_id from ".TP."company where 1=1".$company_filter_clause.")";
-        }
+        
+        
         //////////////////////////////////
         if($filter_trans_clause != ""){
             $filter_trans = "transaction_id IN (select id from ".TP."transaction where 1=1".$filter_trans_clause.")";
@@ -1337,36 +1308,6 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
                 }
                 $filter_trans_clause = "";
                 //////////////////////////////////////////
-                //the case of country / region
-                $company_filter_clause = "";
-                /********************************************************************
-                sng:3/nov/2010
-                Now when sector or industry is specified, we search in transaction table
-                if($stat_params['sector']!=""){
-                    $company_filter_clause.=" and sector='".$stat_params['sector']."'";
-                }
-                if($stat_params['industry']!=""){
-                    $company_filter_clause.=" and industry='".$stat_params['industry']."'";
-                }
-                *****************************************************************/
-                /************************************************************
-                sng:1/dec/2010
-                Now when country is present, we check the transaction::deal_country field
-                Same for region
-                so we do not check the company of the country doing the deal
-                if($stat_params['country']!=""){
-                    //country specified, we do not consider region
-                    $company_filter_clause.=" and hq_country='".$stat_params['country']."'";
-                }else{
-                    //country not specified, check for region
-                    if($stat_params['region']!=""){
-                        $company_filter_clause.=" and hq_country IN(select name from ".TP."region_country_list as rc left join ".TP."country_master as c on(rc.country_id=c.id) where region_id IN (select id from ".TP."region_master where name='".$stat_params['region']."'))";
-                    }
-                }
-                *********************************************************************/
-                if($company_filter_clause!=""){
-                    $filter_trans_clause.="and t.company_id in (SELECT company_id from ".TP."company where 1=1".$company_filter_clause.")";
-                }
                 
                 if($filter_trans_clause !=""){
                     $q.=$filter_trans_clause;
