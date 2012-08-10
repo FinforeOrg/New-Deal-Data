@@ -1163,14 +1163,12 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
         }
         /*********************************************************************************************/
         
-        
-        //////////////////////////////////
-        if($filter_trans_clause != ""){
-            $filter_trans = "transaction_id IN (select id from ".TP."transaction where 1=1".$filter_trans_clause.")";
-        }
-        
+		/**********************
+		sng:10/aug/2012
+        Since we use the filter clause only against transaction table, why not use it directly instead of using IN clause
+		**********************/
         if (isset($stat_params['max_date'])) {
-            $filter_trans .= sprintf(' and last_edited < "%s" ', $stat_params['max_date']); 
+            $filter_trans_clause .= sprintf(' and last_edited < "%s" ', $stat_params['max_date']); 
         }
         /////////////////////////////////////
         if(isset($stat_params['ranking_criteria'])&&($stat_params['ranking_criteria'] == "num_deals")){
@@ -1183,8 +1181,12 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
                         LEFT JOIN " . TP . "transaction t 
                             ON t.id = tp.transaction_id                            
                     WHERE partner_type = '".$stat_params['partner_type']."'";
-            if($filter_trans != ""){
-                $q.=" and ".$filter_trans;
+            if($filter_trans_clause != ""){
+				/************
+				sng:10/aug/2012
+				since we already have AND
+				****/
+                $q.=$filter_trans_clause;
             }
             $q.=" GROUP BY partner_id ORDER BY num_deals DESC LIMIT 0, 5) AS deals_banks LEFT JOIN (SELECT company_id, name, short_name FROM ".TP."company WHERE TYPE = '".$stat_params['partner_type']."') AS companies ON ( deals_banks.partner_id = companies.company_id )";
         }else{
@@ -1198,125 +1200,17 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
                                 tp.partner_id FROM ".TP."transaction_partners AS tp 
                             LEFT JOIN ".TP."transaction AS t ON ( tp.transaction_id = t.id ) 
                             WHERE tp.partner_type = '".$stat_params['partner_type']."'";
-                $filter_trans_clause = "";
-                if(isset($stat_params['deal_cat_name'])&&($stat_params['deal_cat_name']!="")){
-                    $filter_trans_clause.=" and deal_cat_name='".$stat_params['deal_cat_name']."'";
-                }
-                if(isset($stat_params['deal_subcat1_name'])&&($stat_params['deal_subcat1_name']!="")){
-                    $filter_trans_clause.=" and deal_subcat1_name='".$stat_params['deal_subcat1_name']."'";
-                }
-                if(isset($stat_params['deal_subcat2_name'])&&($stat_params['deal_subcat2_name']!="")){
-                    $filter_trans_clause.=" and deal_subcat2_name='".$stat_params['deal_subcat2_name']."'";
-                }
-                /***********************************************************
-                sng:3/nov/2010
-                Now when sector or industry is specified, we search in transaction table
-                ***************/
-                if(isset($stat_params['sector'])&&($stat_params['sector']!="")){
-                    $filter_trans_clause.=" and deal_sector like '%".$stat_params['sector']."%'";
-                }
-                if(isset($stat_params['industry'])&&($stat_params['industry']!="")){
-                    $filter_trans_clause.=" and deal_industry like '%".$stat_params['industry']."%'";
-                }
-                /*********************************************************************/
-                /***
-                sng:11/jun/2010
-                The year can be in a range like 2009-2010 or it may be a single like 2009
-                *******/
-                if(isset($stat_params['year'])&&($stat_params['year']!="")){
-                    /*****
-                    sng:29/sep/2010
-                    if use_deal_date is true, it means, date range id was sent.
-                    in that case do not use year in the stat_param
-                    **********/
-                    if($use_deal_date){
-                        if($use_deal_date_from!="0000-00-00"){
-                            $filter_trans_clause.=" and date_of_deal>='".$use_deal_date_from."'";
-                        }
-                        if($use_deal_date_to!="0000-00-00"){
-                            $filter_trans_clause.=" AND date_of_deal<='".$use_deal_date_to."'";
-                        }
-                    }else{
-                        $year_tokens = explode("-",$stat_params['year']);
-                        $year_tokens_count = count($year_tokens);
-                        if($year_tokens_count == 1){
-                            //singleton year
-                            $filter_trans_clause.=" and year(date_of_deal)='".$year_tokens[0]."'";
-                        }
-                        if($year_tokens_count == 2){
-                            //range year
-                            $filter_trans_clause.=" and year(date_of_deal)>='".$year_tokens[0]."' AND year(date_of_deal)<='".$year_tokens[1]."'";
-                        }
-                    }
-                    ///$filter_trans_clause.=" and year(date_of_deal)='".$stat_params['year']."'";
-                }
-                /***
-                sng:23/july/2010
-                The deal size can be blank or <=valuein billion or >=value in billion
-                ********/
-                if(isset($stat_params['deal_size'])&&($stat_params['deal_size']!="")){
-                    $filter_trans_clause.=" and value_in_billion".$stat_params['deal_size'];
-                }
-                /**************************************************************************************
-                sng:1/dec/2010
-                Now when country is present, we check the transaction::deal_country field
-                Same for region
-                *********************/
-                $country_filter = "";
-                if(isset($stat_params['country'])&&($stat_params['country']!="")){
-                    //country specified, we do not consider region
-                    $country_filter.="deal_country LIKE '%".$stat_params['country']."%'";
-                }else{
-                    //country not specified, check for region
-                    if(isset($stat_params['region'])&&($stat_params['region']!="")){
-                        //get the country names for this region name
-                        $region_q = "select cm.name from ".TP."region_master as rm left join ".TP."region_country_list as rc on(rm.id=rc.region_id) left join ".TP."country_master as cm on(rc.country_id=cm.id) where rm.name='".$stat_params['region']."'";
-                        $region_q_res = mysql_query($region_q);
-                        if(!$region_q_res){
-                            return false;
-                        }
-                        
-                        /*****************
-                        sng:1/Dec/2010
-                        No more the country of the HQ of the company doing the deal. Now use deal_country (which is a csv)
-                        So now that we have got the individual countries of the region. let us create a OR clause and
-                        for each country of the region, try to match it in deal_country. Since any one country from the region needs to
-                        match, we use a OR
-                        So say, region is BRIC. Then country filter is 
-                        (deal_country like '%Brazil%' OR deal_country like '%Russia%' OR deal_country like '%India%' OR deal_country like '%China%')
-                        
-                        ****/
-                        $region_q_res_cnt = mysql_num_rows($region_q_res);
-                        $region_clause = "";
-                        if($region_q_res_cnt > 0){
-                            while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
-                                $region_clause.="|deal_country LIKE '%".$region_q_res_row['name']."%'";
-                            }
-                            $region_clause = substr($region_clause,1);
-                            $region_clause = str_replace("|"," OR ",$region_clause);
-                            $country_filter = "(".$region_clause.")";
-                        }
-                    }
-                }
-                if($country_filter!=""){
-                    $filter_trans_clause.=" and ".$country_filter;
-                }
-                /*********************************************************************************************/
-                ///////////////////////
+							
+                /************
+				sng:10/aug/2012
+				we reuse
+				****/
                 if($filter_trans_clause !=""){
                     $q.=$filter_trans_clause;
                 }
-                $filter_trans_clause = "";
-                //////////////////////////////////////////
+               
+                                
                 
-                if($filter_trans_clause !=""){
-                    $q.=$filter_trans_clause;
-                }
-                
-                if (isset($stat_params['max_date'])) {
-                    $q .= sprintf(' and last_edited < "%s" ', $stat_params['max_date']); 
-                }                
-                $filter_trans_clause = "";
                 /////////////////////////////////////////
                 $q.=" GROUP BY partner_id ORDER BY total_deal_value DESC LIMIT 0, 5) AS deals_assoc LEFT JOIN (SELECT company_id, name, short_name FROM ".TP."company WHERE TYPE = '".$stat_params['partner_type']."') AS companies ON ( deals_assoc.partner_id = companies.company_id )";
                 /////////////////////////////////////////////////////////////////////////
@@ -1332,12 +1226,14 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
                                 LEFT JOIN " . TP . "transaction t 
                                     ON t.id = tp.transaction_id
                             WHERE partner_type = '".$stat_params['partner_type']."'";
-                    if($filter_trans != ""){
-                        $q.=" and ".$filter_trans;
+							/************
+				sng:10/aug/2012
+				we reuse
+				****/
+                    if($filter_trans_clause != ""){
+                        $q.=$filter_trans_clause;
                     }
-                    if (isset($stat_params['max_date'])) {
-                        $q .= sprintf(' and last_edited < "%s" ', $stat_params['max_date']); 
-                    }                     
+                                         
                     $q.=" GROUP BY partner_id ORDER BY total_adjusted_deal_value DESC LIMIT 0, 5) AS deals_assoc LEFT JOIN (SELECT company_id, name, short_name FROM ".TP."company WHERE TYPE = '".$stat_params['partner_type']."') AS companies ON ( deals_assoc.partner_id = companies.company_id )";
                 }else{
                     //unknown stat
@@ -1348,6 +1244,7 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
         ///////////////////////////////////////////////////////////////////////////
         $res = mysql_query($q);
         if(!$res){
+			//echo $q;
             //echo mysql_error();
             return false;
         }
