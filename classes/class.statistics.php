@@ -1335,17 +1335,11 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
     *********/
     public function front_generate_league_table_for_firms_paged($stat_param,$start_offset,$num_to_fetch,&$data_arr,&$data_count){
         global $g_mc;
-        ///////////////////////////////////////////////////////
-        //filter on company of the transaction
-        $company_filter = "";
-        $company_filter_clause = "";
-        
-        
-        
-        if($company_filter_clause != ""){
-            $company_filter.=" and company_id IN (select company_id from ".TP."company where 1=1".$company_filter_clause.")";
-        }
-        ///////////////////////////////////////////////
+        /********************
+		sng:13/aug/2012
+		Now we have one or more participants for a deal. We no longer check the deal_country/deal_sector/deal_industry csv fields for a deal.
+		We now check the hq_country/sector/industry or the participants and consider only those deals
+		*******************/
         
         $q = "SELECT num_deals, partner_id, total_adjusted_deal_value, total_deal_value, name as firm_name FROM ( SELECT count( * ) AS num_deals, partner_id, sum( adjusted_value_in_billion ) AS total_adjusted_deal_value, sum( value_in_billion ) AS total_deal_value FROM ".TP."transaction_partners AS p LEFT JOIN ".TP."transaction AS t ON ( p.transaction_id = t.id ) WHERE partner_type = '".$stat_param['partner_type']."'";
         //////////////////////////////////////////
@@ -1359,17 +1353,7 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
         if($stat_param['deal_subcat2_name']!=""){
             $q.=" and deal_subcat2_name='".$stat_param['deal_subcat2_name']."'";
         }
-        /*********************************************************************************
-        sng:3/dec/2010
-        now if sector is present, we will search in transaction::deal_sector
-        if industry is present, we will search in transaction::deal_industry
-        ****************/
-        if($stat_param['sector']!=""){
-            $q.=" and deal_sector like '%".$stat_param['sector']."%'";
-        }
-        if($stat_param['industry']!=""){
-            $q.=" and deal_industry like '%".$stat_param['industry']."%'";
-        }
+        
         /***
         sng:11/jun/2010
         The year can be in a range like 2009-2010 or it may be a single like 2009
@@ -1395,58 +1379,8 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
             $q.=" and value_in_billion".$stat_param['deal_size'];
         }
         
-        /**************************************************************************************
-        sng:1/dec/2010
-        Now when country is present, we check the transaction::deal_country field
-        Same for region
-        *********************/
-        $country_filter = "";
-        if($stat_param['country']!=""){
-            //country specified, we do not consider region
-            $country_filter.="deal_country LIKE '%".$stat_param['country']."%'";
-        }else{
-            //country not specified, check for region
-            if($stat_param['region']!=""){
-                //get the country names for this region name
-                $region_q = "select cm.name from ".TP."region_master as rm left join ".TP."region_country_list as rc on(rm.id=rc.region_id) left join ".TP."country_master as cm on(rc.country_id=cm.id) where rm.name='".$stat_param['region']."'";
-                $region_q_res = mysql_query($region_q);
-                if(!$region_q_res){
-                    return false;
-                }
-                
-                /*****************
-                sng:1/Dec/2010
-                No more the country of the HQ of the company doing the deal. Now use deal_country (which is a csv)
-                So now that we have got the individual countries of the region. let us create a OR clause and
-                for each country of the region, try to match it in deal_country. Since any one country from the region needs to
-                match, we use a OR
-                So say, region is BRIC. Then country filter is 
-                (deal_country like '%Brazil%' OR deal_country like '%Russia%' OR deal_country like '%India%' OR deal_country like '%China%')
-                
-                ****/
-                $region_q_res_cnt = mysql_num_rows($region_q_res);
-                $region_clause = "";
-                if($region_q_res_cnt > 0){
-                    while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
-                        $region_clause.="|deal_country LIKE '%".$region_q_res_row['name']."%'";
-                    }
-                    $region_clause = substr($region_clause,1);
-                    $region_clause = str_replace("|"," OR ",$region_clause);
-                    $country_filter = "(".$region_clause.")";
-                }
-            }
-        }
-        if($country_filter!=""){
-            $q.=" and ".$country_filter;
-        }
+        
         /*********************************************************************************************/
-        
-        //////////////////////
-
-        if($company_filter!=""){
-            $q.=$company_filter;
-        }
-        
         if (isset($stat_param['min_date'])) {
             $q .= sprintf(" and t.last_edited >= '%s'", $stat_param['min_date']);
         }
