@@ -1340,8 +1340,71 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
 		Now we have one or more participants for a deal. We no longer check the deal_country/deal_sector/deal_industry csv fields for a deal.
 		We now check the hq_country/sector/industry or the participants and consider only those deals
 		*******************/
-        
-        $q = "SELECT num_deals, partner_id, total_adjusted_deal_value, total_deal_value, name as firm_name FROM ( SELECT count( * ) AS num_deals, partner_id, sum( adjusted_value_in_billion ) AS total_adjusted_deal_value, sum( value_in_billion ) AS total_deal_value FROM ".TP."transaction_partners AS p LEFT JOIN ".TP."transaction AS t ON ( p.transaction_id = t.id ) WHERE partner_type = '".$stat_param['partner_type']."'";
+		$filter_by_company_attrib = "";
+		if(isset($stat_param['country'])&&($stat_param['country']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="hq_country='".mysql_real_escape_string($stat_param['country'])."'";
+		}else{
+			/**********
+			might check region. Associated with a region is one or more countries
+			We can use IN clause, that is hq_country IN (select country names for the given region), but it seems that
+			it is much faster if we first get the country names and then create the condition with OR, that is
+			(hq_country='Brazil' OR hq_country='Russia') etc
+			***********/
+			if(isset($stat_param['region'])&&($stat_param['region']!="")){
+				//get the country names for this region name
+				$region_q = "SELECT ctrym.name FROM ".TP."region_master AS rgnm LEFT JOIN ".TP."region_country_list AS rcl ON ( rgnm.id = rcl.region_id ) LEFT JOIN ".TP."country_master AS ctrym ON ( rcl.country_id = ctrym.id )
+WHERE rgnm.name = '".mysql_real_escape_string($stat_param['region'])."'";
+				$region_q_res = mysql_query($region_q);
+				if(!$region_q_res){
+					
+					return false;
+				}
+				$region_q_res_cnt = mysql_num_rows($region_q_res);
+				$region_clause = "";
+				if($region_q_res_cnt > 0){
+					while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
+						$region_clause.="|hq_country='".mysql_real_escape_string($region_q_res_row['name'])."'";
+					}
+					$region_clause = substr($region_clause,1);
+					$region_clause = str_replace("|"," OR ",$region_clause);
+					$region_clause = "(".$region_clause.")";
+				}
+				if($region_clause!=""){
+					if($filter_by_company_attrib != ""){
+						$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+					}
+					$filter_by_company_attrib.=$region_clause;
+				}
+			}
+		}
+			
+		if(isset($stat_param['sector'])&&($stat_param['sector']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="sector='".mysql_real_escape_string($stat_param['sector'])."'";
+		}
+			
+		if(isset($stat_param['industry'])&&($stat_param['industry']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="industry='".mysql_real_escape_string($stat_param['industry'])."'";
+		}
+        /*************************************************************/
+        $q = "SELECT num_deals, partner_id, total_adjusted_deal_value, total_deal_value, name as firm_name FROM ( SELECT count( * ) AS num_deals, partner_id, sum( adjusted_value_in_billion ) AS total_adjusted_deal_value, sum( value_in_billion ) AS total_deal_value FROM ".TP."transaction_partners AS p LEFT JOIN ".TP."transaction AS t ON ( p.transaction_id = t.id )";
+		/***************
+		sng:13/aug/2012
+		snippet
+		Why inner join? We want to consider only those deals on the left which satisfy the conditions on the right
+		***********/
+		if($filter_by_company_attrib!=""){
+			$q.=" INNER JOIN (SELECT DISTINCT transaction_id from ".TP."transaction_companies as fca_tc left join ".TP."company as fca_c on(fca_tc.company_id=fca_c.company_id) where fca_c.type='company' AND ".$filter_by_company_attrib.") AS fca ON (t.id=fca.transaction_id) ";
+		}
+		$q.=" WHERE partner_type = '".$stat_param['partner_type']."'";
         //////////////////////////////////////////
         //filter on transaction types
         if($stat_param['deal_cat_name']!=""){
