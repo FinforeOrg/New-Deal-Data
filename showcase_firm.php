@@ -66,10 +66,14 @@ if(!$success){
 //get the latest tombstones
 $g_view['data'] = array();
 $g_view['data_count'] = 0;
+/*********************************
+sng:13/aug/2012
+Since we are using Mihai's code, we do not need this
 $success = $g_trans->get_showcase_deal_ids_of_firm($g_view['firm_id'],24,$g_view['data'],$g_view['data_count']);
 if(!$success){
 	die("Cannot get tombstones");
 }
+***************/
 ///////////////////////////////////////
 require_once("default_metatags.php");
 
