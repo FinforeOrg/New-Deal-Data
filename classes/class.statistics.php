@@ -1339,39 +1339,9 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
         //filter on company of the transaction
         $company_filter = "";
         $company_filter_clause = "";
-        /*************************************************************************************
-        sng:1/dec/2010
-        Now when country is present, we check the transaction::deal_country field
-        Same for region
-        so we do not check the company of the country doing the deal
         
-        if($stat_param['country']!=""){
-            $company_filter_clause.=" and hq_country='".$stat_param['country']."'";
-        }else{
-            //hq country not specified, so we cna check for region
-            if($stat_param['region']!=""){
-                $company_filter_clause.=" and hq_country IN (SELECT cm.name FROM ".TP."region_master AS rm LEFT JOIN ".TP."region_country_list AS rcl ON ( rm.id = rcl.region_id ) LEFT JOIN ".TP."country_master AS cm ON ( rcl.country_id = cm.id ) WHERE rm.name = '".$stat_param['region']."')";
-            }
-        }
-        ***************************************************************************************/
-        /*********************************************************************************
-        sng:3/dec/2010
-        now if sector is present, we will search in transaction::deal_sector
-        if($stat_param['sector']!=""){
-            $company_filter_clause.=" and sector='".$stat_param['sector']."'";
-        }
-        *************************************************************************************/
-        /***
-        sng:17/jul/2010
-        add industry
-        ***/
-        /*********************************************************************************
-        sng:3/dec/2010
-        now if industry is present, we will search in transaction::deal_industry
-        if($stat_param['industry']!=""){
-            $company_filter_clause.=" and industry='".$stat_param['industry']."'";
-        }
-        ********************************************************************************/
+        
+        
         if($company_filter_clause != ""){
             $company_filter.=" and company_id IN (select company_id from ".TP."company where 1=1".$company_filter_clause.")";
         }
