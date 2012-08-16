@@ -262,14 +262,11 @@
         if($_POST['deal_subcat2_name']!=""){
             $queryWhereClauses .= " and deal_subcat2_name='".$_POST['deal_subcat2_name']."'";
         }
-
-        if($_POST['sector'] != ''){
-            $queryWhereClauses .= " and deal_sector like '%".$_POST['sector']."%'";
-        }
-        if($_POST['industry'] != ''){
-            $queryWhereClauses .= " and deal_industry like '%".$_POST['industry']."%'";
-        }
-
+		/**************
+		sng:16/aug/2012
+		Now that we have participants for a deal, we do not check the deal_sector, deal_industry csv fields for the deal.
+		We check the sector/industry/country of the participants and consider only those deals
+		***************/
         if($_POST['year'] != ''){
             $year_tokens = explode('-',$_POST['year']);
             $year_tokens_count = count($year_tokens);
@@ -286,42 +283,68 @@
         if($_POST['deal_size']!=""){
             $queryWhereClauses.=" and value_in_billion".$_POST['deal_size'];
         }
-        
-        $country_filter = "";
-        if($_POST['country']!=""){
-            //country specified, we do not consider region
-            $country_filter.="deal_country LIKE '%".$_POST['country']."%'";
-        } else {
-            //country not specified, check for region
-            if($_POST['region']!=""){
-                //get the country names for this region name
-                $region_q = "select cm.name from ".TP."region_master as rm left join ".TP."region_country_list as rc on(rm.id=rc.region_id) left join ".TP."country_master as cm on(rc.country_id=cm.id) where rm.name='".$_POST['region']."'";
-                $region_q_res = mysql_query($region_q);
-                if(!$region_q_res){
-                    return false;
-                }
-                
-                $region_q_res_cnt = mysql_num_rows($region_q_res);
-                $region_clause = "";
-                if($region_q_res_cnt > 0){
-                    while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
-                        $region_clause.="|deal_country LIKE '%".$region_q_res_row['name']."%'";
-                    }
-                    $region_clause = substr($region_clause,1);
-                    $region_clause = str_replace("|"," OR ",$region_clause);
-                    $country_filter = "(".$region_clause.")";
-                }
-            }
-        }
-        
-        if($country_filter!=""){
-            $queryWhereClauses.=" and ".$country_filter;
-        }
-
-        if($company_filter!=""){
-            $queryWhereClauses.=$company_filter;
-        }
-
+        /**************
+		sng:16/aug/2012
+		Now that we have participants for a deal, we do not check the deal_country csv fields for the deal.
+		We check the hq_country of the participants and consider only those deals
+		
+		Also we checked but $company_filter is not used
+		***************/
+        $filter_by_company_attrib = "";
+		if(isset($_POST['country'])&&($_POST['country']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="hq_country='".mysql_real_escape_string($_POST['country'])."'";
+		}else{
+			/**********
+			might check region. Associated with a region is one or more countries
+			We can use IN clause, that is hq_country IN (select country names for the given region), but it seems that
+			it is much faster if we first get the country names and then create the condition with OR, that is
+			(hq_country='Brazil' OR hq_country='Russia') etc
+			***********/
+			if(isset($_POST['region'])&&($_POST['region']!="")){
+				//get the country names for this region name
+				$region_q = "SELECT ctrym.name FROM ".TP."region_master AS rgnm LEFT JOIN ".TP."region_country_list AS rcl ON ( rgnm.id = rcl.region_id ) LEFT JOIN ".TP."country_master AS ctrym ON ( rcl.country_id = ctrym.id )
+WHERE rgnm.name = '".mysql_real_escape_string($_POST['region'])."'";
+				$region_q_res = mysql_query($region_q);
+				if(!$region_q_res){
+					
+					return false;
+				}
+				$region_q_res_cnt = mysql_num_rows($region_q_res);
+				$region_clause = "";
+				if($region_q_res_cnt > 0){
+					while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
+						$region_clause.="|hq_country='".mysql_real_escape_string($region_q_res_row['name'])."'";
+					}
+					$region_clause = substr($region_clause,1);
+					$region_clause = str_replace("|"," OR ",$region_clause);
+					$region_clause = "(".$region_clause.")";
+				}
+				if($region_clause!=""){
+					if($filter_by_company_attrib != ""){
+						$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+					}
+					$filter_by_company_attrib.=$region_clause;
+				}
+			}
+		}
+			
+		if(isset($_POST['sector'])&&($_POST['sector']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="sector='".mysql_real_escape_string($_POST['sector'])."'";
+		}
+			
+		if(isset($_POST['industry'])&&($_POST['industry']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="industry='".mysql_real_escape_string($_POST['industry'])."'";
+		}
+		/********************************************************/
         $queryWhereClauses.=" GROUP BY partner_id";
 
         $ranking_by = '';
@@ -342,8 +365,16 @@
                             sum( adjusted_value_in_billion ) AS total_adjusted_deal_value, 
                             sum( value_in_billion ) AS total_deal_value  
                    FROM __TP__transaction_partners AS p
-                   LEFT JOIN __TP__transaction AS t ON ( p.transaction_id = t.id ) 
-                   WHERE partner_type = "%s"
+                   LEFT JOIN __TP__transaction AS t ON ( p.transaction_id = t.id )';
+		/***************
+		sng:13/aug/2012
+		snippet
+		Why inner join? We want to consider only those deals on the left which satisfy the conditions on the right
+		***********/
+		if($filter_by_company_attrib!=""){
+			$query.=" INNER JOIN (SELECT DISTINCT transaction_id from ".TP."transaction_companies as fca_tc left join ".TP."company as fca_c on(fca_tc.company_id=fca_c.company_id) where fca_c.type='company' AND ".$filter_by_company_attrib.") AS fca ON (t.id=fca.transaction_id) ";
+		}
+                   $query.=' WHERE partner_type = "%s"
                        %s
                    LIMIT 0, 11
                 )   AS stat
