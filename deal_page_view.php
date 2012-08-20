@@ -52,6 +52,7 @@ Since we have more than one companies associated with a deal, we use another fun
 	<ul class="TabbedPanelsTabGroup">
 	<li class="TabbedPanelsTab" tabindex="0">Detail</li>
 	<li class="TabbedPanelsTab" tabindex="0">Advisors</li>
+	<li class="TabbedPanelsTab" tabindex="0">People</li>
 	<li class="TabbedPanelsTab" tabindex="0">Edit Detail</li>
 	
 	<li class="TabbedPanelsTab" tabindex="0">Discussion Page</li>
@@ -64,6 +65,9 @@ Since we have more than one companies associated with a deal, we use another fun
 		</div>
 		<div class="TabbedPanelsContent">
 		<?php require("deal_page_partners.php");?>
+		</div>
+		<div class="TabbedPanelsContent">
+		<?php require("deal_page_partners_members.php");?>
 		</div>      
 		<div class="TabbedPanelsContent">
 		<?php 
