@@ -841,6 +841,14 @@ class transaction{
 	To do that, we add another flag to the argument.
 	deal_active
 	true, set deal is_active to y else n
+	
+	sng:24/aug/2012
+	Here is a big concept.
+	We are not interested in Debt / Equity deals that are just 'announced', that is the deal_date_type is date_announced
+	We set the flag in_calculation to 0 so that the deal is not considered in League Table / Volume charts calculation
+	If deal_date_type is not set for Debt / Equity deal, assume it as not completed and set in_calculation = 0
+	If deal_date_type is date_completed, set in_calculation = 1
+	see simple_submission_view.php
 	*******************/
 	public function front_create_deal_from_simple_suggestion($mem_id,$data,$deal_active,&$deal_created,&$msg){
 		global $g_db;
@@ -861,6 +869,30 @@ class transaction{
 			$msg = "One or more mandatory information was not specified";
 			$deal_created = false;
 			return true;
+		}
+		/************
+		sng:24/aug/2012
+		check the type and set calculation flag
+		***************/
+		$in_calculation = 1;
+		$temp_deal_type = strtolower($data['deal_cat_name']);
+		
+		if(($temp_deal_type=="debt")||($temp_deal_type=="equity")){
+			if(isset($data['deal_date_type'])){
+				if($data['deal_date_type']=="date_announced"){
+					//merely announced, so
+					$in_calculation = 0;
+				}else{
+					//assume completed
+					$in_calculation = 1;
+				}
+			}else{
+				//not set so
+				$in_calculation = 0;
+			}
+		}else{
+			//This is M&A. for that, we are interested in both announced and completed deals
+			$in_calculation = 1;
 		}
 		
 		if($data['deal_date']==""){
@@ -973,6 +1005,11 @@ class transaction{
 			$is_active='n';
 		}
 		$q.=",is_active='".$is_active."'";
+		/***************************************************
+		sng:24/aug/2012
+		Now we have $in_calculation flag
+		*************************************************/
+		$q.=",in_calculation='".$in_calculation."'";
 		//we handle notification later
 		$ok = $g_db->mod_query($q);
 		if(!$ok){
