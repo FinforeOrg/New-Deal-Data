@@ -864,6 +864,8 @@ class transaction{
 	With M&A, there is Pending/Completion subtype and date of deal. The user may/may not select the subtype. Or may
 	select Pending as aubtype but specify Completed as deal_date_type or select Completed as subtype but select Announced as deal_date_type
 	
+	What we do is, we force to select the deal subtype in case of M&A and also check the deal_date_type
+	
 	sng:27/aug/2012
 	Also, we need better validation and error reporting
 	*******************/
@@ -884,6 +886,17 @@ class transaction{
 		if(!isset($data['deal_cat_name'])||($data['deal_cat_name']=="")){
 			$err['deal_type'] = "Please specify the type of the deal";
 			$validation_passed = false;
+		}else{
+			/************
+			deal type set
+			we check if it is M&A. If so, we need to know whether it is Pending or Completed. M&A has all sorts of complication
+			*************/
+			if("m&a"==strtolower($data['deal_cat_name'])){
+				if(!isset($data['deal_subcat1_name'])||($data['deal_subcat1_name']=="")){
+					$err['deal_type'] = "Please specify the subtype for M&A";
+					$validation_passed = false;
+				}
+			}
 		}
 		/*****************
 		date of deal
@@ -891,6 +904,19 @@ class transaction{
 		if($data['deal_date']==""){
 			$err['deal_date'] = "Please specify the date of the deal";
 			$validation_passed = false;
+		}
+		
+		/****************
+		Now some logical check
+		If M&A deal, and subcat is Pending, deal_date_type cannot be Completed
+		*********************/
+		if(isset($data['deal_cat_name'])&&("m&a"==strtolower($data['deal_cat_name']))){
+			if(isset($data['deal_subcat1_name'])&&("pending"==strtolower($data['deal_subcat1_name']))){
+				if("date_completed"==$data['deal_date_type']){
+					$err['deal_type'] = "Pending M&A deal cannot have completion date";
+					$validation_passed = false;
+				}
+			}
 		}
 		/****************************
 		value: either the exact value has to be specified or a range has to be specified, even if 'undisclosed'
