@@ -8,6 +8,7 @@ can write the processing code in a single file.
 
 Problem is, for priviledged members, we need to create the deal directly and that SQL is different. Of course, we
 can offload it to appropriate include files.
+(This is not a concern now. A deal record is created for both privileged/non-privileged members
 *********************/
 require_once("../../include/global.php");
 require_once("classes/class.member.php");
@@ -16,78 +17,14 @@ require_once("classes/class.company.php");
 $result = array();
 $result['status'] = 0;
 $result['msg'] = "";
-
+/**************
+sng:27/aug/2012
+Now we need better error reporting
+validation will done by the transaction::front_create_deal_from_simple_suggestion which will populate the err
+**************/
+$result['err'] = array();
 //print_r($_POST);
-/**********************************
-validation
-at least deal_type has to be specified
-***********************************/
-if(!isset($_POST['deal_cat_name'])||($_POST['deal_cat_name']=="")){
-	$result['status'] = 0;
-	$result['msg'] = "One or more mandatory information was not specified";
-	echo json_encode($result);
-	exit;
-}
-/******************
-date of deal
-********************/
-if($_POST['deal_date']==""){
-	$result['status'] = 0;
-	$result['msg'] = "One or more mandatory information was not specified";
-	echo json_encode($result);
-	exit;
-}
-/******************
-either the exact value has to be specified or a range has to be specified, even if 'undisclosed'
-*******************/
-if($_POST['deal_value']==""){
-	//check if range is specified or not
-	if(!isset($_POST['value_range_id'])){
-		$result['status'] = 0;
-		$result['msg'] = "One or more mandatory information was not specified";
-		echo json_encode($result);
-		exit;
-	}
-}else{
-	//deal value specified
-}
-/*******
-even if no company is specified, the companies array is posted, with 3 blank elements
-************/
-$company_count = count($_POST['companies']);
-$has_company = false;
-for($company_i=0;$company_i<$company_count;$company_i++){
-	if($_POST['companies'][$company_i]!=""){
-		$has_company = true;
-		//there is a company so break
-		break;
-	}
-}
-if(!$has_company){
-	$result['status'] = 0;
-	$result['msg'] = "One or more mandatory information was not specified";
-	echo json_encode($result);
-	exit;
-}
 
-/*********
-even if no bank is specified, the banks array is posted with 3 blank elements
-***********/
-$bank_count = count($_POST['banks']);
-$has_bank = false;
-for($bank_i=0;$bank_i<$bank_count;$bank_i++){
-	if($_POST['banks'][$bank_i]!=""){
-		$has_bank = true;
-		//there is a bank so break
-		break;
-	}
-}
-if(!$has_bank){
-	$result['status'] = 0;
-	$result['msg'] = "One or more mandatory information was not specified";
-	echo json_encode($result);
-	exit;
-}
 
 $company_data = NULL;
 $ok = $g_company->get_company($_SESSION['company_id'],$company_data);

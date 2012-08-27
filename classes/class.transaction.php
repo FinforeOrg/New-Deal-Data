@@ -849,27 +849,107 @@ class transaction{
 	If deal_date_type is not set for Debt / Equity deal, assume it as not completed and set in_calculation = 0
 	If deal_date_type is date_completed, set in_calculation = 1
 	see simple_submission_view.php
+	
+	The exception is M&A
+	M&A deals take a long time from Announcement to Completion. Plus there are often competing bids, so the process can get drawn out. 
+	Despite the long timetable they tend to happen. i.e. it is rare for an Announced deal not to complete.
+	In contrast, Equity and Debt deals often happen, Announcement and Completion, on the same day. 
+	Therefore the need for the Announcement option is less important.
+	There are a few exceptions where a deal takes a little longer to happen, e.g. Rights Issues or IPOs can take 2 weeks between 
+	Announcement and Completion, but this is rare.
+	
+	So, for M&A, we set in_calculation = 1
+	Now, for Debt/Equity, it was pretty straight - since there is no Pending/Completed subtype, check the deal_date_type.
+	
+	With M&A, there is Pending/Completion subtype and date of deal. The user may/may not select the subtype. Or may
+	select Pending as aubtype but specify Completed as deal_date_type or select Completed as subtype but select Announced as deal_date_type
+	
+	sng:27/aug/2012
+	Also, we need better validation and error reporting
 	*******************/
-	public function front_create_deal_from_simple_suggestion($mem_id,$data,$deal_active,&$deal_created,&$msg){
+	public function front_create_deal_from_simple_suggestion($mem_id,$data,$deal_active,&$deal_created,&$msg,&$err){
 		global $g_db;
 		
 		require_once("classes/class.deal_support.php");
 		$deal_support = new deal_support();
 		/********
-		We must validate it here again. Just simple flag
-		at least deal_type has to be specified
+		sng:27/aug/2012
+		Validate it here with better error report
+		**********/
+		$deal_created = false;
+		$validation_passed = true;
+		/**************************
+		at least deal_type has to be specified.
+		****************************/
+		if(!isset($data['deal_cat_name'])||($data['deal_cat_name']=="")){
+			$err['deal_type'] = "Please specify the type of the deal";
+			$validation_passed = false;
+		}
+		/*****************
 		date of deal
+		****************/
+		if($data['deal_date']==""){
+			$err['deal_date'] = "Please specify the date of the deal";
+			$validation_passed = false;
+		}
+		/****************************
 		value: either the exact value has to be specified or a range has to be specified, even if 'undisclosed'
+		*****************/
+		if($data['deal_value']==""){
+			//check if range is specified or not
+			if(!isset($data['value_range_id'])){
+				$err['deal_value'] = "Please specify a value or select from range";
+				$validation_passed = false;
+			}
+		}else{
+			//deal value specified
+			if($data['deal_value']<=0.0){
+				$err['deal_value'] = "Please specify a proper value or remove this and select from range";
+				$validation_passed = false;
+			}
+		}
+		/********************
 		companies: at least one
 		thing is, even if no company is specified, the companies array is posted, with blank elements
 		ditto for banks
 		***********/
-		$deal_created = false;
-		if(!isset($data['deal_cat_name'])||($data['deal_cat_name']=="")){
-			$msg = "One or more mandatory information was not specified";
+		$company_count = count($data['companies']);
+		$has_company = false;
+		for($company_i=0;$company_i<$company_count;$company_i++){
+			if($data['companies'][$company_i]!=""){
+				$has_company = true;
+				//there is a company so break
+				break;
+			}
+		}
+		if(!$has_company){
+			$err['companies'] = "Please specify one or more companies associated with the deal";
+			$validation_passed = false;
+		}
+		/*********************
+		banks: at least one
+		thing is, even if no bank is specified, the bank array is posted, with blank elements
+		************/
+		$bank_count = count($data['banks']);
+		$has_bank = false;
+		for($bank_i=0;$bank_i<$bank_count;$bank_i++){
+			if($data['banks'][$bank_i]!=""){
+				$has_bank = true;
+				//there is a bank so break
+				break;
+			}
+		}
+		if(!$has_bank){
+			$err['banks'] = "Please specify one or more banks associated with the deal";
+			$validation_passed = false;
+		}
+		
+		if(!$validation_passed){
 			$deal_created = false;
+			$msg = "One or more mandatory information was not specified";
 			return true;
 		}
+		
 		/************
 		sng:24/aug/2012
 		check the type and set calculation flag
@@ -895,52 +975,13 @@ class transaction{
 			$in_calculation = 1;
 		}
 		
-		if($data['deal_date']==""){
-			$msg = "One or more mandatory information was not specified";
-			$deal_created = false;
-			return true;
-		}
 		
-		if($data['deal_value']==""){
-			//check if range is specified or not
-			if(!isset($data['value_range_id'])){
-				$msg = "One or more mandatory information was not specified";
-				$deal_created = false;
-				return true;
-			}
-		}else{
-			//deal value specified
-		}
 		
-		$company_count = count($data['companies']);
-		$has_company = false;
-		for($company_i=0;$company_i<$company_count;$company_i++){
-			if($data['companies'][$company_i]!=""){
-				$has_company = true;
-				//there is a company so break
-				break;
-			}
-		}
-		if(!$has_company){
-			$msg = "One or more mandatory information was not specified";
-			$deal_created = false;
-			return true;
-		}
 		
-		$bank_count = count($data['banks']);
-		$has_bank = false;
-		for($bank_i=0;$bank_i<$bank_count;$bank_i++){
-			if($data['banks'][$bank_i]!=""){
-				$has_bank = true;
-				//there is a bank so break
-				break;
-			}
-		}
-		if(!$has_bank){
-			$msg = "One or more mandatory information was not specified";
-			$deal_created = false;
-			return true;
-		}
+		
+		
+		
+		
 		/*************************************************************************/
 		$date_time_now = date("Y-m-d H:i:s");
 		/***********

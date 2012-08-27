@@ -520,14 +520,21 @@ function submit_data(){
 	/**************************
 	we block the UI to show that the data is being posted
 	***************************/
+	clear_error_msg();
 	$.blockUI({ message: '<h1>submitting...</h1><img src="images/loader.gif" />' });
 	$.post('ajax/suggest_deal/simple_request.php',data,function(result){
 		$.unblockUI();
 		apprise(result.msg);
 		if(result.status == 1){
-			//post success job
+			//all ok
 		}else{
-			//post error job
+			//error
+			$('#err_deal_type').html(result.err.deal_type);
+			$('#err_companies').html(result.err.companies);
+			$('#err_deal_date').html(result.err.deal_date);
+			$('#err_deal_value').html(result.err.deal_value);
+			$('#err_banks').html(result.err.banks);
+			
 		}
 		/************************
 		We now upload files via ajax and the filenames appears in a <ul id="qq-upload-list"></ul> (we got this from the fileupload js code).
@@ -535,6 +542,15 @@ function submit_data(){
 		****************/
 		create_suggest_file_uploader();
 	},"json");
+}
+</script>
+<script>
+function clear_error_msg(){
+	$('#err_deal_type').html('');
+	$('#err_companies').html('');
+	$('#err_deal_date').html('');
+	$('#err_deal_value').html('');
+	$('#err_banks').html('');
 }
 </script>
 <form id="suggest_deal_form">
@@ -595,7 +611,7 @@ function submit_data(){
 		<?php $k++; endforeach;?>                    
 	</td>
 </tr>
-
+<tr><td><span id="err_deal_type" class="err_txt"></span></td></tr>
 <tr><td><hr class='gray'/></td></tr>
 
 <tr>
@@ -614,6 +630,7 @@ function submit_data(){
 </div>
 </td>
 </tr>
+<tr><td><span id="err_companies" class="err_txt"></span></td></tr>
 <tr><td><hr class='gray'/></td></tr>
 <tr><td>Date of Transaction: <span class="err_txt">*</span></td></tr>
 <tr>
@@ -625,6 +642,7 @@ function submit_data(){
 </div>
 </td>
 </tr>
+<tr><td><span id="err_deal_date" class="err_txt"></span></td></tr>
 <tr><td><hr class='gray'/></td></tr>
 <tr>
 <td>Please list any links to press releases, regulatory fillings, financial news sites, etc.</td>
@@ -683,7 +701,7 @@ Note: Deals with no exact size are excluded from the league tables that use size
 Or enter size here: <input type="text" name="deal_value" id="deal_value" class="std special" style="width:185px">
 </td>
 </tr>
-
+<tr><td><span id="err_deal_value" class="err_txt"></span></td></tr>
 
 <tr>
 <td><span id="label_additional_details">Enter additional details here:</span></td>
@@ -713,6 +731,7 @@ Or enter size here: <input type="text" name="deal_value" id="deal_value" class="
 </div>
 </td>
 </tr>
+<tr><td><span id="err_banks" class="err_txt"></span></td></tr>
 
 <tr>
 <td>Law Firms involved in the transaction:</td>

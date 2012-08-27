@@ -7,10 +7,12 @@ require_once("classes/class.deal_support.php");
 $deal_support = new deal_support();
 $g_db = new db();
 
+require_once("classes/class.transaction_support.php");
+$trans_support = new transaction_support();
 /*******************************************************************
 support for simple submission form
 **/
-$categories = $g_trans->getCategoryTree();
+$categories = $trans_support->get_category_tree();
 
 $g_view['value_range_items'] = NULL;
 $g_view['value_range_items_count'] = 0;

@@ -10,7 +10,13 @@ $msg = "";
 the date is set as 15/Feb/2012 format and the code expect it as yyyy-mm-dd, so we change it
 ***************/
 $_POST['deal_date'] = fotmat_date_for_suggestion($_POST['deal_date']);
-$ok = $g_trans->front_create_deal_from_simple_suggestion($suggestion_mem_id,$_POST,$activate_deal,$deal_created,$msg);
+
+/**************
+sng:27/aug/2012
+Now we need better error reporting
+**************/
+
+$ok = $g_trans->front_create_deal_from_simple_suggestion($suggestion_mem_id,$_POST,$activate_deal,$deal_created,$msg,$result['err']);
 if(!$ok){
 	$result['status'] = 0;
 	$result['msg'] = "Internal error";
