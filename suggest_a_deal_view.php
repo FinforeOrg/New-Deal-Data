@@ -51,17 +51,7 @@ $db = new db();
     }    
 	
 </style>
-<?php
-/***********************
-1/oct/2011
-we now put these in container view
-<script src="js/jquery-ui-1.8.11.custom.min.js" type="text/javascript"></script>  
-<script src="js/jquery.ui.selectmenu.js" type="text/javascript"></script>
-<link rel="stylesheet" href="css/custom-theme/jquery-ui-1.8.9.custom.css" />
-<link rel="stylesheet" href="css/custom-theme/jquery-ui-1.8.9.custom_orange.css" />
-<link rel="stylesheet" href="css/custom-theme/jquery.ui.selectmenu.css" />
-**************************/
-?>
+
 
 <script type="text/javascript">
 var _currentBankNum  = 4;

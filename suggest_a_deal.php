@@ -16,7 +16,10 @@ require_once("classes/class.magic_quote.php");
 require_once("classes/class.deal_support.php");
 $success = $g_company->get_all_sector_list($g_view['sector_list'],$g_view['sector_count']); 
 $success = $g_company->get_all_industry_list($g_view['industry_list'],$g_view['industry_count']); 
-$categories = $g_trans->getCategoryTree();
+
+require_once("classes/class.transaction_support.php");
+$trans_support = new transaction_support();
+$categories = $trans_support->get_category_tree();
 
 /**************************************
 sng:16/mar/2012
