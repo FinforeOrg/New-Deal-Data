@@ -51,6 +51,25 @@ $db = new db();
     }    
 	
 </style>
+<style>
+/**********************
+sng:28/aug/2012
+we introduce these two styles to create a header for the different sections since we
+no longer use the accordion
+*********************/
+.section-header {
+    background: url("images/ui-bg_glass_75_e6e6e6_1x400.png") repeat-x scroll 50% 50% #E6E6E6;
+    border: 1px solid #D3D3D3;
+    color: #555555;
+    font-weight: normal;
+}
+.section-header a{
+color:#888888;
+text-decoration:none;
+margin:5px 0px 5px 5px;
+display:block;
+}
+</style>
 
 
 <script type="text/javascript">
@@ -842,10 +861,17 @@ $(function() {
             },
             text: true  */
     })
+	/***********
+	sng:28/aug/2012
+	We are not using the accordion
     $('.next-step-button').button();
+	***************/
     $('#submit_data').button().click(function(event){event.preventDefault()});
-    $( "#multi_step_form" ).accordion({autoHeight: false, changestart: function(event, ui) {}, event: 'passValidation'});
-    
+    /**********************
+	sng:28/aug/2012
+	we no longer use the accordion
+	$( "#multi_step_form" ).accordion({autoHeight: false, changestart: function(event, ui) {}, event: 'passValidation'});
+    *************/
     $('.ui-accordion-header').attr("disabled", "disabled");
     
     $('#add_banks_btn').button().click(function(){
@@ -1105,8 +1131,11 @@ function toggle_single_button(button,id){
 	}
 }
 /********************************************************************/
+
+/*************
+sng:28/aug/2012
+We no longer use the accordion
 function nextStep(currentStep, nextStep) {
-    
     if (!validateFields(currentStep)) {
         return false;
     }
@@ -1120,10 +1149,20 @@ function previousStep(step) {
 	$('#' + step).trigger('passValidation');
 	window.scrollTo(0,0);
 }
+***************/
 
-function validateFields(currentStep) {
-    var curentStepId = $(currentStep).attr('id');
+/**************
+sng:28/aug/2012
+We are not using the accordion and do not go from step to step. We do it in one step.
+Since nextStep() is no longer used, letus use the step ids directly.
+So instead of currentStep, let us take curentStepId
+We will not require
+var curentStepId = $(currentStep).attr('id');
+************/
+function validateFields(curentStepId) {
+    
     var valid = true;
+	
 	if(_requiredFields[_lastClickedButton] == undefined) {
 		return true;
 	}
@@ -1163,6 +1202,29 @@ function validateFields(currentStep) {
     return valid;
 }
 
+/********************
+sng:28/aug/2012
+With accordion, in the last step, the submit button triggered validation for step 3.
+Now, without accordion, we just manually call validation on the 3 steps
+*************/
+function validateAllFields(){
+	var validation_passed = true;
+	
+	if(!validateFields('step1')){
+		validation_passed = false;
+	}
+	
+	if(!validateFields('step2')){
+		validation_passed = false;
+	}
+	
+	if(!validateFields('step3')){
+		validation_passed = false;
+	}
+	
+	return validation_passed;
+}
+
 function validateAndSubmit() {
 	<?php
 	/******************
@@ -1176,7 +1238,12 @@ function validateAndSubmit() {
 		<?php
 	}
 	?>
+	/*************
+	sng:28/aug/2012
+	Now we do not use the accordion and so perform the validation in a single call
     var valid = validateFields($('#step3'));
+	************/
+	var valid = validateAllFields();
     if (valid) {
         console.log('Form is valid we should submit it');
         for (index in _defaultInputs) {
@@ -1305,7 +1372,7 @@ removed the class="registercontent" here
                 <hr style="color: #E86200; background-color: #E86200; height: 1px; margin-top: 15px; margin-bottom: 15px;" />                
                 <form id="sugest_deal_form" action="#" method="post">
                     <div id="multi_step_form">
-                    <h3 id="step1"><a href="#">Deal information</a></h3>
+                    <h3 id="step1" class="section-header"><a href="#">Deal information</a></h3>
                     <div style="overflow:hidden" >
                         <table width="100%" cellspacing="0" cellpadding="0" border="0">
                         <tbody>
@@ -1463,13 +1530,19 @@ removed the class="registercontent" here
                                 </div>
                             </div>                        
                         </td>
-                        <td><span style="float:right">
+                        <td>
+						<!--////////////////
+						sng:28/aug/2012
+						we no longer use the accordion
+						<span style="float:right">
                           <input type="button" onclick="nextStep(this, 'step2')" value="Next step" class="next-step-button" id="step1"/>
-                        </span></td>
+                        </span>
+						//////////////////////////-->
+						</td>
                       </tr>
                     </table>
                  </div>   
-                    <h3 id="step2"> <a href="#"> Deal valuation </a></h3>
+                    <h3 id="step2" class="section-header"> <a href="#"> Deal valuation </a></h3>
                     <div style="overflow:hidden">
                         <div id='deal_valuation_tab' >
                             <table width="100%" border="0" cellspacing="0" cellpadding="4">
@@ -1656,9 +1729,15 @@ removed the class="registercontent" here
                     </div>
                     <table width="100%" border="0">
                       <tr>
-                        <td width="100px"><span style="float:right">
+                        <td width="100px">
+						<!--////////////////////
+						sng:28/aug/2012
+						We are no longer using the accordion
+						<span style="float:right">
                           <input type="button" onclick="previousStep('step1')" value="Previous step" class="next-step-button" />
-                        </span></td>
+                        </span>
+						/////////////////-->
+						</td>
                         <td>
                             <div class="ui-widget" style="display: none;" id="mandatoryWarning-step2">
                                 <div style="padding: 0 .3em;" class="ui-state-error ui-corner-all"> 
@@ -1667,13 +1746,19 @@ removed the class="registercontent" here
                                 </div>
                             </div>                        
                         </td>
-                        <td><span style="float:right">
+                        <td>
+						<!--////////////////
+						sng:28/aug/2012
+						we no longer use the accordion
+						<span style="float:right">
                           <input type="button" onclick="nextStep(this, 'step3')" value="Next step" class="next-step-button" id="step2"/>
-                        </span></td>
+                        </span>
+						/////////////////////////-->
+						</td>
                       </tr>
                     </table>                    
                    </div> 
-                    <h3 id="step3"> <a href="#"> Additional Information </a></h3> 
+                    <h3 id="step3" class="section-header"> <a href="#"> Additional Information </a></h3> 
                     <div style="overflow: hidden;">
                         <div id='aditional_tab_details'>
                             <table width="100%" border="0" cellspacing="0" cellpadding="4">
@@ -1982,7 +2067,11 @@ removed the class="registercontent" here
                         <table width="100%" border="0" cellspacing="0" cellpadding="4">
                             <tr>
                                 <td>
+								<!--//////////////////
+								sng:28/aug/2012
+								We are no longer using the accordion
                                 <input type="button" onclick="previousStep('step2')" value="Previous step" class="next-step-button" />
+								///////////////////////////////-->
                                 </td>
                                 <td>
                                     <input type="checkbox" name="public_details" id="public_details">
