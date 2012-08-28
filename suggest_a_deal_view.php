@@ -58,16 +58,15 @@ we introduce these two styles to create a header for the different sections sinc
 no longer use the accordion
 *********************/
 .section-header {
-    background: url("images/ui-bg_glass_75_e6e6e6_1x400.png") repeat-x scroll 50% 50% #E6E6E6;
-    border: 1px solid #D3D3D3;
-    color: #555555;
-    font-weight: normal;
+    background: #E86200;
 }
 .section-header a{
-color:#888888;
+color:#FFFFFF;
 text-decoration:none;
-margin:5px 0px 5px 5px;
+margin:5px 0px 5px 0px;
 display:block;
+font: 14px/32px Tahoma,Geneva,sans-serif;
+padding: 0px 10px;
 }
 </style>
 
