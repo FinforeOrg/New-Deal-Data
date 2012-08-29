@@ -57,6 +57,12 @@ if(!$is_favoured){
 }else{
 	$activate_deal = true;
 }
+/*********************
+sng:29/aug/2012
+It has been decided that deal posted by any member will be treated as active deal. In case someone posts bogus data, those
+deals will be flagged.
+For minimum disruption, we just ignore the deal_active parameter for now
+***********************/
 require_once("deal_creation_from_simple_suggestion.php");
 
 $result['status'] = 0;

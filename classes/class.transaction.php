@@ -868,6 +868,11 @@ class transaction{
 	
 	sng:27/aug/2012
 	Also, we need better validation and error reporting
+	
+	sng:29/aug/2012
+	It has been decided that deal posted by any member will be treated as active deal. In case someone posts bogus data, those
+	deals will be flagged.
+	For minimum disruption, we just ignore the deal_active parameter for now
 	*******************/
 	public function front_create_deal_from_simple_suggestion($mem_id,$data,$deal_active,&$deal_created,&$msg,&$err){
 		global $g_db;
@@ -1066,11 +1071,16 @@ class transaction{
 		$q.=",added_on='".$date_time_now."'";
 		$q.=",last_edited='".$date_time_now."'";
 		$q.=",admin_verified='n'";
+		/***************************************
+		sng:29/aug/2012
+		Now we have decided to activate all deals
 		if($deal_active){
 			$is_active='y';
 		}else{
 			$is_active='n';
 		}
+		**************************************/
+		$is_active='y';
 		$q.=",is_active='".$is_active."'";
 		/***************************************************
 		sng:24/aug/2012
