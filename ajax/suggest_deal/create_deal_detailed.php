@@ -28,6 +28,10 @@ value: the exact value has to be specified in detailed submission
 companies: at least one
 thing is, even if no company is specified, the companies array is posted, with blank elements
 ditto for banks
+
+The validations will change a bit, see transaction 872
+Also, better show all the validation messages at once
+Then we have that case of flag
 *****************************/
 $result = array();
 if(!isset($_POST['deal_cat_name'])||($_POST['deal_cat_name']=="")){
@@ -213,11 +217,17 @@ if(!$ok){
 	myJson($result);
 	return;
 }
+/****************************
+sng:29/aug/2012
+Now the deals submitted by non-privileged members are considered as active. If a spurious deal is submitted, others can flag the deal
+***********************
 if($member_favoured){
 	$is_active = 'y';
 }else{
 	$is_active = 'n';
 }
+*********************/
+$is_active = 'y';
 $q.=",is_active='".$is_active."'";
 
 $db = new db();
