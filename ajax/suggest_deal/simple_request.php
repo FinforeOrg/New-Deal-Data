@@ -25,25 +25,20 @@ validation will done by the transaction::front_create_deal_from_simple_suggestio
 $result['err'] = array();
 //print_r($_POST);
 
-
-$company_data = NULL;
-$ok = $g_company->get_company($_SESSION['company_id'],$company_data);
-if(!$ok){
-	$result['status'] = 0;
-	$result['msg'] = "Internal error";
-	echo json_encode($result);
-	exit;
-}
-$company_name = $company_data['name'];
+/*************************
+sng:29/aug/2012
+Let us use the member::is_member_favoured instead
+*****************************/
 $is_favoured = false;
+$ok = $g_mem->is_member_favoured($_SESSION['mem_id'],$is_favoured);
 
-$ok = $g_mem->is_work_email_favoured($_SESSION['member_type'],$_SESSION['work_email'],$company_name,$is_favoured);
 if(!$ok){
 	$result['status'] = 0;
 	$result['msg'] = "Internal error";
 	echo json_encode($result);
 	exit;
 }
+
 /*****************************
 sng:20/feb/2012
 Now we have that for both privileged and non privileged members, a deal record is to be created.
