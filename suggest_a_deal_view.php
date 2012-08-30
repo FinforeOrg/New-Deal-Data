@@ -46,7 +46,7 @@ $db = new db();
 	color:#CCCCCC;
 	}
     .invalidValueField {
-        background: url("/images/exclamation.png") center right no-repeat;
+        background: url("images/exclamation.png") center right no-repeat;
         
     }    
 	
