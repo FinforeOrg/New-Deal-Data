@@ -29,16 +29,29 @@ companies: at least one
 thing is, even if no company is specified, the companies array is posted, with blank elements
 ditto for banks
 
-The validations will change a bit, see transaction 872
-Also, better show all the validation messages at once
-Then we have that case of flag
+sng:30/aug/2012
+We now have some more validation because of in_calculation flag.
+We also show more detailed error message
+(refer to transaction::front_create_deal_from_simple_suggestion (comment sng:24/aug/2012)
 *****************************/
 $result = array();
+$error_msg = "";
+$validation_passed = true;
+
 if(!isset($_POST['deal_cat_name'])||($_POST['deal_cat_name']=="")){
-	$result['status'] = 0;
-	$result['msg'] = "One or more mandatory information was not specified";
-	myJson($result);
-	return;
+	$error_msg.="Please specify the type of the deal<br />";
+	$validation_passed = false;
+}else{
+	/************
+	deal type set
+	we check if it is M&A. If so, we need to know whether it is Pending or Completed. M&A has all sorts of complication
+	*************/
+	if("m&a"==strtolower($_POST['deal_cat_name'])){
+		if(!isset($_POST['deal_subcat1_name'])||($_POST['deal_subcat1_name']=="")){
+			$error_msg.="Please specify the subtype for M&A<br />";
+			$validation_passed = false;
+		}
+	}
 }
 
 /**************************
@@ -54,12 +67,11 @@ These two are only for display.
 **********************************/
 if(!isset($_POST['closed_date'])||($_POST['closed_date']=="")){
 	if(!isset($_POST['announced_date'])||($_POST['announced_date']=="")){
-		$result['status'] = 0;
-		$result['msg'] = "One or more mandatory information was not specified";
-		myJson($result);
-		return;
+		$error_msg.="Please specify the date of the deal<br />";
+		$validation_passed = false;
 	}
 }
+
 
 /**********************************
 In detailed submission form, we specify the exact value
@@ -68,14 +80,17 @@ implied_deal_size (for M&A)
 **********************************/
 if(!isset($_POST['deal_size'])||($_POST['deal_size']=="")){
 	if(!isset($_POST['implied_deal_size'])||($_POST['implied_deal_size']=="")){
-		$result['status'] = 0;
-		$result['msg'] = "One or more mandatory information was not specified";
-		myJson($result);
-		return;
+		$error_msg.="Please specify the deal value<br />";
+		$validation_passed = false;
 	}
+}else{
+	//deal value specified
 }
 
-/*******************************/
+/*******************************
+companies, at least one
+thing is, even if no company is specified, the companies array is posted, with blank elements
+*******************/
 $company_count = count($_POST['companies']);
 $has_company = false;
 for($company_i=0;$company_i<$company_count;$company_i++){
@@ -86,12 +101,12 @@ for($company_i=0;$company_i<$company_count;$company_i++){
 	}
 }
 if(!$has_company){
-	$result['status'] = 0;
-	$result['msg'] = "One or more mandatory information was not specified";
-	myJson($result);
-	return;
+	$error_msg.="Please specify one or more companies associated with the deal<br />";
+	$validation_passed = false;
 }
-/************************************************/
+/************************************************
+banks: at least one
+*************/
 $bank_count = count($_POST['banks']);
 $has_bank = false;
 for($bank_i=0;$bank_i<$bank_count;$bank_i++){
@@ -102,8 +117,52 @@ for($bank_i=0;$bank_i<$bank_count;$bank_i++){
 	}
 }
 if(!$has_bank){
+	
+	$error_msg.="Please specify one or more banks associated with the deal<br />";
+	$validation_passed = false;
+}
+if(!$validation_passed){
 	$result['status'] = 0;
-	$result['msg'] = "One or more mandatory information was not specified";
+	$result['msg'] = "One or more mandatory information was not specified<br />";
+	$result['msg'].=$error_msg;
+	myJson($result);
+	return;
+}
+/******************
+Now some logical check
+If M&A deal, we already forced the user to select subcat. Now
+if the subcat is Pending, Completed date cannot be specified.
+Problem is:
+1) I select M&A - completed
+2) Specify both Announce date and Completion date
+3) I change my mind and select Pending
+4) Submit the data
+Since both data is sent, the server code set  Completion date as date of deal and also set completion date
+of deal as Completion date even though I only specified the deal as Pending.
+
+Let us check for this is blank out in the server side
+NOTE; We can only check at this point when the basic validation has been done and the code reached here without any error
+*****************/
+if("m&a"==strtolower($_POST['deal_cat_name'])){
+	if("pending"==strtolower($_POST['deal_subcat1_name'])){
+		$_POST['closed_date'] = "";
+		/**********
+		so this will be ignored. But what if Announced date is not specified?
+		It may happen that the user only selected closed_date
+		and specified M&A/Pending. In that case our code blanks out date_closed and date_announced was also blank and then date of deal will be blank
+		which is an error
+		**************/
+		if(!isset($_POST['announced_date'])||($_POST['announced_date']=="")){
+			$error_msg.="Please specify the announcement date of the Pending M&A deal<br />";
+			$validation_passed = false;
+		}
+	}
+}
+
+if(!$validation_passed){
+	$result['status'] = 0;
+	$result['msg'] = "One or more mandatory information was not specified<br />";
+	$result['msg'].=$error_msg;
 	myJson($result);
 	return;
 }
@@ -181,6 +240,26 @@ if(isset($_POST['closed_date'])&&($_POST['closed_date']!="")){
 	$date_of_deal = fotmat_date_for_suggestion($_POST['announced_date']);
 }
 $q.=",date_of_deal='".$date_of_deal."'";
+/************
+sng:30/aug/2012
+check the type and set calculation flag
+***************/
+$in_calculation = 1;
+$temp_deal_type = strtolower($_POST['deal_cat_name']);
+
+if(($temp_deal_type=="debt")||($temp_deal_type=="equity")){
+	if(isset($_POST['closed_date'])&&($_POST['closed_date']!="")){
+		//deal closed
+		$in_calculation = 1;
+	}else{
+		//merely annonced
+		$in_calculation = 0;
+	}
+}else{
+	//This is M&A. for that, we are interested in both announced and completed deals
+	$in_calculation = 1;
+}
+$q.=",in_calculation='".$in_calculation."'";
 
 $q.=",deal_cat_name='".$_POST['deal_cat_name']."'";
 if(isset($_POST['deal_subcat1_name'])&&($_POST['deal_subcat1_name']!="")){
