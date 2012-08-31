@@ -1054,6 +1054,27 @@ class transaction_suggestion{
 	public function front_submit_deal_data($deal_id,$mem_id,$data_arr,&$msg){
 	
 		$db = new db();
+		/****************
+		sng:31/aug/2012
+		We need to know the type of deal. If it is Debt/Equity, we set in_calculation = 1 if
+		completion date is not set in the current data and it is specified here.
+		
+		Basically, we are not interested in Debt/Equity deals which are only 'announced'. How do we know that
+		it has only been announced? In the deal submission, we get only the date of announcement.
+		See simple deal submission and detailed deal submission process
+		**********************/
+		$q = "select deal_cat_name from ".TP."transaction where id='".$deal_id."'";
+		$success = $db->select_query($q);
+		if(!$success){
+			return false;
+		}
+		if(!$db->has_row()){
+			return false;
+		}
+		$row = $db->get_row();
+		
+		$deal_cat = $row['deal_cat_name'];
+		/*****************************************************************/
 		
 		$q = "";
 		
@@ -1364,7 +1385,42 @@ class transaction_suggestion{
 			return true;
 		}
 		
-		
+		/*************************
+		sng:31/aug/2012
+		If debt/equity and if comlpletion date is given, see if date_closed is set for the deal or not
+		*********************/
+		$deal_cat = strtolower($deal_cat);
+		if(("debt"==$deal_cat)||("equity"==$deal_cat)){
+			if(isset($data_arr['date_closed'])&&($data_arr['date_closed']!='')){
+				$date_q = "select date_closed from ".TP."transaction_extra_detail where transaction_id='".$deal_id."'";
+				$success = $db->select_query($date_q);
+				if(!$success){
+					return false;
+				}
+				if(!$db->has_row()){
+					return false;
+				}
+				$row = $db->get_row();
+				
+				if((""==$row['date_closed'])||("0000-00-00"==$row['date_closed'])){
+					//date closed not set, set it
+					$updt_q = "update ".TP."transaction_extra_detail set date_closed='".mysql_real_escape_string($data_arr['date_closed'])."' where transaction_id='".$deal_id."'";
+					$ok = $db->mod_query($updt_q);
+					if($ok){
+						$updt_q = "update ".TP."transaction set in_calculation='1' where id='".$deal_id."'";
+						$db->mod_query($updt_q);
+					}else{
+						//we don't mind if this fails
+					}
+				}else{
+					//date closed is set for the deal, do nothing
+				}
+			}else{
+				//no suggestion, set nothing
+			}
+		}else{
+			//M&A deal
+		}
 		
 		
 		$report_date = date("Y-m-d");
