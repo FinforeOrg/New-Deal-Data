@@ -1057,13 +1057,14 @@ class transaction_suggestion{
 		/****************
 		sng:31/aug/2012
 		We need to know the type of deal. If it is Debt/Equity, we set in_calculation = 1 if
-		completion date is not set in the current data and it is specified here.
+		completion date is not set in the current data and it is specified here (that is, the deal was in
+		'announced' state and now a member is marking it as 'completed'
 		
 		Basically, we are not interested in Debt/Equity deals which are only 'announced'. How do we know that
 		it has only been announced? In the deal submission, we get only the date of announcement.
 		See simple deal submission and detailed deal submission process
 		**********************/
-		$q = "select deal_cat_name from ".TP."transaction where id='".$deal_id."'";
+		$q = "select deal_cat_name,deal_subcat1_name from ".TP."transaction where id='".$deal_id."'";
 		$success = $db->select_query($q);
 		if(!$success){
 			return false;
@@ -1074,13 +1075,19 @@ class transaction_suggestion{
 		$row = $db->get_row();
 		
 		$deal_cat = $row['deal_cat_name'];
+		$deal_sub_cat = strtolower($row['deal_subcat1_name']);
 		/*****************************************************************/
 		
 		$q = "";
+		/****************************************
+		sng:1/sep/2012
+		This may not be needed. It was a hack for M&A deal to allow members to mark it as completed
+		Now we will use custom list
 		
 		if(isset($data_arr['deal_subcat1_name'])&&($data_arr['deal_subcat1_name']!='')){
 			$q.=",deal_subcat1_name='".mysql_real_escape_string($data_arr['deal_subcat1_name'])."'";
 		}
+		***************************/
 		
 		if(isset($data_arr['date_rumour'])&&($data_arr['date_rumour']!='')){
 			$q.=",date_rumour='".mysql_real_escape_string($data_arr['date_rumour'])."'";
@@ -1419,7 +1426,36 @@ class transaction_suggestion{
 				//no suggestion, set nothing
 			}
 		}else{
-			//M&A deal
+			/****************
+			sng:1/sep/2012
+			M&A deal. If the current subcat is already 'completed' then ignore any suggestion. Completed deals cannot change to Pending
+			*********************/
+			if($deal_sub_cat=="completed"){
+			}else{
+				/************
+				Now it becomes interesting.
+				Did the user sent any deal_completion_status
+				***********/
+				if(isset($data_arr['deal_completion_status'])&&($data_arr['deal_completion_status']!='')){
+					$stat_update_q = "";
+					if($data_arr['deal_completion_status']=="pending"){
+						$stat_update_q = "deal_subcat1_name='Pending',in_calculation='1'";
+					}
+					if($data_arr['deal_completion_status']=="completed"){
+						$stat_update_q = "deal_subcat1_name='Completed',in_calculation='1'";
+					}
+					if($data_arr['deal_completion_status']=="lost"){
+						$stat_update_q = "deal_subcat1_name='Pending',in_calculation='0'";
+					}
+					if($data_arr['deal_completion_status']=="cancelled"){
+						$stat_update_q = "deal_subcat1_name='Pending',in_calculation='0'";
+					}
+					if($stat_update_q!=""){
+						$stat_update_q = "update ".TP."transaction set ".$stat_update_q." where id='".$deal_id."'";
+						$ok = $db->mod_query($stat_update_q);
+					}
+				}
+			}
 		}
 		
 		

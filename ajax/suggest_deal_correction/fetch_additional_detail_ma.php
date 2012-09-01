@@ -1,10 +1,17 @@
 <?php
 /****************
 for M&A deals, we need the subcategories so that we can show whether the deal is Complete or Pending
-***/
+
+sng:1/sep/2012
+We no longer use this hack. Now we use the custom list
+***
 $g_view['subcat1_list'] = array();
 $g_view['subcat1_count'] = 0;
 $success = $g_trans->get_all_category_subtype1_for_category_type($g_view['deal_data']['deal_cat_name'],$g_view['subcat1_list'],$g_view['subcat1_count']);
+*************/
+$g_view['status_list'] = NULL;
+$g_view['status_list_count'] = 0;
+$ok = $trans_support->deal_completion_status_types($g_view['status_list'],$g_view['status_list_count']);
 
 /**********************
 we need list of M&A merger type
@@ -42,6 +49,11 @@ if(0==$g_view['suggestion_data_count']){
 ?>
 
 <td class="deal-edit-snippet-right-col">
+<?php
+/*************************
+sng:1/sep/2012
+The subtype was a hack so that members can mark a Pending M&A deal as Complete.
+Now we use a custom list
 <select name="deal_subcat1_name" class="deal-edit-snippet-dropdown">
 <option value="">Select</option>
 <?php
@@ -52,6 +64,34 @@ for($i=0;$i<$g_view['subcat1_count'];$i++){
 }
 ?>
 </select>
+***************************/
+?>
+<?php
+/*********************
+sng:1/sep/2012
+If the deal subtype is already Completed then do not show dropdown
+*********************/
+if("completed"==strtolower($g_view['deal_data']['deal_subcat1_name'])){
+	?>Completed<?php
+}else{
+	/***********
+	not completed deal, so we can show the dropdowns
+	we will highlight the 'pending' option as default
+	********************/
+	?>
+	<select name="deal_completion_status" class="deal-edit-snippet-dropdown">
+	<?php
+	for($i=0;$i<$g_view['status_list_count'];$i++){
+		?>
+		<option value="<?php echo $g_view['status_list'][$i]['status_code'];?>" <?php if($g_view['status_list'][$i]['status_code']=="pending"){?>selected="selected"<?php }?>><?php echo $g_view['status_list'][$i]['status_name'];?></option>
+		<?php
+	}
+	?>
+	</select>
+	<?php
+}
+?>
+
 </td>
 
 </tr>

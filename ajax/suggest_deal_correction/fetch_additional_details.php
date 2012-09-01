@@ -11,8 +11,13 @@ require_once("../../include/global.php");
 require_once("classes/class.transaction.php");
 require_once("classes/class.deal_support.php");
 require_once("classes/class.transaction_suggestion.php");
+require_once("classes/class.transaction_support.php");
 $trans_suggestion = new transaction_suggestion();
 $deal_support = new deal_support();
+/************
+sng:1/sep/2012
+***************/
+$trans_support = new transaction_support();
 
 $g_view['deal_id'] = $_GET['deal_id'];
 $g_view['deal_found'] = false;
