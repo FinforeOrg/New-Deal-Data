@@ -844,8 +844,16 @@ class statistics{
         to block the quarter/year/year half that is running, we will use having caluse after group by
         get the extry to be excluded. This depends on grouping type
         These will be like 2009-2
-        *********/
+		
+		sng: 4/sep/2012
+		In the def of exclude_month_div_entry, there is this comment
+		"sng:29/nov/2010
+		We consider the running year, year half and quarter also"
+		
+		This means, we no longer block the running quarter/year half/year, so no need to call this function
+        *********
         $exclude_term = $g_stat_h->exclude_month_div_entry($month_div);
+		*************************/
         /***************************************************************/
         
         
@@ -952,12 +960,18 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
         if($filter_trans_clause!=""){
             $q.=$filter_trans_clause;
         }
-        
+        /***********
+		sng:4/sep/2012
+		consider only active deals
+		consider deals which are 'completed' - for Debt/Equity or not marked explicitly to be excluded (M&A) - in_calculation
+		************/
+		$q.=" and t.is_active='y' and t.in_calculation='1'";
+		
         $q.=" GROUP BY D";
         
         $q.=" having D!='".$exclude_term."' order by D";
         /********************************************************/
-        //echo $q;die();
+        //echo $q;
 
         $res = mysql_query($q);
         if(!$res){
@@ -980,6 +994,7 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
         $value_arr = NULL;
         $label_arr = NULL;
         $g_stat_h->volume_get_month_div_entries_starting_from($month_div,$year_month_div,$value_arr,$label_arr);
+		
         $j = 0;
         $cnt = count($value_arr);
         $lookup_arr = array();
@@ -999,31 +1014,44 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
 
         for($i=0;$i<$row_count;$i++){
             $row = mysql_fetch_assoc($res);
+			
+			/***********************
+			sng:4/sep/2012
+			Assume today is sep 2012. The member select option 'Quarterly' start from '3Q 2012'
+			The query loads data where deal year >= 2012. This means, data of 1Q and 2Q is also there in the recordset.
+			We need to exclude those. How? We check if the tag is there in the lookup arr or not
+			**********************/
+			if(array_key_exists($row['D'],$lookup_arr)){
+				$data_value = $row['total_issuance'];
+				/***
+				total deal value is in billion and has a high precision, correct to 2 decimal place
+				**/
+				$data_value = round($data_value,2);
             
-            /***
-            use lookup array to get the offset where to put data
-            ***/
-            $data_value = $row['total_issuance'];
-            /***
-            total deal value is in billion and has a high precision, correct to 2 decimal place
-            **/
-            $data_value = round($data_value,2);
+				if($max_value == ""){
+					$max_value = $data_value;
+				}else{
+					if($data_value > $max_value){
+						$max_value = $data_value;
+					}
+				}
+				/****
+				use lookup array to get the offset where to put data
+				****/
+				$data_offset = $lookup_arr[$row['D']];
+				$data_arr[$data_offset]['value'] = $data_value;
+			}else{
+				continue;
+			}
             
-            if($max_value == ""){
-                $max_value = $data_value;
-            }else{
-                if($data_value > $max_value){
-                    $max_value = $data_value;
-                }
-            }
-            $data_offset = $lookup_arr[$row['D']];
+			
             
-            $data_arr[$data_offset]['value'] = $data_value;
             /***************************************************************
             sng:27/nov/2010
             end of change
             ***************************************************************/
         }
+		
             $_SESSION['lastGeneratedGraphData'] =  $data_arr;
         return true;
     }
