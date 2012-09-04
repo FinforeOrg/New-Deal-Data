@@ -282,9 +282,29 @@ and the code in the view page triggers a chart creation.
                     <tr>
                         <td style="width: 30%">&nbsp;</td>
                         <td><select name="deal_size" id="deal_size" style="width: 200px;">
-                          <option value="">Refine by Deal Size</option>
+						<?php
+						/***************
+						sng:4/sep/2012
+						see issuance_data.php on the different cases
+						***************/
+						$selected = false;
+						if(isset($_POST['deal_size'])&&($_POST['deal_size']=="")){
+							$selected = true;
+						}
+						?>
+                          <option value="" <?php if($selected){?>selected="selected"<?php }?>>Refine by Deal Size</option>
                           <?php for($j=0;$j<$g_view['deal_size_filter_list_count'];$j++):?>
-                          <option value="<?php echo base64_encode($g_view['deal_size_filter_list'][$j]['condition']);?>" <?php if($_POST['deal_size']==$g_view['deal_size_filter_list'][$j]['condition']){?>selected="selected"<?php } else { if ($g_view['deal_size_filter_list'][$j]['condition'] == '>=0.100') echo "selected='selected'"; }?> ><?php echo $g_view['deal_size_filter_list'][$j]['caption'];?></option>
+						  <?php
+							$selected = false;
+							if(isset($_POST['deal_size'])&&($_POST['deal_size']==$g_view['deal_size_filter_list'][$j]['condition'])){
+								$selected = true;
+							}else{
+								if(!isset($_POST['deal_size'])&&($g_view['deal_size_filter_list'][$j]['condition'] == '>=0.100')){
+									$selected = true;
+								}
+							}
+							?>
+                          <option value="<?php echo base64_encode($g_view['deal_size_filter_list'][$j]['condition']);?>" <?php if($selected){?>selected="selected"<?php }?> ><?php echo $g_view['deal_size_filter_list'][$j]['caption'];?></option>
                           <?php  endfor; ?>
                         </select></td>
                     </tr>

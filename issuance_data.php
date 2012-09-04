@@ -32,8 +32,30 @@ sng:3/aug/2012
 We cannot send data like >= in POST. The sanitiser will erase it.
 So we base64 encoded the view file
 and we decode it here again
+
+sng:4/sep/2012
+We need to check whether $_POST['deal_size'] is set or not. Only then we call base64_decode
+Why this is needed? We can come to this page 3 ways
+1) From saved search option
+2) From menu option
+3) From the detail page
+
+(1) If we come here from saved search option and if we did not specified the size then we should not pre select the 100m in the view
+We see that for (1) $_POST['deal_size'] is set and is blank if no option was selected.
+
+For (2), $_POST['deal_size'] is not set
+We preselect the 100m by default
+(In the other cases this was deliberately set to 'no size' filter value)
+
+For (3) $_POST['deal_size'] is set and is blank if no option was selected.
+
+Thus we do not set $_POST['deal_size'] = base64_decode($_POST['deal_size']) blindly. we will not be able to distinguish case (2)
 ************************/
-$_POST['deal_size'] = base64_decode($_POST['deal_size']);
+if(isset($_POST['deal_size'])){
+	$_POST['deal_size'] = base64_decode($_POST['deal_size']);
+}else{
+}
+
 //////////////////
 //sng: 21/apr/2010
 require("league_table_filter_support.php");
