@@ -1145,6 +1145,14 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
         if(isset($stat_params['deal_size'])&&($stat_params['deal_size']!="")){
             $filter_trans_clause.=" and value_in_billion".$stat_params['deal_size'];
         }
+		
+		/**************
+		sng:5/sep/2012
+		We need to exclude inactive deals
+		We exclude 'announced' Debt / Equity deals and M&A deals that are explicitly marked (in_calculation=0)
+		We use the alias t to mark the transaction table (just to be safe since other tables can have those fields)
+		****************/
+		$filter_trans_clause.=" and t.is_active='y' and t.in_calculation='1'";
         /**************************************************************************************
         sng:1/dec/2010
         Now when country is present, we check the transaction::deal_country field
@@ -1479,7 +1487,13 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_param['region'])."'";
         if (isset($stat_param['max_date'])) {
             $q .= sprintf(" and t.last_edited < '%s'", $stat_param['max_date']);
         }    
-        
+        /**************
+		sng:5/sep/2012
+		We need to exclude inactive deals
+		We exclude 'announced' Debt / Equity deals and M&A deals that are explicitly marked (in_calculation=0)
+		We use the alias t to mark the transaction table (just to be safe since other tables can have those fields)
+		****************/
+		$q.=" and t.is_active='y' and t.in_calculation='1'";
         /////////////////////////////////////////////
         $q.=" GROUP BY partner_id";
         ///////////////////////////////////////
