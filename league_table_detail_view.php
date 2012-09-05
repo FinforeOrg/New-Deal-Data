@@ -224,9 +224,33 @@ and the code in the view page triggers a chart creation.
 			***************/
 			?>
         <td><select name="deal_size" id="deal_size" style="width: 200px;">
-          <option value="">Refine by Deal Size</option>
+		<?php
+		/******************
+		sng:5/sep/2012
+		If I have specifically set the deal size to 'no filter' option, we should pre select the 'no filter' option and not the 'deals over 100m'
+		**************/
+		$selected = false;
+		if(isset($_POST['deal_size'])&&($_POST['deal_size']=="")){
+			$selected = true;
+		}
+		?>
+          <option value="" <?php if($selected){?>selected="selected"<?php }?>>Refine by Deal Size</option>
           <?php for($j=0;$j<$g_view['deal_size_filter_list_count'];$j++):?>
-          <option value="<?php echo base64_encode($g_view['deal_size_filter_list'][$j]['condition']);?>" <?php if($_POST['deal_size']==$g_view['deal_size_filter_list'][$j]['condition']){?>selected="selected"<?php } else { if ($g_view['deal_size_filter_list'][$j]['condition'] == '>=0.100') echo "selected='selected'"; }?> ><?php echo $g_view['deal_size_filter_list'][$j]['caption'];?></option>
+		  <?php
+		/***************
+		sng:5/sep/2012
+		However, if I just visiting this page, there is no preselected deal size. In that case we preselect the 'more than 100m' option
+		******************/
+		$selected = false;
+		if(isset($_POST['deal_size'])&&($_POST['deal_size']==$g_view['deal_size_filter_list'][$j]['condition'])){
+			$selected = true;
+		}else{
+			if(!isset($_POST['deal_size'])&&($g_view['deal_size_filter_list'][$j]['condition'] == '>=0.100')){
+				$selected = true;
+			}
+		}
+		?>
+          <option value="<?php echo base64_encode($g_view['deal_size_filter_list'][$j]['condition']);?>" <?php if($selected){?>selected="selected"<?php }?> ><?php echo $g_view['deal_size_filter_list'][$j]['caption'];?></option>
           <?php  endfor; ?>
         </select></td>
       </tr>

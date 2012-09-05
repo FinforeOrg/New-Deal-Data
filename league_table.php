@@ -26,6 +26,9 @@ if (isset($_REQUEST['from']) && $_REQUEST['from'] == 'oneStop') {
 /************
 sng:23/jul/2012
 We cannot send conditions like >=23. The sanitizer will erase it. We base64_encode it in the forms and decode it here
+
+sng:5/sep/2012
+For more explanation on why we put this in if() see issuance_data.php
 *****************/
 if(isset($_POST['deal_size'])){
 	$_POST['deal_size'] = base64_decode($_POST['deal_size']);
