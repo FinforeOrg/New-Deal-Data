@@ -4697,6 +4697,13 @@ WHERE rgnm.name = '".mysql_real_escape_string($filter_arr['region'])."'";
         if($filter_arr['deal_size']!=""){
             $q.=" and value_in_billion".$filter_arr['deal_size'];
         }
+		/**************
+		sng:5/sep/2012
+		We need to exclude inactive deals
+		We exclude 'announced' Debt / Equity deals and M&A deals that are explicitly marked (in_calculation=0)
+		We use the alias t to mark the transaction table (just to be safe since other tables can have those fields)
+		****************/
+		$q.=" and t.is_active='y' and t.in_calculation='1'";
         /*********************************************************************************
         sng:4/dec/2010
         we no longer use the country of the company. We use the deal_country or transaction.
