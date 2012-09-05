@@ -4449,6 +4449,9 @@ WHERE rgnm.name = '".mysql_real_escape_string($_POST['region'])."'";
 		/************
 		sng:2/mar/2012
 		We only get active deals
+		
+		sng:5/sep/2012
+		Exclude any 'announced' Debt/Equity and M&A explicitly marked for non-inclusion (that is use the in_calculation)
 		***************/
 		$q.="LEFT JOIN {$tablePrefix}transaction as t on";
 		
@@ -4458,7 +4461,7 @@ WHERE rgnm.name = '".mysql_real_escape_string($_POST['region'])."'";
 			$q.="(p.transaction_id=t.id) ";
 		}
 		
-		$q.="LEFT JOIN {$tablePrefix}company AS c ON ( t.company_id = c.company_id ) WHERE t.is_active='y' AND partner_id='$firmId' $where $order limit $start,$end  ";
+		$q.="LEFT JOIN {$tablePrefix}company AS c ON ( t.company_id = c.company_id ) WHERE t.is_active='y' AND t.in_calculation='1' AND partner_id='$firmId' $where $order limit $start,$end  ";
 		
         $res = mysql_query( $q );
         $_SESSION['tombToken'] = base64_encode($q);
