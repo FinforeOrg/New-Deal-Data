@@ -15,7 +15,7 @@ Here we keep it open
 /***********************
 sng:24/oct/2011
 *************************/
-//if (isset($_GET['from']) && $_GET['from'] = 'savedSearches') {
+//if (isset($_GET['from']) && $_GET['from'] == 'savedSearches') {
 //	$_SESSION['after_login'] = "showcase_firm.php?id=".$_REQUEST['id']."&from=savedSearches";
 //}
 //require_once("check_mem_login.php");
