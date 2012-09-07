@@ -282,16 +282,10 @@
 		/***********
 		sng:6/sep/2012
 		The deal size is like >=x or <=y
-		Problem is, we are not sure whether we decoded or not. We check the first char
 		**************/
 		
         if($_POST['deal_size']!=""){
-			$sng_char = substr($_POST['deal_size'],0,1);
-			if(($sng_char=='>')||($sng_char=='<')){
-				//ok
-			}else{
-				$_POST['deal_size'] = base64_decode($_POST['deal_size']);
-			}
+			$_POST['deal_size'] = Util::decode_deal_size($_POST['deal_size']);
             $queryWhereClauses.=" and value_in_billion".$_POST['deal_size'];
         }
         /**************

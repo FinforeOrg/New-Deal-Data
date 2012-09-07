@@ -859,8 +859,12 @@ class statistics{
         
         /****
         The deal size can be blank or <=valuein billion or >=value in billion
+		
+		sng:7/sep/2012
+		better pass through util::decode_deal_size
         ***/
         if($stat_params['deal_size']!=""){
+			$stat_params['deal_size'] = Util::decode_deal_size($stat_params['deal_size']);
             $filter_trans_clause.=" and value_in_billion".$stat_params['deal_size'];
         }
         
@@ -971,7 +975,7 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
         
         $q.=" having D!='".$exclude_term."' order by D";
         /********************************************************/
-        //echo $q;
+		
 
         $res = mysql_query($q);
         if(!$res){
@@ -1141,8 +1145,12 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
         /***
         sng:23/july/2010
         The deal size can be blank or <=valuein billion or >=value in billion
+		
+		sng:7/sep/2012
+		better pass through util::decode_deal_size
         ********/
         if(isset($stat_params['deal_size'])&&($stat_params['deal_size']!="")){
+			$stat_params['deal_size'] = Util::decode_deal_size($stat_params['deal_size']);
             $filter_trans_clause.=" and value_in_billion".$stat_params['deal_size'];
         }
 		
@@ -1473,8 +1481,12 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_param['region'])."'";
         /***
         sng:23/july/2010
         The deal size can be blank or <=valuein billion or >=value in billion
+		
+		sng:7/sep/2012
+		better pass through util::decode_deal_size
         ********/
         if($stat_param['deal_size']!=""){
+			$stat_param['deal_size'] = Util::decode_deal_size($stat_param['deal_size']);
             $q.=" and value_in_billion".$stat_param['deal_size'];
         }
         

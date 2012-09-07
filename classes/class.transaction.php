@@ -2631,6 +2631,12 @@ WHERE rgnm.name = '".mysql_real_escape_string($search_data['region'])."'";
 			if($search_data['deal_size']=="0.0"){
 				$q.=" and t.value_in_billion=0.0";
 			}else{
+				/***********
+				sng:7/sep/2012
+				The value is either blank or like >=deal value in billion or <=deal value in billion
+				better pass through util::decode_deal_size
+				**************/
+				$search_data['deal_size'] = Util::decode_deal_size($search_data['deal_size']);
 				$q.=" and t.value_in_billion".$search_data['deal_size']." and t.value_in_billion!=0.0";
 			}
         }
@@ -4411,6 +4417,12 @@ WHERE rgnm.name = '".mysql_real_escape_string($_POST['region'])."'";
 			if($_POST['deal_size']=="0.0"){
 				$where.=" and value_in_billion=0.0";
 			}else{
+				/***********
+				sng:7/sep/2012
+				The value is either blank or like >=deal value in billion or <=deal value in billion
+				better pass through util::decode_deal_size
+				**************/
+				$_POST['deal_size'] = Util::decode_deal_size($_POST['deal_size']);
 				$where.=" and value_in_billion".$_POST['deal_size']." and t.value_in_billion!=0.0";
 			}
         }
@@ -4693,8 +4705,12 @@ WHERE rgnm.name = '".mysql_real_escape_string($filter_arr['region'])."'";
         /***
         sng:23/july/2010
         filter deal_size. The value is either blank or like >=deal value in billion or <=deal value in billion
+		
+		sng:7/sep/2012
+		better pass through util::decode_deal_size
         ***/
         if($filter_arr['deal_size']!=""){
+			$filter_arr['deal_size'] = Util::decode_deal_size($filter_arr['deal_size']);
             $q.=" and value_in_billion".$filter_arr['deal_size'];
         }
 		/**************
