@@ -422,8 +422,11 @@ class Util {
 	What we do is get the first char and check it. If it is > or < we return it as it is else decode it.
 	****************************/
 	public static function decode_deal_size($data){
-		$char = substr($data,0,1);
-		if(($char=='>')||($sng_char=='<')){
+		/*******
+		cannot have variable like $char
+		******/
+		$c = substr($data,0,1);
+		if(($c=='>')||($c=='<')){
 			//all ok, return
 			return $data;
 		}else{
