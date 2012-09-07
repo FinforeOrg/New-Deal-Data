@@ -410,5 +410,25 @@ class Util {
 		$data = substr($data,2);
 		return $data;
 	}
+	/**************************
+	sng:7/sep/2012
+	filter deal_size:
+	The value is either blank or like >=deal value in billion or <=deal value in billion
+	This is base64_encoded so that it can slip past the sanitizer and then decoded before it is used
+	in query
+	Problem is, we can forgot to decode it and then we will be in problem. On the other hand, blindly
+	decoding is also a problem. We do not know whether it has already been decoded or not.
+	
+	What we do is get the first char and check it. If it is > or < we return it as it is else decode it.
+	****************************/
+	public static function decode_deal_size($data){
+		$char = substr($data,0,1);
+		if(($char=='>')||($sng_char=='<')){
+			//all ok, return
+			return $data;
+		}else{
+			return base64_decode($data);
+		}
+	}
 }
 
