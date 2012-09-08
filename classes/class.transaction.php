@@ -3581,17 +3581,36 @@ LIMIT ".$start_offset." , ".$num_to_fetch;
         $this->get_tombstone_from_deal_data($row['logo'],$row['company_name'],$row['deal_cat_name'],$row['deal_subcat1_name'],$row['deal_subcat2_name'],$row['value_in_billion'],$row['value_range_id'],$row['fuzzy_value'],$row['date_of_deal'], $withFavorites, $isTombstoneFavorite, $row['deal_id'], $row['logos']);
         return true;
     }
-
+	/**************
+	sng:8/sep/2012
+	We no longer use this but use get_tombstone_from_deal_ids_for_alert
+	There was only one place that used this - the cron/sendSearchChangedAlert
+	******************/
     public function get_tombstone_from_deal_ids($deal_ids){
-        //get the details
-        $q = "
-        SELECT t.id AS deal_id, value_in_billion, date_of_deal, deal_cat_name, deal_subcat1_name, deal_subcat2_name, c.logo, c.name AS company_name, t.logos
-        FROM ".TP."transaction AS t
-        LEFT JOIN ".TP."company AS c ON ( t.company_id = c.company_id )
-        WHERE t.id IN ( " . join(',', $deal_ids).  ")
-        LIMIT 0 , 30 ";
-        //echo $q;
-        //$q = "select t.id as deal_id, value_in_billion,date_of_deal,deal_cat_name,deal_subcat1_name,deal_subcat2_name,c.logo,c.name as company_name, t.logos from ".TP."transaction as t left join ".TP."company as c on(t.company_id=c.company_id) where t.id='".$deal_id."'";
+        
+    }
+	/********************
+	sng:8/sep/2012
+	We now use this for sending alerts
+	**********************/
+	public function get_tombstone_from_deal_ids_for_alert($deal_ids_arr){
+        /***************
+		get the details that can obtained from deal record
+		We consider the fact that the member has specified the deal value in terms of a range
+		
+		Now we have multiple participants and each company has its own logo.
+		Since there is no concept of 'default' or 'main' company, we show the first logo.
+		
+		Since we will be emailing this, we cannot show multiple logos. Javascript will not run on email clients.
+		Also, this is the first time the user is seeing the deal info so no chance of marking a logo as favourite. Hence we do not
+		bother with favourite
+		
+		However, we also get the participating companies in case we do not have logo and has to show the companies
+		
+		There will be no concept of downloading to powerpoint
+		**************************************************/
+		$q = "select id AS deal_id,value_in_billion,t.value_range_id,date_of_deal,deal_cat_name,deal_subcat1_name,deal_subcat2_name,vrm.display_text as fuzzy_value,'logo' as logo,'companes' as companies from ".TP."transaction AS t LEFT JOIN ".TP."transaction_value_range_master AS vrm on (t.value_range_id=vrm.value_range_id) WHERE t.id IN ( " . join(',', $deal_ids_arr).  ") LIMIT 0 , 30 ";
+		
         $res = mysql_query($q);
         if(!$res){
             return false;
@@ -3601,9 +3620,25 @@ LIMIT ".$start_offset." , ".$num_to_fetch;
             //no such deal
             return false;
         }
+		require_once("classes/class.transaction_company.php");
+		$trans_com = new transaction_company();
+		
         $ret = false;
+		$i = 0;
         while($row = mysql_fetch_assoc($res)) {
-            $ret[] = $row;
+            $ret[$i] = $row;
+			$deal_id = $ret[$i]['deal_id'];
+			
+			$participants_logos = array();
+			$ok = $trans_com->get_deal_participants_logos($deal_id,$participants_logos);
+			//even if there is error, we have a blank array
+			$ret[$i]['logo'] = $participants_logos;
+			
+			$participants = array();
+			$ok = $trans_com->get_deal_participants($deal_id,$participants);
+			//even if there is error, we have a blank array
+			$ret[$i]['companies'] = $participants;
+			$i++;
         }
         
         return $ret;
