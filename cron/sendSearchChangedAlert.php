@@ -23,7 +23,7 @@ echo "Found " . sizeOf($ret) ." saved searches that require alerts." . PHP_EOL;
 
 foreach($ret as $numAlert) {
         $links = array(
-            'deal'=>'http://www.deal-data.com/deal_search.php?alert=1&token=',
+            'deal'=>$g_http_path.'/deal_search.php?alert=1&token=',
         );
         $success = $g_trans->front_deal_search_paged(unserialize($numAlert['parameters']),0,999999,$deals,$dealCount, $numAlert['lastAlertId']);
        
@@ -51,11 +51,11 @@ foreach($ret as $numAlert) {
                 <td align='center' valign='top'>
                 <table width='100%' border='0'>
                   <tr>
-                    <td><img height='65' width='236' alt='' src='http://www.deal-data.com/images/mytombstones_logo.gif'></td>
+                    <td><img height='65' width='236' alt='' src='".$g_http_path."/images/mytombstones_logo.gif'></td>
                   </tr>
                   <tr>
                     <td>
-                        <div style='font:14px Arial,sans-serif;'> Hello {$numAlert['l_name']}, <br  /><br  /> {$dealCount} new deals have been added in the '{$label}' section of <a href='http://www.deal-data.com/' > deal-data.com </a> . <br /><br />
+                        <div style='font:14px Arial,sans-serif;'> Hello {$numAlert['l_name']}, <br  /><br  /> {$dealCount} new deals have been added in the '{$label}' section of <a href='".$g_http_path."/' > ".$g_http_path." </a> . <br /><br />
                            Below you can find the list of added transactions.
                         </div>
                     </td>
@@ -66,10 +66,11 @@ foreach($ret as $numAlert) {
                 
                  ";
             foreach ($dealArray as $deal) {
-            //var_dump($deal); 
+            //var_dump($deal);
+			 
             if (strlen($deal['logo']) && is_file($filename = dirname(dirname(__FILE__)) . "/uploaded_img/logo/thumbnails/" . $deal['logo'])) {
             $dealLogo =  "<a style='text-decoration: none; cursor: pointer; display:block; text-align:center' href='{$link}'>
-                <img src='http://deal-data.com/uploaded_img/logo/thumbnails/{$deal['logo']}' style='border: 0 none;' align='center'>                    </a>
+                <img src='".LOGO_IMG_URL."/{$deal['logo']}' style='border: 0 none;' align='center'>                    </a>
             "; 
                 //echo 'Logo found ' . $filename . "\n";               
             } else {
@@ -79,7 +80,7 @@ foreach($ret as $numAlert) {
             //echo 'Logo not found ' . $filename . "\n";
             }
             
-            $link = 'http://www.deal-data.com/hitCount.php?referer=savedSearch&token='.base64_encode('deal_detail.php?deal_id=' . $deal['deal_id']);
+            $link = $g_http_path.'/hitCount.php?referer=savedSearch&token='.base64_encode('deal_detail.php?deal_id=' . $deal['deal_id']);
             $content .= "
 <table class='tombstone_display' style='border: 1px solid #CCCCCC; width: 210px;  text-decoration: none; float: left; margin-left: 10px; margin-bottom:5px;'> 
     <tbody>
@@ -138,8 +139,8 @@ foreach($ret as $numAlert) {
                 $q = "UPDATE {$savedSearchesTable} SET lastAlertId = $lastIdForDeal WHERE id = {$numAlert['id']}";    
                  echo "Updating saved alert {$numAlert['id']} last id to  : $lastIdForDeal \n";                                  
                  $result = mysql_query($q) or die(mysql_error());
-                // echo    $content; exit;
-                $mailSent = sendHTMLemail($content,'no-reply@deal-data.com',$numAlert['work_email'], 'New deals added ('.($savedSearches->cleanAndTranslate($numAlert['parameters']). ")") );
+                 echo    $content; exit;
+                //$mailSent = sendHTMLemail($content,'no-reply@new.deal-data.com',$numAlert['work_email'], 'New deals added ('.($savedSearches->cleanAndTranslate($numAlert['parameters']). ")") );
                 if ($mailSent)
                     echo "Email sent to " .$numAlert['work_email'] . PHP_EOL ;
             } else {
