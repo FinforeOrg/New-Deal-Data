@@ -387,6 +387,17 @@ function init_participants_footnote(){
 
 
 var _lastClickedButton = 'Pending';
+/*******************************************************************
+sng:11/sep/2012
+We change the front end validation rules a bit
+M&A Completed - closing date is mandatory in step 1
+Equity Preferred - closing date is mandatory in step 1
+Equity IPO - closing date is mandatory in step 1
+
+In step 2, deal value in USD is mandatory (rest optional)
+
+In step 3, bank1 is mandatory (rest optional)
+*************************************************************************/
 var _requiredFields = {
     'Pending' : {
         'step1' : [
@@ -404,10 +415,13 @@ var _requiredFields = {
     'Completed' : 
     {
         'step1' :[
+			'closed_date'
         ],
         'step2' :[
+			'implied_deal_size'
         ],
         'step3' :[
+			'bank1'
         ]
     },
 	'Bond' : {
@@ -418,8 +432,7 @@ var _requiredFields = {
 			'deal_size'
 		],
         'step3' :[ 
-            'bank1',
-            'end_date'
+            'bank1'
         ]
 	},
     'Loan' : {
@@ -430,9 +443,7 @@ var _requiredFields = {
             'facility_size'
          ],
         'step3' :[ 
-            'bank1',
-            'end_date' ,
-            'margin' ,
+            'bank1'
         ]
     },
     'Convertible' : {
@@ -443,11 +454,20 @@ var _requiredFields = {
             'deal_size'
          ],
         'step3' :[ 
-            'coupon',
-            'end_date' ,
-            'bank1' ,
+            'bank1'
         ]
     },
+	'Preferred':{
+		'step1':[
+			'closed_date'
+		],
+        'step2' :[
+			'deal_size'
+        ],
+        'step3' :[
+			'bank1'
+        ]
+	},
     'Additional' : {
         'step1' : [
             'closed_date'  
@@ -456,17 +476,18 @@ var _requiredFields = {
             'deal_size'
          ],
         'step3' :[ 
-            'bank1',
+            'bank1'
         ]
     },    
     'IPO' : {
         'step1' : [
+			'closed_date'
         ],
         'step2' : [
             'deal_size'
          ],
         'step3' :[ 
-            'bank1',
+            'bank1'
         ]
     } ,
     'Rights Issue' : {
@@ -477,7 +498,7 @@ var _requiredFields = {
             'deal_size'
          ],
         'step3' :[ 
-            'bank1',
+            'bank1'
         ]
     }
 }   
