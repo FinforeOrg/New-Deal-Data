@@ -157,6 +157,16 @@ if("m&a"==strtolower($_POST['deal_cat_name'])){
 			$validation_passed = false;
 		}
 	}
+	/**************
+	sng:11/sep/2012
+	We also check if the deal is M&A Completed. If so, we check if the completion date is given or not
+	******************/
+	if("completed"==strtolower($_POST['deal_subcat1_name'])){
+		if(!isset($_POST['closed_date'])||($_POST['closed_date']=="")){
+			$error_msg.="Please specify the completion date of the Completed M&A deal<br />";
+			$validation_passed = false;
+		}
+	}
 }
 
 if(!$validation_passed){
