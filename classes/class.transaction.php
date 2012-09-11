@@ -923,6 +923,18 @@ class transaction{
 				}
 			}
 		}
+		/*********
+		sng:11/sep/2012
+		if M&A deal and sub cat is Completed, deal_date_type cannot be Announced
+		**************/
+		if(isset($data['deal_cat_name'])&&("m&a"==strtolower($data['deal_cat_name']))){
+			if(isset($data['deal_subcat1_name'])&&("completed"==strtolower($data['deal_subcat1_name']))){
+				if("date_announced"==$data['deal_date_type']){
+					$err['deal_type'] = "Completed M&A deal must have completion date";
+					$validation_passed = false;
+				}
+			}
+		}
 		/****************************
 		value: either the exact value has to be specified or a range has to be specified, even if 'undisclosed'
 		*****************/
