@@ -1443,6 +1443,17 @@ class transaction_suggestion{
 					}
 					if($data_arr['deal_completion_status']=="completed"){
 						$stat_update_q = "deal_subcat1_name='Completed',in_calculation='1'";
+						/***************
+						sng:5/sep/2012
+						So, I am setting the deal as completed. In that case, what about the date of completion? What about the date of deal?
+						sng:11/sep/2012
+						We do not have concept of error here, only message and return. Ok, let us check for completion date. If not set
+						we create a message and exit here.
+						***************/
+						if(!isset($data_arr['date_closed'])||($data_arr['date_closed']=='')){
+							$msg = "Please specify the closing date for the M&a deal if you want to mark it as completed";
+							return true;
+						}
 					}
 					if($data_arr['deal_completion_status']=="lost"){
 						$stat_update_q = "deal_subcat1_name='Pending',in_calculation='0'";
