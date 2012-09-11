@@ -1414,7 +1414,11 @@ class transaction_suggestion{
 					$updt_q = "update ".TP."transaction_extra_detail set date_closed='".mysql_real_escape_string($data_arr['date_closed'])."' where transaction_id='".$deal_id."'";
 					$ok = $db->mod_query($updt_q);
 					if($ok){
-						$updt_q = "update ".TP."transaction set in_calculation='1' where id='".$deal_id."'";
+						/**********
+						sng:11/sep/2012
+						Since we are setting the closed date, this will now become date of the deal
+						************/
+						$updt_q = "update ".TP."transaction set date_of_deal='".mysql_real_escape_string($data_arr['date_closed'])."',in_calculation='1' where id='".$deal_id."'";
 						$db->mod_query($updt_q);
 					}else{
 						//we don't mind if this fails
@@ -1442,7 +1446,7 @@ class transaction_suggestion{
 						$stat_update_q = "deal_subcat1_name='Pending',in_calculation='1'";
 					}
 					if($data_arr['deal_completion_status']=="completed"){
-						$stat_update_q = "deal_subcat1_name='Completed',in_calculation='1'";
+						
 						/***************
 						sng:5/sep/2012
 						So, I am setting the deal as completed. In that case, what about the date of completion? What about the date of deal?
@@ -1454,6 +1458,20 @@ class transaction_suggestion{
 							$msg = "Please specify the closing date for the M&a deal if you want to mark it as completed";
 							return true;
 						}
+						/*********
+						sng:11/sep/2012
+						closing date set
+						
+						First we need to set the closing date
+						then that closing date becomes the date of the deal 
+						and the subcat is changed and flag set
+						**************/
+						$extra_updt_q = "update ".TP."transaction_extra_detail set date_closed='".mysql_real_escape_string($data_arr['date_closed'])."' where transaction_id='".$deal_id."'";
+						$ok = $db->mod_query($extra_updt_q);
+						if(!$ok){
+							return false;
+						}
+						$stat_update_q = "date_of_deal='".mysql_real_escape_string($data_arr['date_closed'])."',deal_subcat1_name='Completed',in_calculation='1'";
 					}
 					if($data_arr['deal_completion_status']=="lost"){
 						$stat_update_q = "deal_subcat1_name='Pending',in_calculation='0'";
