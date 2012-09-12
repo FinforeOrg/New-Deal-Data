@@ -59,17 +59,16 @@ $g_trans->get_tombstone_from_deal_id($g_view['deal_data']['deal_id']);
 sng:20/july/2010
 If the logo is not present, we show the link to send logo suggestion.
 This is only for logged in member
+
+sng:12/sep/2012
+Now we have one or more participants for a deal, each with its own logo that is to be shown in the tombstone.
+If logo for some company is missing, we tell the user to suggest a logo for the company by editing the company data or better
+we do not check but show the message anyway
 ***/
-if(($g_view['deal_data']['logo']=="")&&($g_account->is_site_member_logged())){
-	?>
-	<div style="margin:10px 0 10px 0;">
-	<form action="mailto:<?php echo $g_view['logo_email'];?>">
-	<input type="submit" class="btn_auto" name="submit" value="Email us a logo" />
-	</form>
-	</div>
-	<?php
-}
 ?>
+<div style="margin:10px 0 10px 0;">
+If some logo is missing, you can search for the company and then in the edit section you can specify the logo
+</div>
 
 </td>
 <td style="width:60px;">&nbsp;</td>
