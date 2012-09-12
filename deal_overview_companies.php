@@ -27,7 +27,7 @@ for($deal_company_i=0;$deal_company_i<$deal_company_count;$deal_company_i++){
 	}
 	?>
 	<p>
-	<strong><?php echo $g_view['deal_data']['participants'][$deal_company_i]['company_name'];?></strong> <?php if($g_view['deal_data']['participants'][$deal_company_i]['role_name']!=""){?><br /><span style="font-style:italic"><?php echo $g_view['deal_data']['participants'][$deal_company_i]['role_name'];?></span><?php }?>
+	<a href="company.php?show_company_id=<?php echo $g_view['deal_data']['participants'][$deal_company_i]['company_id'];?>"><strong><?php echo $g_view['deal_data']['participants'][$deal_company_i]['company_name'];?></strong></a> <?php if($g_view['deal_data']['participants'][$deal_company_i]['role_name']!=""){?><br /><span style="font-style:italic"><?php echo $g_view['deal_data']['participants'][$deal_company_i]['role_name'];?></span><?php }?>
 	<?php
 	if($g_view['deal_data']['participants'][$deal_company_i]['footnote']!=""){
 		?><sup><?php echo $role_footnote_i+1;?></sup><?php
