@@ -1439,7 +1439,17 @@ class transaction_suggestion{
 				/************
 				Now it becomes interesting.
 				Did the user sent any deal_completion_status
+				
+				sng:12/sep/2012
+				It could also happen that closing date has been sent but completion status is not 'completed'
 				***********/
+				if(isset($data_arr['date_closed'])&&($data_arr['date_closed']!='0000-00-00')){
+					if(!isset($data_arr['deal_completion_status'])||($data_arr['deal_completion_status']!='completed')){
+						$msg = "Non completed deal cannot have closing date";
+						return true;
+					}
+				}
+				
 				if(isset($data_arr['deal_completion_status'])&&($data_arr['deal_completion_status']!='')){
 					$stat_update_q = "";
 					if($data_arr['deal_completion_status']=="pending"){
