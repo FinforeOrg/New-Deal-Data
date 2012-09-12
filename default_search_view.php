@@ -76,7 +76,7 @@ if(!isset($_POST['top_search_area'])){
 <select name="top_search_area" id="top_search_area">
 <option value="">select</option>
 <option value="company" <?php if($_POST['top_search_area']=="company"){?> selected="selected"<?php }?>>Companies</option>
-<option value="deal" <?php if((!isset($_POST['top_search_area']))||($_POST['top_search_area']=="deal")){?> selected="selected"<?php }?>>Deals</option>
+<option value="deal" <?php if((!isset($_POST['top_search_area']))||($_POST['top_search_area']=="")||($_POST['top_search_area']=="deal")){?> selected="selected"<?php }?>>Deals</option>
 <option value="bank" <?php if($_POST['top_search_area']=="bank"){?> selected="selected"<?php }?>>Banks</option>
 <option value="law_firm" <?php if($_POST['top_search_area']=="law_firm"){?> selected="selected"<?php }?>>Law Firms</option>
 </select>

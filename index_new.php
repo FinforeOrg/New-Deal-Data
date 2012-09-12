@@ -51,6 +51,14 @@ if(!$success){
 
 
 require_once("default_metatags.php");
+/***************
+sng:12/sep/2012
+For the home page, the default top search bar selection is deals
+****************/
+if(!isset($_POST['top_search_area'])){
+	$_POST['top_search_area'] = "deal";
+}
+
 $g_view['page_heading'] = "Welcome to Deal Data";
 $g_view['show_help'] = true;
 $g_view['content_view'] = "index_new_view.php";

@@ -110,8 +110,13 @@ require_once("default_metatags.php");
 /**
 sng:19/may/2010
 we use the default search
-****/
 
+sng:12/sep/2012
+by default we select 'company'
+****/
+if(!isset($_POST['top_search_area'])){
+	$_POST['top_search_area'] = "company";
+}
 $g_view['page_heading'] = "";
 $g_view['content_view'] = "deal_page_view.php";
 require("content_view.php");
