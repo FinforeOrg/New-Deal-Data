@@ -64,11 +64,11 @@ sng:12/sep/2012
 Now we have one or more participants for a deal, each with its own logo that is to be shown in the tombstone.
 If logo for some company is missing, we tell the user to suggest a logo for the company by editing the company data or better
 we do not check but show the message anyway
+
+Better not show anything here.
 ***/
 ?>
-<div style="margin:10px 0 10px 0;">
-If some logo is missing, you can search for the company and then in the edit section you can specify the logo
-</div>
+
 
 </td>
 <td style="width:60px;">&nbsp;</td>
