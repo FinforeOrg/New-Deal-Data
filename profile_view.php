@@ -28,7 +28,7 @@ function goto_unregister(){
 	window.location="member_unregister.php";
 }
 </script>
-<tr><td style="text-align:right;"><input type="button" value="Edit profile" class="btn_auto" onclick="goto_edit_profile();" />&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="Unregister" class="btn_auto" onclick="goto_unregister();" /></td></tr>
+<tr><td style="text-align:right;"><input type="button" value="EDIT PROFILE" class="btn_auto" onclick="goto_edit_profile();" />&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="UNREGISTER" class="btn_auto" onclick="goto_unregister();" /></td></tr>
 <?php
 }
 ?>
@@ -38,7 +38,19 @@ function goto_unregister(){
 <table width="100%" cellpadding="0" cellspacing="0" border="0">
 <tr>
 <td style="text-align:left"><h1><?php echo $g_view['data']['f_name'];?> <?php echo $g_view['data']['l_name'];?></h1></td>
-<td style="text-align: right"></td>
+<td style="text-align: right">
+<?php
+if($g_view['total_points'] == 0){
+?>
+No tombstone points yet
+<?php
+}else{
+?>
+$<?php echo convert_billion_to_million_for_display($g_view['total_points']);?>m total points, $<?php echo convert_billion_to_million_for_display($g_view['last_3_months_total_points']);?>m points in the last 3 months
+<?php
+}
+?>
+</td>
 </tr>
 </table>
 <!--top part containing name and tombstone points-->
@@ -95,15 +107,11 @@ if($g_view['data']['posting_country']!=""){
 /****
 sng:7/may/2010
 we show recommend/admire button here based on condition
-
-sng:12/nov/2011
-No need for recommend / admire for now since in the current data-cx, no one can see profile of another
 ********/
 ?>
 </td>
 </tr>
-<?php
-/*****************************
+<!--///////////////////////////////////Recent tombstones///////////////////////////////-->
 <tr><td colspan="2" style="height:20px;">&nbsp;</td></tr>
 <tr>
 <td colspan="2">
@@ -148,8 +156,7 @@ if($g_view['tombstone_data_count'] == 0){
 ?>
 </td>
 </tr>
-********************************************/
-?>
+<!--///////////////////////////////////Recent tombstones///////////////////////////////-->
 </table>
 <!--image, designation, company-->
 </td>
@@ -175,12 +182,81 @@ if($g_view['prev_work_count'] == 0){
 	}
 }
 ?>
+<tr><td style="height:10px;">&nbsp;</td></tr>
+<tr>
+<td><h3><?php echo $g_view['data']['f_name'];?> recommends</h3></td>
+</tr>
 <?php
-/********************************
-sng:12/nov/2011
-We remove the admire/recommend section for now
-The roginal code in in profile_view.php-2011-11-12
-*********************************/
+if($g_view['recommended_count'] == 0){
+//do nothing
+}else{
+	for($recom=0;$recom<$g_view['recommended_count'];$recom++){
+		?>
+		<tr>
+		<td>
+		<a href="profile.php?mem_id=<?php echo $g_view['recommended_data'][$recom]['recommended_mem_id'];?>"><?php echo $g_view['recommended_data'][$recom]['f_name'];?> <?php echo $g_view['recommended_data'][$recom]['l_name'];?></a>, <?php echo $g_view['recommended_data'][$recom]['designation'];?> at <?php echo $g_view['recommended_data'][$recom]['company_name'];?>
+		</td>
+		</tr>
+		<?php
+	}
+}
+?>
+<tr><td style="height:10px'">&nbsp;</td></tr>
+<tr>
+<td><h3><?php echo $g_view['data']['f_name'];?> admires</h3></td>
+</tr>
+<?php
+if($g_view['admired_count'] == 0){
+//do nothing
+}else{
+	for($adm=0;$adm<$g_view['admired_count'];$adm++){
+		?>
+		<tr>
+		<td>
+		<a href="profile.php?mem_id=<?php echo $g_view['admired_data'][$adm]['admired_mem_id'];?>"><?php echo $g_view['admired_data'][$adm]['f_name'];?> <?php echo $g_view['admired_data'][$adm]['l_name'];?></a>, <?php echo $g_view['admired_data'][$adm]['designation'];?> at <?php echo $g_view['admired_data'][$adm]['company_name'];?>
+		</td>
+		</tr>
+		<?php
+	}
+}
+?>
+<tr><td style="height:10px;">&nbsp;</td></tr>
+<tr>
+<td><h3>Members who recommend <?php echo $g_view['data']['f_name'];?></h3></td>
+</tr>
+<?php
+if($g_view['recommended_by_count'] == 0){
+//do nothing
+}else{
+	for($recom=0;$recom<$g_view['recommended_by_count'];$recom++){
+		?>
+		<tr>
+		<td>
+		<a href="profile.php?mem_id=<?php echo $g_view['recommended_by_data'][$recom]['mem_id'];?>"><?php echo $g_view['recommended_by_data'][$recom]['f_name'];?> <?php echo $g_view['recommended_by_data'][$recom]['l_name'];?></a>, <?php echo $g_view['recommended_by_data'][$recom]['designation'];?> at <?php echo $g_view['recommended_by_data'][$recom]['company_name'];?>
+		</td>
+		</tr>
+		<?php
+	}
+}
+?>
+<tr><td style="height:10px'">&nbsp;</td></tr>
+<tr>
+<td><h3>Members who admire <?php echo $g_view['data']['f_name'];?></h3></td>
+</tr>
+<?php
+if($g_view['admired_by_count'] == 0){
+//do nothing
+}else{
+	for($adm=0;$adm<$g_view['admired_by_count'];$adm++){
+		?>
+		<tr>
+		<td>
+		<a href="profile.php?mem_id=<?php echo $g_view['admired_by_data'][$adm]['mem_id'];?>"><?php echo $g_view['admired_by_data'][$adm]['f_name'];?> <?php echo $g_view['admired_by_data'][$adm]['l_name'];?></a>, <?php echo $g_view['admired_by_data'][$adm]['designation'];?> at <?php echo $g_view['admired_by_data'][$adm]['company_name'];?>
+		</td>
+		</tr>
+		<?php
+	}
+}
 ?>
 </table>
 </td>
@@ -189,8 +265,7 @@ The roginal code in in profile_view.php-2011-11-12
 <!--mid part-->
 </td>
 </tr>
-<?php
-/***************************************************
+
 <tr><td style="height:10px'">&nbsp;</td></tr>
 <tr><td><h1><?php echo $g_view['data']['f_name'];?>'s Recent Deals</h1></td></tr>
 <tr>
@@ -237,7 +312,5 @@ if($g_view['deal_count'] == 0){
 <!--bottom part-->
 </td>
 </tr>
-*********************************************/
-?>
 
 </table>

@@ -20,7 +20,7 @@ function goto_unregister(){
 	window.location="member_unregister.php";
 }
 </script>
-<tr><td style="text-align:right;"><input type="button" value="Edit profile" class="btn_auto" onclick="goto_edit_profile();" />&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="Unregister" class="btn_auto" onclick="goto_unregister();" /></td></tr>
+<tr><td style="text-align:right;"><input type="button" value="EDIT PROFILE" class="btn_auto" onclick="goto_edit_profile();" />&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="UNREGISTER" class="btn_auto" onclick="goto_unregister();" /></td></tr>
 <?php
 }
 ?>
