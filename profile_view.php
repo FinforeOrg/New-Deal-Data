@@ -5,7 +5,25 @@ we now include jquery in the container view
 <script type="text/javascript" src="js/jquery-1.2.1.pack.js"></script>
 ********************************/
 ?>
+<script type="text/javascript">
+function recommend_colleague(this_colleague_id){
+	$('#recommend_result').html('sending request');
+	$.post("ajax/recommend_colleague.php", {colleague_id: ""+this_colleague_id+""}, function(data){
+		if(data.length >0) {
+			$('#recommend_result').html(data);
+		}
+	});
+}
 
+function admire_competitor(this_competitor_id){
+	$('#admire_result').html('sending request');
+	$.post("ajax/admire_competitor.php", {competitor_id: ""+this_competitor_id+""}, function(data){
+		if(data.length >0) {
+			$('#admire_result').html(data);
+		}
+	});
+}
+</script>
 <table width="100%" cellpadding="0" cellspacing="0">
 <?php
 /***
@@ -108,6 +126,22 @@ if($g_view['data']['posting_country']!=""){
 sng:7/may/2010
 we show recommend/admire button here based on condition
 ********/
+if($g_view['show_recommend_colleague']){
+?>
+<br />
+<input type="button" value="Recommend" class="btn_auto" onclick="recommend_colleague(<?php echo $g_view['member_id'];?>)" /><br />
+<span id="recommend_result"></span>
+<?php
+}
+?>
+<?php
+if($g_view['show_admire_competitor']){
+?>
+<br />
+<input type="button" value="I admire" class="btn_auto" onclick="admire_competitor(<?php echo $g_view['member_id'];?>)" /><br />
+<span id="admire_result"></span>
+<?php
+}
 ?>
 </td>
 </tr>
