@@ -1,9 +1,17 @@
 <?php
 /*********
 show the discussion, subjected to restriction, the ajax loading code also check this
+
+sng:14/sep/2012
+put an empty implementation of update_discussion if NOT show_discussion.
+Otherwise the function is not found when the tab is clicked (and the function is invoked)
 **********/
 if(!$g_view['show_discussion']){
 	?>
+	<script>
+	function update_discussion(){
+	}
+	</script>
 	<p>These pages are only available to the actual deal participants (banks and law firms) and data providers.</p>
 	<?php
 	return;

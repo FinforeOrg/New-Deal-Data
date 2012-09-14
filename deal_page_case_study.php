@@ -2,7 +2,23 @@
 /***********************
 sng:17/nov/2011
 This is now ajaxified
+
+sng:14/sep/2012
+If the member is not supposed to see this section, we just show the minimum and exit
+We put a blank implementation so that when the funciton is called via spry tab, there is no error
 **************************/
+?>
+<?php
+if(!$g_view['can_upload_case_study']){
+	?>
+	<script>
+	function update_case_study(){
+	}
+	</script>
+	<p>Your firm was not involved in the deal, so you cannot upload a case study.</p>
+	<?php
+	return;
+}
 ?>
 <script>
 function update_case_study(){
@@ -20,17 +36,7 @@ function update_case_study(){
 
 </div>
 <table width="100%" cellpadding="0" cellspacing="0">
-<?php
-if($g_view['can_upload_case_study']){
-	?>
-	<tr><td><input type="button" class="btn_auto" id="btn_case_study" value="Submit case study" /></td></tr>
-	<?php
-}else{
-	?>
-	<tr><td>Your firm was not involved in the deal, so you cannot upload a case study.</td></tr>
-	<?php
-}
-?>
+<tr><td><input type="button" class="btn_auto" id="btn_case_study" value="Submit case study" /></td></tr>
 </table>
 <?php
 /*************************************************
