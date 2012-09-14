@@ -60,6 +60,12 @@ Since we have more than one companies associated with a deal, we use another fun
 	</ul>
 
 	<div class="TabbedPanelsContentGroup">
+		<?php
+		/******************
+		sng:14/sep/2012
+		Vorsicht: If you add new tabs here, be sure to change the codes below for spiry
+		******************/
+		?>
 		<div class="TabbedPanelsContent">
 		<?php require("deal_page_overview.php");?>
 		</div>
@@ -120,13 +126,25 @@ to check if discussion tab is about to be shown and only then we trigger the scr
 		}
 		**********************/
 		switch(tpIndex){
+			case 0:
+				//overview
+				break;
+			case 1:
+				//banks and law firms
+				break;
 			case 2:
-				can_edit_alert();
+				//team members
 				break;
 			case 3:
-				update_discussion();
+				//edit
+				can_edit_alert();
 				break;
 			case 4:
+				//discussion
+				update_discussion();
+				break;
+			case 5:
+				//case study
 				update_case_study();
 				break;
 			default:
@@ -142,7 +160,7 @@ to check if discussion tab is about to be shown and only then we trigger the scr
 if(isset($_GET['viewtab'])&&($_GET['viewtab']!="")){
 	if($_GET['viewtab'] == "discussion"){
 		?>
-		tabbed_deal_page.showPanel(3);
+		tabbed_deal_page.showPanel(4);
 		<?php
 	}
 }
@@ -174,6 +192,6 @@ We have put a button in the overview tab. Clicking that takes the user to 'edit 
 ?>
 <script>
 function goto_edit_tab(){
-	tabbed_deal_page.showPanel(2);
+	tabbed_deal_page.showPanel(3);
 }
 </script>
