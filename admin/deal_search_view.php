@@ -252,7 +252,7 @@ if($g_view['data_count']==0){
 		?>
 		<td><?php if($g_view['data'][$i]['value_in_billion']!=0.0) echo $g_view['data'][$i]['value_in_billion'];else echo $g_view['data'][$i]['fuzzy_value'];?></td>
 		<td>
-		<?
+		<?php
 		$bank_cnt = count($g_view['data'][$i]['banks']);
 		$banks_csv = "";
 		if($bank_cnt > 0){

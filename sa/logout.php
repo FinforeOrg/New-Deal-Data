@@ -1,4 +1,4 @@
-<?
+<?php
 include("../include/global.php");
 require_once ("sa/checklogin.php");
 ///////////////////////////////////////////////

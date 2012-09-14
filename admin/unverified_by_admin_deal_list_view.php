@@ -18,7 +18,7 @@ if($g_view['data_count']!=0){
 <p>
 
 </p>
-<?
+<?php
 }
 ?>
 <tr bgcolor="#dec5b3" style="height:20px;">

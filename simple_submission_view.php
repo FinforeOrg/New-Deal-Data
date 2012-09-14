@@ -231,7 +231,7 @@ $(function() {
         selectOtherMonths: true,
         showOn: "button",
         buttonImage: "images/calendar.png",
-        buttonImageOnly: true,
+        buttonImageOnly: true
     });
 	/**************************************************************************/
 });

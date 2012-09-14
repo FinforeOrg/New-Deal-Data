@@ -91,7 +91,7 @@ if($g_view['result_data']['ranking_criteria']=="total_adjusted_deal_value") echo
 <div id="chart1" style="width: 90%; float: right;">
     <?php echo $chartHtml?> 
 </div> 
-<? /*
+<?php /*
 <img src="league_table_renderer.php?t=<?php echo time();?>" />
 */ ?>
 <!--the chart-->

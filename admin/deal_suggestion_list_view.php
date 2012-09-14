@@ -31,7 +31,7 @@ If the suggestion is useless or duplicate, close the popup window and click 'Rej
 <p>
 If the detail is usefull, click the 'Create a deal' button to open the form and start adding the data.
 </p>
-<?
+<?php
 }
 ?>
 <tr bgcolor="#dec5b3" style="height:20px;">
