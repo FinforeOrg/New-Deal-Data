@@ -134,6 +134,7 @@ to check if discussion tab is about to be shown and only then we trigger the scr
 				break;
 			case 2:
 				//team members
+				update_members();
 				break;
 			case 3:
 				//edit
