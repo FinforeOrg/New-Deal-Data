@@ -3083,152 +3083,30 @@ WHERE rgnm.name = '".mysql_real_escape_string($search_data['region'])."'";
 		}
 		return true;
 	}
+    /*******************
+	sng:18/sep/2012
+	No longer needed. In the new look, we get all the members associated with a deal
+	*********************/
+	public function get_deal_partner_team_data($deal_id,$deal_partner_id,&$deal_partner_team_data_arr,&$deal_partner_team_data_count){
+	}
     
-    public function get_deal_partner_team_data($deal_id,$deal_partner_id,&$deal_partner_team_data_arr,&$deal_partner_team_data_count){
-        $q = "select p.*,m.f_name,m.l_name from ".TP."transaction_partner_members as p left join ".TP."member as m on(p.member_id=m.mem_id) where transaction_id='".$deal_id."' and partner_id='".$deal_partner_id."' order by p.adjusted_value_in_billion desc";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $deal_partner_team_data_count = mysql_num_rows($res);
-        if(0==$deal_partner_team_data_count){
-            return true;
-        }
-        //////////////////////////////////
-        for($i=0;$i<$deal_partner_team_data_count;$i++){
-            $deal_partner_team_data_arr[$i] = mysql_fetch_assoc($res);
-        }
-        return true;
-    }
     /***
     an ugly hack to support the listing of top 3 team member for each bank/law firm in detail page
     get the top members. The order is by share value
+	
+	sng:18/sep/2012
+	We no longer need this. Now we have a tab in deal detail page where we show all the bankers ans lawyers associated with the deal
     *********/
     public function get_deal_partner_members($deal_id,$deal_partner_id,$num_to_fetch,&$deal_partner_team_data_arr,&$deal_partner_team_data_count){
-        $q = "select p.*,m.f_name,m.l_name from ".TP."transaction_partner_members as p left join ".TP."member as m on(p.member_id=m.mem_id) where transaction_id='".$deal_id."' and partner_id='".$deal_partner_id."' order by adjusted_value_in_billion desc limit 0,".$num_to_fetch;
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $deal_partner_team_data_count = mysql_num_rows($res);
-        if(0==$deal_partner_team_data_count){
-            return true;
-        }
-        //////////////////////////////////
-        for($i=0;$i<$deal_partner_team_data_count;$i++){
-            $deal_partner_team_data_arr[$i] = mysql_fetch_assoc($res);
-        }
-        return true;
-    }
-    /***
-    sng:17/apr/2010
-    adding a member to a deal team of a bank/law firm that was associated with the deal
-    check:
-    if that partner company is actually with the deal. If so
-    check whether this member is already a part of the deal team or not.
-    A member can be added only once, never mind the his/her company.
-    If not present, the member can be added. But, when the deal was closed
-    did the member worked for that partner company? We code a simpler validation.
-    The member is either working for the partner company or worked for the parter company
-    **********/
-    public function add_deal_partner_team_member($deal_id,$deal_partner_id,$mem_id,&$mem_added,&$msg){
-        //check if the partner company is actually associated with the deal
-        $q = "select count(*) as cnt from ".TP."transaction_partners where transaction_id='".$deal_id."' and partner_id='".$deal_partner_id."'";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $row = mysql_fetch_assoc($res);
-        if($row['cnt'] == 0){
-            //this partner was not found for the deal
-            $mem_added = false;
-            $msg = "This firm was not associated with the deal";
-            return true;
-        }
-        ///////////////////////////////////////////////////////////////////////////
-        //check if the member is already added or not
-        $q = "select count(*) as cnt from ".TP."transaction_partner_members where transaction_id='".$deal_id."' and member_id='".$mem_id."'";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $row = mysql_fetch_assoc($res);
-        if($row['cnt']!=0){
-            //this member found for this deal
-            $mem_added = false;
-            $msg = "This member is present in the deal team";
-            return true;
-        }
-        /////////////////////////////////////////////////////////////////
-        //if the partner work for the partner company, the partner id and od of the
-        //member's company will match, get the designation and weight
-         $q = "select designation,member_type from ".TP."member where mem_id='".$mem_id."' and company_id='".$deal_partner_id."'";
-         $res = mysql_query($q);
-        if(!$res){
-        
-            return false;
-        }
-        $cnt = mysql_num_rows($res);
-        if($cnt==0){
-            //either the member is not found or the member does not work for the deal partner company
-            //we assume that member does not work there, so we check the history
-            //whether the member worked in that company at all
-            //we try to get the last postition at that company
-            $q1 = "select member_type,designation from ".TP."member_work_history where mem_id='".$mem_id."' and company_id='".$deal_partner_id."' order by year_from desc limit 0,1";
-            $res1 = mysql_query($q1);
-            if(!$res1){
-            
-                return false;
-            }
-            $cnt1 = mysql_num_rows($res1);
-            if($cnt1==0){
-                //not found in hostory so
-                $mem_added = false;
-                $msg = "Association with the firm was not found";
-                return true;
-            }else{
-                //found
-                $row1 = mysql_fetch_assoc($res1);
-                $designation = $row1['designation'];
-                $mem_type = $row1['member_type'];
-            }
-        }else{
-            //member works, so get the designation and wight
-            $row = mysql_fetch_assoc($res);
-            $designation = $row['designation'];
-            $mem_type = $row['member_type'];
-        }
-        //////////////////////////////////////////////
-        //now get the weight for this designation for this member type
-        $q = "select deal_share_weight from ".TP."designation_master where designation='".$designation."' and member_type='".$mem_type."'";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $cnt = mysql_num_rows($res);
-        if($cnt==0){
-            //no such designation for this member type, use default of 1
-            $deal_share_weight = 1;
-        }else{
-            $row = mysql_fetch_assoc($res);
-            $deal_share_weight = $row['deal_share_weight'];
-        }
-        /////////////////////////////////
-        //insert
-        $q = "insert into ".TP."transaction_partner_members set transaction_id='".$deal_id."', partner_id='".$deal_partner_id."', member_id='".$mem_id."',member_type='".$mem_type."',designation='".$designation."',deal_share_weight='".$deal_share_weight."'";
-        $result = mysql_query($q);
-        if($result){
-            $mem_added = true;
-            $msg = "Added to the deal team";
-            //update deal team members adjusted value
-            $success = $this->update_deal_team_members_adjusted_value($deal_id,$deal_partner_id);
-            
-            return true;
-        }else{
-            return false;
-        }
         
     }
+    
+	/*********************************
+	sng:19/sep/2012
+	Moved to class transaction_member
+	public function add_deal_partner_team_member($deal_id,$deal_partner_id,$mem_id,&$mem_added,&$msg){
+	}
+	************************************/
     
     /***
     sng:25/may/2010
@@ -3357,47 +3235,14 @@ WHERE rgnm.name = '".mysql_real_escape_string($search_data['region'])."'";
         $msg = "Members flagged";
         return true;
     }
-    
+    /***************
+	sng:19/sep/2012
+	We have moved the function in transaction_member. We are keeping it here so as not to break the other calls
+	*****/
     public function update_deal_team_members_adjusted_value($deal_id,$deal_partner_id){
-        //get the adjusted value for the partner company
-        $q = "select adjusted_value_in_billion from ".TP."transaction_partners where transaction_id='".$deal_id."' and partner_id='".$deal_partner_id."'";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $cnt = mysql_num_rows($res);
-        if($cnt == 0){
-            //no such deal and partner
-            return false;
-        }
-        ////////////////////////////////////
-        $row = mysql_fetch_assoc($res);
-        $partner_adjusted_value_in_billion = $row['adjusted_value_in_billion'];
-        ///////////////////////////////////////////////
-        //now get the sum of weight for all the members for this deal and partner
-        $q = "select sum(deal_share_weight) as sum_weight from ".TP."transaction_partner_members where transaction_id='".$deal_id."' and partner_id='".$deal_partner_id."'";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $row = mysql_fetch_assoc($res);
-        $sum_wt = $row['sum_weight'];
-        /***
-        sng:12/may/2010
-        if there are no members then there is no weights and sum is zero, so in that case we do not proceed
-        ********/
-        if(0==$sum_wt){
-            return true;
-        }
-        $ratio = $partner_adjusted_value_in_billion/$sum_wt;
-        //update the members
-        $q = "update ".TP."transaction_partner_members set adjusted_value_in_billion=deal_share_weight*".$ratio." where transaction_id='".$deal_id."' and partner_id='".$deal_partner_id."'";
-        
-        $result = mysql_query($q);
-        if(!$result){
-            return false;
-        }
-        return true;
+        require_once("classes/class.transaction_member.php");
+		$trans_mem = new transaction_member();
+		return $trans_mem->update_deal_team_members_adjusted_value($deal_id,$deal_partner_id);
     }
     
     public function get_disputed_deal_team_members_paged($start_offset,$num_to_fetch,&$data_arr,&$data_count){
@@ -3449,7 +3294,7 @@ LIMIT ".$start_offset." , ".$num_to_fetch;
         return true;
     }
     ////////////////////////////////////////////////////////////////////////////
-    /***
+    /*****************************
     get the recent deals in which the member participated
     This is used in the member's profile page
     It may happen that the member changed company and some deals were with JP Morgan, some with Citi. So take the firm name
@@ -3462,21 +3307,44 @@ LIMIT ".$start_offset." , ".$num_to_fetch;
     we also need the id of the deal making company in case we want to link to that company
     
     we will not use the function front_get_deals_of_member_paged. That function might have different requirement
+	
+	sng:19/sep/2012
+	We need to change this. Start with minimal data for profile page.
     ***/
     public function front_get_recent_deals_of_member($member_id,$num_deals,&$data_arr,&$data_count){
-        global $g_mc;
-        $q = "SELECT t.date_of_deal,t.id as deal_id, t.deal_cat_name,t.deal_subcat1_name,t.deal_subcat2_name, t.value_in_billion, pm.designation, firm.name AS firm_name, c.name AS deal_company_name,c.logo,c.company_id as deal_company_id FROM ".TP."transaction_partner_members AS pm LEFT JOIN ".TP."transaction AS t ON ( pm.transaction_id = t.id ) LEFT JOIN ".TP."company AS firm ON ( pm.partner_id = firm.company_id ) LEFT JOIN ".TP."company AS c ON ( t.company_id = c.company_id ) WHERE member_id = '".$member_id."' ORDER BY t.date_of_deal DESC LIMIT 0 , ".$num_deals;
-        
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        /////////////////////////
-        $data_count = mysql_num_rows($res);
+        $db = new db();
+		
+		$q = "select t.date_of_deal,t.id as deal_id,t.deal_cat_name,t.deal_subcat1_name,t.deal_subcat2_name,t.value_in_billion,pm.designation,firm.name AS firm_name,t.value_range_id,vrm.display_text as fuzzy_value FROM ".TP."transaction_partner_members AS pm LEFT JOIN ".TP."transaction AS t ON ( pm.transaction_id = t.id ) LEFT JOIN ".TP."company AS firm ON ( pm.partner_id = firm.company_id ) LEFT JOIN ".TP."transaction_value_range_master as vrm ON (t.value_range_id=vrm.value_range_id) WHERE member_id = '".$member_id."' ORDER BY t.date_of_deal DESC LIMIT 0 , ".$num_deals;
+		$ok = $db->select_query($q);
+		if(!$ok){
+			
+			return false;
+		}
+		
+		$data_count = $db->row_count();
         if(0 == $data_count){
             //no deals done by this member
             return true;
         }
+		$data_arr = $db->get_result_set_as_array();
+		/****************
+		get the participants
+		**************/
+		require_once("classes/class.transaction_company.php");
+		$g_trans_comp = new transaction_company();
+		for($k=0;$k<$data_count;$k++){
+			$data_arr[$k]['participants'] = NULL;
+			$success = $g_trans_comp->get_deal_participants($data_arr[$k]['deal_id'],$data_arr[$k]['participants']);
+			if(!$success){
+				return false;
+			}
+		}
+		return true;
+        //$q = "SELECT ,, , , pm.designation, firm.name AS firm_name, c.name AS deal_company_name,c.logo,c.company_id as deal_company_id FROM ".TP."transaction_partner_members AS pm LEFT JOIN ".TP."transaction AS t ON ( pm.transaction_id = t.id ) LEFT JOIN ".TP."company AS firm ON ( pm.partner_id = firm.company_id ) LEFT JOIN ".TP."company AS c ON ( t.company_id = c.company_id ) WHERE member_id = '".$member_id."' ORDER BY t.date_of_deal DESC LIMIT 0 , ".$num_deals;
+        
+        
+        /////////////////////////
+        
         ///////////////////////////
         for($i=0;$i<$data_count;$i++){
             $data_arr[$i] = mysql_fetch_assoc($res);

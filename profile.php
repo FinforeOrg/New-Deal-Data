@@ -101,17 +101,17 @@ $g_view['tombstone_data_count'] = 0;
 $success = $g_trans->front_get_recent_deals_of_member($g_view['member_id'],4,$g_view['tombstone_data'],$g_view['tombstone_data_count']);
 if(!$success){
 	die("Cannot fetch tombstone data");
-}
+}*/
 /*************************************************************************************
 get the last 25 deals
-********
+********/
 $g_view['deal_data'] = array();
 $g_view['deal_count'] = 0;
 $success = $g_trans->front_get_recent_deals_of_member($g_view['member_id'],25,$g_view['deal_data'],$g_view['deal_count']);
 if(!$success){
 	die("Cannot fetch deal data");
 }
-*/
+
 /******
 sng:7/may/2010
 if the viewer is logged in, we might show the recommend colleague/admire competitor
