@@ -48,7 +48,7 @@ if(0==$g_view['deal_bankers_count']){
 	for($i=0;$i<$g_view['deal_bankers_count'];$i++){
 		?>
 		<tr>
-		<td><?php echo $g_view['deal_bankers'][$i]['f_name']." ".$g_view['deal_bankers'][$i]['l_name'];?></td>
+		<td><a href="profile.php?mem_id=<?php echo $g_view['deal_bankers'][$i]['member_id'];?>"><?php echo $g_view['deal_bankers'][$i]['f_name']." ".$g_view['deal_bankers'][$i]['l_name'];?></a></td>
 		<td><?php echo $g_view['deal_bankers'][$i]['designation'];?></td>
 		<td><?php echo $g_view['deal_bankers'][$i]['firm_name'];?></td>
 		<td><?php echo convert_billion_to_million_for_display($g_view['deal_bankers'][$i]['value_in_billion']);?></td>
@@ -78,7 +78,7 @@ if(0==$g_view['deal_lawyers_count']){
 	for($i=0;$i<$g_view['deal_lawyers_count'];$i++){
 		?>
 		<tr>
-		<td><?php echo $g_view['deal_lawyers'][$i]['f_name']." ".$g_view['deal_lawyers'][$i]['l_name'];?></td>
+		<td><a href="profile.php?mem_id=<?php echo $g_view['deal_lawyers'][$i]['member_id'];?>"><?php echo $g_view['deal_lawyers'][$i]['f_name']." ".$g_view['deal_lawyers'][$i]['l_name'];?></a></td>
 		<td><?php echo $g_view['deal_lawyers'][$i]['designation'];?></td>
 		<td><?php echo $g_view['deal_lawyers'][$i]['firm_name'];?></td>
 		<td><?php echo convert_billion_to_million_for_display($g_view['deal_lawyers'][$i]['value_in_billion']);?></td>
