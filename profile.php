@@ -37,17 +37,36 @@ if($g_view['data']['member_type'] == "company rep"){
 	return;
 }
 /*****************
-smg:5/apr/2011
+sng:5/apr/2011
 support for data partner role
 *****************/
 if($g_view['data']['member_type'] == "data partner"){
 	require("data_partner_profile.php");
 	return;
 }
-/**********************
-sng:12/nov/2011
-No need to show tombstone points since we are not implementing deal team yet
-**********************/
+/****************************************
+get total tombstone value and values in last 3 months
+sng:13/may/2010
+we convert to million in view
+****/
+$g_view['total_points'] = 0;
+$success = $g_stat->front_get_total_deal_value_of_member($g_view['member_id'],$g_view['total_points'],false);
+if(!$success){
+	die("Cannot fetch total points for the member");
+}
+
+/**********************************************
+points earned in last 3 months
+*******************/
+$g_view['last_3_months_total_points'] = 0;
+$success = $g_stat->front_get_total_deal_value_of_member($g_view['member_id'],$g_view['last_3_months_total_points'],true);
+if(!$success){
+	die("Cannot fetch total points for the member");
+}
+/**
+sng:13/may/2010
+we convert to million in view
+***/
 /*************************************************************************************
 get the previous work records, if any
 ********/

@@ -456,22 +456,28 @@ class statistics{
     /////////////////////////////////////////FRONT END FUNCTIONS ENDS///////////////////
     
     /////////////////////////////////////STAT FOR MEMBERS FRONT STARTS/////////////
-    /***
+    /*************************
     deal value is in billion and is in float
+	sng: 20/sep/2012
+	Now we have announced/failed deals and inactive deals. We consider those flags too
     ***/
     public function front_get_total_deal_value_of_member($member_id,&$deal_value_in_billion,$last_three_months = false){
+		$db = new db();
         $three_month_stamp = strtotime("-3 months");
         $three_month_date = date("Y-m-d",$three_month_stamp);
-        $q = "SELECT sum( t.value_in_billion ) AS total_deal_value, p.member_id FROM ".TP."transaction_partner_members AS p LEFT JOIN ".TP."transaction AS t ON ( p.transaction_id = t.id ) where member_id = '".$member_id."'";
+		
+        $q = "SELECT sum( t.value_in_billion ) AS total_deal_value, p.member_id FROM ".TP."transaction_partner_members AS p LEFT JOIN ".TP."transaction AS t ON ( p.transaction_id = t.id ) where member_id = '".$member_id."' and is_active='y' and in_calculation='1'";
+		
         if($last_three_months){
             $q.=" and date_of_deal >='".$three_month_date."'";
         }
         $q.=" GROUP BY p.member_id";
-        $res = mysql_query($q);
-        if(!$res){
+		
+        $ok = $db->select_query($q);
+        if(!$ok){
             return false;
         }
-        $row = mysql_fetch_assoc($res);
+        $row = $db->get_row();
         $deal_value_in_billion = $row['total_deal_value'];
         return true;
     }
