@@ -8,18 +8,7 @@ we now include jquery in container view
     <script src="js/scripts.js" type="text/javascript" charset="utf-8"></script>
     <link rel="stylesheet" href="css/savedSearches.css" type="text/css" media="screen" />
 <script type="text/javascript">
-/*****************
-sng:23/feb/2012
-The entire preferred logo handling is changed. Now we store the logo filename instead of ordinal number.
-Why? because now we have multiple companies and logos instead of logos for a deal
-********************/
-function updateChosenLogos() {
-    jQuery.get(
-        'ajax/save_chosen_logo.php?deal_id='+deal_id+'&logo_file='+filename,
-        function (data) {
-        }
-  )  
-}
+
  function download(url, data, method){
 //url and data options required
     if( url && data ){ 
@@ -38,38 +27,8 @@ function updateChosenLogos() {
 };
 
 
-function showNext(id) {
-    activeLogoId =  $("#logo-"+id+" img:visible").attr('id');
-    c = activeLogoId.match(/logo-\d+-(\d+)/);
-    currentId = parseInt(c[1]);
-    /* Test if we have a next picture */
-    next = $("#logo-"+id+"-" + (currentId + 1) );
-    if (next.length == 0) {
-        return false;
-    } else {
-         $("#logo-"+id+" img:visible").css('display','none');
-         next.css('display','block');
-         /************
-		 sng:23/feb/2012
-		 use the ordinal number to get the name of the next logo
-		 ****************/
-         updateChosenLogos(id,jQuery("#logo-"+id+"-"+(currentId+1)).attr('name'));
-    }
-}
-function showPrevious(id) {
-    activeLogoId =  $("#logo-"+id+" img:visible").attr('id');
-    c = activeLogoId.match(/logo-\d+-(\d+)/);
-    currentId = parseInt(c[1]);
-    /* Test if we have a previous picture */
-    prev = $("#logo-"+id+"-" + (currentId - 1) );
-    if (prev.length == 0) {
-        return false;
-    } else {
-         $("#logo-"+id+" img:visible").css('display','none');
-         prev.css('display','block');
-         updateChosenLogos(id,jQuery("#logo-"+id+"-"+(currentId-1)).attr('name'));
-    }
-} 
+
+ 
 
 function goto_showcase_firm_deals(firm_id){
 	window.location="showcase_firm_deals.php?id="+firm_id;
@@ -103,7 +62,7 @@ function goto_deal_detail(deal_id){
 	window.location="deal_detail.php?deal_id="+deal_id;
 }
 </script>
-
+<script src="js/logo_preference.js"></script>
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0">
 <tr>

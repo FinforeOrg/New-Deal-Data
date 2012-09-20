@@ -5,46 +5,8 @@ We now include the jquery in container view
 <script type="text/javascript" src="js/jquery-1.2.1.pack.js"></script>
 ********************************/
 ?>
+<script src="js/logo_preference.js"></script>
 <script type="text/javascript">
-function updateChosenLogos() {
-    $.get(
-        'ajax/save_chosen_logo.php?' + jQuery(".thumb-val").serialize(),
-        function (data) {
-        }
-  )  
-}
-
-function showNext(id) {
-    activeLogoId =  $("#logo-"+id+" img:visible").attr('id');
-    c = activeLogoId.match(/logo-\d+-(\d+)/);
-    currentId = parseInt(c[1]);
-    /* Test if we have a next picture */
-    next = $("#logo-"+id+"-" + (currentId + 1) );
-    if (next.length == 0) {
-        return false;
-    } else {
-         $("#logo-"+id+" img:visible").css('display','none');
-         next.css('display','block');
-         $("#thumb-"+id).val(currentId + 1);
-         updateChosenLogos();
-    }
-}
-
-function showPrevious(id) {
-    activeLogoId =  $("#logo-"+id+" img:visible").attr('id');
-    c = activeLogoId.match(/logo-\d+-(\d+)/);
-    currentId = parseInt(c[1]);
-    /* Test if we have a previous picture */
-    prev = $("#logo-"+id+"-" + (currentId - 1) );
-    if (prev.length == 0) {
-        return false;
-    } else {
-         $("#logo-"+id+" img:visible").css('display','none');
-         prev.css('display','block');
-         $("#thumb-"+id).val(currentId - 1);
-         updateChosenLogos();
-    }
-} 
 function recommend_colleague(this_colleague_id){
 	$('#recommend_result').html('sending request');
 	$.post("ajax/recommend_colleague.php", {colleague_id: ""+this_colleague_id+""}, function(data){
@@ -64,34 +26,7 @@ function admire_competitor(this_competitor_id){
 }
 
 
-function showNext(id) {
-    activeLogoId =  $("#logo-"+id+" img:visible").attr('id');
-    c = activeLogoId.match(/logo-\d+-(\d+)/);
-    currentId = parseInt(c[1]);
-    /* Test if we have a next picture */
-    next = $("#logo-"+id+"-" + (currentId + 1) );
-    if (next.length == 0) {
-        return false;
-    } else {
-         $("#logo-"+id+" img:visible").css('display','none');
-         next.css('display','block');
-         $("#thumb-"+id).val(currentId + 1);
-    }
-}
-function showPrevious(id) {
-    activeLogoId =  $("#logo-"+id+" img:visible").attr('id');
-    c = activeLogoId.match(/logo-\d+-(\d+)/);
-    currentId = parseInt(c[1]);
-    /* Test if we have a previous picture */
-    prev = $("#logo-"+id+"-" + (currentId - 1) );
-    if (prev.length == 0) {
-        return false;
-    } else {
-         $("#logo-"+id+" img:visible").css('display','none');
-         prev.css('display','block');
-         $("#thumb-"+id).val(currentId - 1);
-    }
-} 
+ 
 
 </script>
 <table width="100%" cellpadding="0" cellspacing="0">

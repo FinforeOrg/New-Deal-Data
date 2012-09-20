@@ -5,6 +5,7 @@ we now include jquery in the container view
 <script type="text/javascript" src="js/jquery-1.2.1.pack.js"></script>
 ********************************/
 ?>
+<script src="js/logo_preference.js"></script>
 <script type="text/javascript">
 function recommend_colleague(this_colleague_id){
 	$('#recommend_result').html('sending request');

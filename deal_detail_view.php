@@ -10,45 +10,9 @@ we now include jquery in container view
 jQuery.noConflict()
 </script>
 <script type="text/javascript" src="js/prototype.js"></script>
+<script src="js/logo_preference.js"></script>
 <script type="text/javascript">
-function updateChosenLogos() {
-    jQuery.get(
-        'ajax/save_chosen_logo.php?' + jQuery(".thumb-val").serialize(),
-        function (data) {
-        }
-  )  
-}
-
-function showNext(id) {
-    activeLogoId =  jQuery("#logo-"+id+" img:visible").attr('id');
-    c = activeLogoId.match(/logo-\d+-(\d+)/);
-    currentId = parseInt(c[1]);
-    /* Test if we have a next picture */
-    next = jQuery("#logo-"+id+"-" + (currentId + 1) );
-    if (next.length == 0) {
-        return false;
-    } else {
-         jQuery("#logo-"+id+" img:visible").css('display','none');
-         next.css('display','block');
-         jQuery("#thumb-"+id).val(currentId + 1);
-         updateChosenLogos();
-    }
-}
-function showPrevious(id) {
-    activeLogoId =  jQuery("#logo-"+id+" img:visible").attr('id');
-    c = activeLogoId.match(/logo-\d+-(\d+)/);
-    currentId = parseInt(c[1]);
-    /* Test if we have a previous picture */
-    prev = jQuery("#logo-"+id+"-" + (currentId - 1) );
-    if (prev.length == 0) {
-        return false;
-    } else {
-         jQuery("#logo-"+id+" img:visible").css('display','none');
-         prev.css('display','block');
-         jQuery("#thumb-"+id).val(currentId - 1);
-         updateChosenLogos();
-    }
-} 
+ 
 
 function open_report_box(){
 	document.getElementById('error_report').style.width="400px";
