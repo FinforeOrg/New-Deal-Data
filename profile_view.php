@@ -169,7 +169,11 @@ if($g_view['tombstone_data_count'] == 0){
 		?>
 		<td style="width:200px">
 		<?php
-		$g_trans->get_tombstone_from_deal_data($g_view['tombstone_data'][$i]['logo'],$g_view['tombstone_data'][$i]['deal_company_name'],$g_view['tombstone_data'][$i]['deal_cat_name'],$g_view['tombstone_data'][$i]['deal_subcat1_name'],$g_view['tombstone_data'][$i]['deal_subcat2_name'],$g_view['tombstone_data'][$i]['value_in_billion'],$g_view['tombstone_data'][$i]['date_of_deal'],false,false,$g_view['tombstone_data'][$i]['deal_id'],"");
+		/******************
+		sng:20/sep/2012
+		We use a simpler system
+		**************/
+		$g_trans->get_tombstone_from_deal_data_simple($g_view['tombstone_data'][$i]['deal_cat_name'],$g_view['tombstone_data'][$i]['deal_subcat1_name'],$g_view['tombstone_data'][$i]['deal_subcat2_name'],$g_view['tombstone_data'][$i]['value_in_billion'],$g_view['tombstone_data'][$i]['value_range_id'],$g_view['tombstone_data'][$i]['fuzzy_value'],$g_view['tombstone_data'][$i]['date_of_deal'],$g_view['tombstone_data'][$i]['deal_id']);
 		?>
 		</td>
 		<?php

@@ -3523,7 +3523,21 @@ LIMIT ".$start_offset." , ".$num_to_fetch;
         
         return $ret;
     }
-        
+	
+	/*******************************
+	sng:20/sep/2012
+	A simpler way to create tombstone
+	***********/
+	public function get_tombstone_from_deal_data_simple($deal_cat_name,$deal_subcat1_name,$deal_subcat2_name,$value_in_billion,$value_range_id ,$fuzzy_value,$date_of_deal,$dealId){
+		$logo = "";
+		$company_name = "";
+		$withfavorites = false;
+		$isTombstoneFavorite = false;
+		$logos = "";
+		
+		return $this->get_tombstone_from_deal_data($logo,$company_name,$deal_cat_name,$deal_subcat1_name,$deal_subcat2_name,$value_in_billion,$value_range_id ,$fuzzy_value,$date_of_deal, $withfavorites = false, $isTombstoneFavorite = false, $dealId,$logos = "");
+	}
+	
     public function get_tombstone_from_deal_data($logo,$company_name,$deal_cat_name,$deal_subcat1_name,$deal_subcat2_name,$value_in_billion,$value_range_id ,$fuzzy_value,$date_of_deal, $withfavorites = false, $isTombstoneFavorite = false, $dealId,$logos = ""){
         global $g_http_path;
         ?>

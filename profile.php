@@ -114,13 +114,13 @@ if(!$success){
 }
 /*************************************************************************************
 get the last 4 deals for tombstones
-********
+********/
 $g_view['tombstone_data'] = array();
 $g_view['tombstone_data_count'] = 0;
 $success = $g_trans->front_get_recent_deals_of_member($g_view['member_id'],4,$g_view['tombstone_data'],$g_view['tombstone_data_count']);
 if(!$success){
 	die("Cannot fetch tombstone data");
-}*/
+}
 /*************************************************************************************
 get the last 25 deals
 ********/
