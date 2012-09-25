@@ -113,8 +113,39 @@ if($g_account->is_site_member_logged()){
 <div class="msg_txt" id="add_self_to_deal_result"></div>
 </div>
 
+<?php
+/******************************
+sng:22/sep/2012
+Add a colleague to deal
+We send the work email as hidden value because that is unique
+***********************/
+if($g_account->is_site_member_logged()){
+?>
+<div>
+<input type="hidden" id="team_member_id" value="" />
+<p><strong>Add a colleague to the team</strong></p>
+<p><input type="text" name="team_member_name" id="team_member_name" class="txtbox" /></p>
+<p><input type="button" value="Add" class="btn_auto" onclick="add_colleague_to_deal(<?php echo $g_view['deal_id'];?>,<?php echo $_SESSION['company_id'];?>)" /></p>
+</div>
+<div>Type the first few letters. If the member is found, it will be shown in the list. Please select the member you wish to add to the team.</div>
+<?php
+}
+?>
+<div class="msg_txt" id="add_colleague_to_deal_result"></div>
 
 
 <script>
 $('.btn_auto').button();
+
+jQuery('#team_member_name').devbridge_autocomplete({
+	serviceUrl:'ajax/fetch_colleague_list.php',
+	minChars:1,
+	noCache: true,
+	width:'100%',
+	onSelect: function(value, data){
+		var tokens = data.split("|");
+		$('#team_member_id').val(tokens[1]);
+		jQuery('#team_member_name').val(tokens[0]);
+	}
+});
 </script>

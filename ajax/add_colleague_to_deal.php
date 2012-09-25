@@ -1,14 +1,7 @@
 <?php
 /************************
-13/jan/2011
-Now a member can search for deals done by his/her firm. In that case
-the member can add self to the deal
-
-sng:19/sep/2012
-We have moved the method to transaction_member so we update the code here
-
-sng:25/sep/2012
-We return result in json
+25/sep/2012
+This allow a member to add other members from his/her bank to this deal
 ************/
 include("../include/global.php");
 require_once("classes/class.account.php");
@@ -20,9 +13,10 @@ if(!$g_account->is_site_member_logged()){
 }
 $trans_mem = new transaction_member();
 /***********************************************/
-$this_member = $_SESSION['mem_id'];
+$this_member = $_POST['member_id'];
 $deal_id = $_POST['deal_id'];
 $partner_id = $_POST['partner_id'];
+
 $mem_added = false;
 $msg = "";
 
@@ -39,7 +33,7 @@ if(!$success){
 }
 if($mem_added){
 	$result['mem_added'] = 1;
-	$result['msg'] = "You have been added to the deal";
+	$result['msg'] = "Added to the deal team";
 	echo json_encode($result);
 	exit;
 }else{
