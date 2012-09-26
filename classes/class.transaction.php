@@ -3310,11 +3310,14 @@ LIMIT ".$start_offset." , ".$num_to_fetch;
 	
 	sng:19/sep/2012
 	We need to change this. Start with minimal data for profile page.
+	
+	sng: 26/sep/2012
+	Need to exclude the inactive deals
     ***/
     public function front_get_recent_deals_of_member($member_id,$num_deals,&$data_arr,&$data_count){
         $db = new db();
 		
-		$q = "select t.date_of_deal,t.id as deal_id,t.deal_cat_name,t.deal_subcat1_name,t.deal_subcat2_name,t.value_in_billion,pm.designation,firm.name AS firm_name,t.value_range_id,vrm.display_text as fuzzy_value FROM ".TP."transaction_partner_members AS pm LEFT JOIN ".TP."transaction AS t ON ( pm.transaction_id = t.id ) LEFT JOIN ".TP."company AS firm ON ( pm.partner_id = firm.company_id ) LEFT JOIN ".TP."transaction_value_range_master as vrm ON (t.value_range_id=vrm.value_range_id) WHERE member_id = '".$member_id."' ORDER BY t.date_of_deal DESC LIMIT 0 , ".$num_deals;
+		$q = "select t.date_of_deal,t.id as deal_id,t.deal_cat_name,t.deal_subcat1_name,t.deal_subcat2_name,t.value_in_billion,pm.designation,firm.name AS firm_name,t.value_range_id,vrm.display_text as fuzzy_value FROM ".TP."transaction_partner_members AS pm LEFT JOIN ".TP."transaction AS t ON ( pm.transaction_id = t.id ) LEFT JOIN ".TP."company AS firm ON ( pm.partner_id = firm.company_id ) LEFT JOIN ".TP."transaction_value_range_master as vrm ON (t.value_range_id=vrm.value_range_id) WHERE member_id = '".$member_id."' and t.is_active='y' ORDER BY t.date_of_deal DESC LIMIT 0 , ".$num_deals;
 		$ok = $db->select_query($q);
 		if(!$ok){
 			
@@ -3340,68 +3343,54 @@ LIMIT ".$start_offset." , ".$num_to_fetch;
 			}
 		}
 		return true;
-        //$q = "SELECT ,, , , pm.designation, firm.name AS firm_name, c.name AS deal_company_name,c.logo,c.company_id as deal_company_id FROM ".TP."transaction_partner_members AS pm LEFT JOIN ".TP."transaction AS t ON ( pm.transaction_id = t.id ) LEFT JOIN ".TP."company AS firm ON ( pm.partner_id = firm.company_id ) LEFT JOIN ".TP."company AS c ON ( t.company_id = c.company_id ) WHERE member_id = '".$member_id."' ORDER BY t.date_of_deal DESC LIMIT 0 , ".$num_deals;
-        
-        
-        /////////////////////////
-        
-        ///////////////////////////
-        for($i=0;$i<$data_count;$i++){
-            $data_arr[$i] = mysql_fetch_assoc($res);
-            $data_arr[$i]['firm_name'] = $g_mc->db_to_view($data_arr[$i]['firm_name']);
-            $data_arr[$i]['deal_company_name'] = $g_mc->db_to_view($data_arr[$i]['deal_company_name']);
-            if(($data_arr[$i]['deal_subcat1_name']!="")&&($data_arr[$i]['deal_subcat1_name']!="n/a")){
-                if($data_arr[$i]['deal_subcat1_name']!=$data_arr[$i]['deal_cat_name']){
-                    $data_arr[$i]['deal_cat_name'].=", ".$data_arr[$i]['deal_subcat1_name'];
-                }
-            }
-            if(($data_arr[$i]['deal_subcat2_name']!="")&&($data_arr[$i]['deal_subcat2_name']!="n/a")){
-                $data_arr[$i]['deal_cat_name'].=", ".$data_arr[$i]['deal_subcat2_name'];
-            }
-        }
-        return true;
     }
     /****
     function to get all the deals of this member.
     Used in profile edit, so see all deal in which the member participated
+	
+	sng:26/sep/2012
+	Let us update this code also
     *************/
     public function front_get_deals_of_member_paged($member_id,$num_to_fetch,$start_offset,&$data_arr,&$data_count){
-        global $g_mc;
-        $q = "SELECT t.date_of_deal,t.id as deal_id, t.deal_cat_name,t.deal_subcat1_name,t.deal_subcat2_name, t.value_in_billion, pm.designation, firm.name AS firm_name, c.name AS deal_company_name,c.logo,c.company_id as deal_company_id FROM ".TP."transaction_partner_members AS pm LEFT JOIN ".TP."transaction AS t ON ( pm.transaction_id = t.id ) LEFT JOIN ".TP."company AS firm ON ( pm.partner_id = firm.company_id ) LEFT JOIN ".TP."company AS c ON ( t.company_id = c.company_id ) WHERE member_id = '".$member_id."' ORDER BY t.date_of_deal DESC LIMIT ".$start_offset." , ".$num_to_fetch;
-        
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        /////////////////////////
-        $data_count = mysql_num_rows($res);
+        $db = new db();
+		
+		$q = "select t.date_of_deal,t.id as deal_id,t.deal_cat_name,t.deal_subcat1_name,t.deal_subcat2_name,t.value_in_billion,pm.designation,firm.name AS firm_name,t.value_range_id,vrm.display_text as fuzzy_value FROM ".TP."transaction_partner_members AS pm LEFT JOIN ".TP."transaction AS t ON ( pm.transaction_id = t.id ) LEFT JOIN ".TP."company AS firm ON ( pm.partner_id = firm.company_id ) LEFT JOIN ".TP."transaction_value_range_master as vrm ON (t.value_range_id=vrm.value_range_id) WHERE member_id = '".$member_id."' and t.is_active='y' ORDER BY t.date_of_deal DESC LIMIT ".$start_offset." , ".$num_to_fetch;
+		
+       $ok = $db->select_query($q);
+		if(!$ok){
+			
+			return false;
+		}
+        $data_count = $db->row_count();
         if(0 == $data_count){
             //no deals done by this member
             return true;
         }
-        ///////////////////////////
-        for($i=0;$i<$data_count;$i++){
-            $data_arr[$i] = mysql_fetch_assoc($res);
-            $data_arr[$i]['firm_name'] = $g_mc->db_to_view($data_arr[$i]['firm_name']);
-            $data_arr[$i]['deal_company_name'] = $g_mc->db_to_view($data_arr[$i]['deal_company_name']);
-            if(($data_arr[$i]['deal_subcat1_name']!="")&&($data_arr[$i]['deal_subcat1_name']!="n/a")){
-                if($data_arr[$i]['deal_subcat1_name']!=$data_arr[$i]['deal_cat_name']){
-                    $data_arr[$i]['deal_cat_name'].=", ".$data_arr[$i]['deal_subcat1_name'];
-                }
-            }
-            if(($data_arr[$i]['deal_subcat2_name']!="")&&($data_arr[$i]['deal_subcat2_name']!="n/a")){
-                $data_arr[$i]['deal_cat_name'].=", ".$data_arr[$i]['deal_subcat2_name'];
-            }
-        }
-        return true;
+		$data_arr = $db->get_result_set_as_array();
+		/****************
+		get the participants
+		**************/
+		require_once("classes/class.transaction_company.php");
+		$g_trans_comp = new transaction_company();
+		for($k=0;$k<$data_count;$k++){
+			$data_arr[$k]['participants'] = NULL;
+			$success = $g_trans_comp->get_deal_participants($data_arr[$k]['deal_id'],$data_arr[$k]['participants']);
+			if(!$success){
+				return false;
+			}
+		}
+		return true;
     }
     
     /****
     sng:22/nov/2010
     function to get all the deals of this member.
     Used by admin to get the deals of a ghost member and then remove the ghost member from that deal
+	
+	need to update this
     *************/
     public function admin_get_deals_of_member_paged($member_id,$num_to_fetch,$start_offset,&$data_arr,&$data_count){
+		die("UPDATE THIS, see front_get_deals_of_member_paged");
         global $g_mc;
         $q = "SELECT t.date_of_deal,t.id as deal_id, t.deal_cat_name,t.deal_subcat1_name,t.deal_subcat2_name, t.value_in_billion, pm.designation,pm.partner_id,firm.name AS firm_name, c.name AS deal_company_name,c.logo,c.company_id as deal_company_id FROM ".TP."transaction_partner_members AS pm LEFT JOIN ".TP."transaction AS t ON ( pm.transaction_id = t.id ) LEFT JOIN ".TP."company AS firm ON ( pm.partner_id = firm.company_id ) LEFT JOIN ".TP."company AS c ON ( t.company_id = c.company_id ) WHERE member_id = '".$member_id."' ORDER BY t.date_of_deal DESC LIMIT ".$start_offset." , ".$num_to_fetch;
         

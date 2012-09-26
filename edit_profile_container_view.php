@@ -19,11 +19,9 @@ The items are same for company rep and data partner
 <tr><td><a href="edit_profile_works.php">Previous works</a></td></tr>
 <?php
 if(($_SESSION['member_type']!="company rep")&&($_SESSION['member_type']!="data partner")){
-/*************************
-sng:12/nov/2011
-Since we are not allowing any member to add himself/herself to deal, there is no point in showing this
+?>
 <tr><td><a href="edit_profile_my_deals.php">My deals</a></td></tr>
-*******************************/
+<?php
 }
 ?>
 <?php
@@ -42,13 +40,11 @@ if($_SESSION['is_delegate']){
 ?>
 <?php
 if(($_SESSION['member_type']!="company rep")&&($_SESSION['member_type']!="data partner")){
-/***************************************
-sng:12/nov/2011
-Let us hide the recommend/admire section in data-cx since there is no way for a member to see profile of another member
+?>
 
 <tr><td><a href="edit_profile_recommended_admired_by_me.php">Members I recommend / admire</a></td></tr>
 <tr><td><a href="edit_profile_recommend_admire_me.php">Members recommend / admire me</a></td></tr>
-*****************************************/
+<?php
 }else{
 /********************************************
 sng:20/sep/2011

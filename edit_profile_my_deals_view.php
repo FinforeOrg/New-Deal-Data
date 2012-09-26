@@ -24,9 +24,27 @@ if($g_view['deal_count'] == 0){
 		?>
 		<tr>
 		<td><?php echo date("M, Y",strtotime($g_view['deal_data'][$i]['date_of_deal']));?></td>
-		<td><a href="company.php?show_company_id=<?php echo $g_view['deal_data'][$i]['deal_company_id'];?>"><?php echo $g_view['deal_data'][$i]['deal_company_name'];?></a></td>
-		<td><?php echo $g_view['deal_data'][$i]['deal_cat_name'];?></td>
-		<td><?php echo convert_billion_to_million_for_display($g_view['deal_data'][$i]['value_in_billion']);?></td>
+		<?php
+		/*********************
+		sng:19/sep/2012
+		We now have participants
+		******************/
+		?>
+		<td><?php echo Util::deal_participants_to_csv_with_links($g_view['deal_data'][$i]['participants']);?></td>
+		<?php
+		/**************
+		sng:19/sep/2012
+		We use our utility function here
+		***********/
+		?>
+		<td><?php show_deal_type_for_listing($g_view['deal_data'][$i]['deal_cat_name'],$g_view['deal_data'][$i]['deal_subcat1_name'],$g_view['deal_data'][$i]['deal_subcat2_name']);?></td>
+		<?php
+		/*************
+		sng:19/sep/2012
+		We use utility function here since we now have deal range id, that is, the deal can have range instead of definite value
+		*************/
+		?>
+		<td><?php echo convert_deal_value_for_display_round($g_view['deal_data'][$i]['value_in_billion'],$g_view['deal_data'][$i]['value_range_id'],$g_view['deal_data'][$i]['fuzzy_value']);?></td>
 		<td><?php echo $g_view['deal_data'][$i]['firm_name'];?></td>
 		<td><?php echo $g_view['deal_data'][$i]['designation'];?></td>
 		<td>
