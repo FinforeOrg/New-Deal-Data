@@ -1576,6 +1576,38 @@ class transaction_suggestion{
 			$msg = "Please specify at least one suggestion";
 			return true;
 		}
+		/*********************************************
+		sng:26/sep/2012
+		We check if deal value is set for the transaction or not. If not set then we set the deal value (if it is in the suggestion)
+		**********/
+		if(isset($data_arr['value_in_million'])&&($data_arr['value_in_million']!='')){
+			$deal_value_query = "select value_in_billion from ".TP."transaction where id='".$deal_id."'";
+			$ok = $db->select_query($deal_value_query);
+			if(!$ok){
+				return false;
+			}
+			if(!$db->has_row()){
+				return false;
+			}
+			$row = $db->get_row();
+			if($row['value_in_billion']==0.0){
+				/**********
+				need to convert to billion
+				and get value range id
+				********************/
+				require_once("classes/class.deal_support.php");
+				$deal_support = new deal_support();
+				$value_in_billion = (float)$data_arr['value_in_million']/1000;
+				$value_range_id = 0;
+				$ok = $deal_support->front_get_value_range_id_from_value($data_arr['value_in_million'],$value_range_id);
+				if(!$ok){
+					return false;
+				}
+				$value_updt_q = "update ".TP."transaction set value_in_billion='".$value_in_billion."',value_range_id='".$value_range_id."' where id='".$deal_id."'";
+				$ok = $db->mod_query($value_updt_q);
+			}
+		}
+		/**************************************************/
 		
 		$report_date = date("Y-m-d");
 		$q = "insert into ".TP."transaction_edit_suggestion_valuation set deal_id='".$deal_id."', suggested_by='".$mem_id."', date_suggested='".$report_date."'".$q;
