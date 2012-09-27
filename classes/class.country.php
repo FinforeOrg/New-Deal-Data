@@ -157,7 +157,7 @@ class country{
 	
 	/*******************
 	sng:24/feb/2011
-	support to activate/deactivate region
+	support to display order
 	***************/
 	public function set_region_display_order($region_id,$display_order,&$msg){
 		
@@ -167,6 +167,22 @@ class country{
 			return false;
 		}
 		$msg = "The display order has been updated";
+		
+		return true;
+	}
+	
+	/*******************
+	sng:27/sep/2012
+	support to edit the name
+	***************/
+	public function set_region_display_name($region_id,$region_name,&$msg){
+		
+		$q = "update ".TP."region_master set name='".mysql_real_escape_string($region_name)."' where id='".$region_id."'";
+		$result = mysql_query($q);
+		if(!$result){
+			return false;
+		}
+		$msg = "The name has been updated";
 		
 		return true;
 	}

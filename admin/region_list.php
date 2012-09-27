@@ -35,7 +35,17 @@ if(isset($_POST['action'])&&($_POST['action']=="change_display_order")){
 		die("Cannot change the display order of this region");
 	}
 }
-///////////////////////////////////////////////////////////
+/*************************************
+sng:27/sep/2012
+support for editing the region name
+***********/
+if(isset($_POST['action'])&&($_POST['action']=="change_region_name")){
+	$success = $g_country->set_region_display_name($_POST['region_id'],$_POST['name'],$g_view['msg']);
+	if(!$success){
+		die("Cannot change the display order of this region");
+	}
+}
+/*************************************/
 //get the list of admin users
 $g_view['data_count'] = 0;
 $g_view['data'] = array();

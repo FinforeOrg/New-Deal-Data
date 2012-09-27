@@ -57,10 +57,20 @@ if($g_view['data_count']==0){
 		?>
 		</td>
 		<?php
-		/**********************************************/
+		/**********************************************
+		sng:27/sep/2012
+		Let us allow admin to edit the region name
+		******/
 		?>
 		
-		<td><?php echo $g_view['data'][$i]['name'];?></td>
+		<td>
+		<form method="post" action="">
+		<input type="hidden" name="action" value="change_region_name" />
+		<input type="hidden" name="region_id" value="<?php echo $g_view['data'][$i]['id'];?>" />
+		<input type="text" name="name" value="<?php echo $g_view['data'][$i]['name'];?>" style="width:200px;" />
+		<input type="submit" name="submit" value="Change" />
+		</form>
+		</td>
 		<?php
 		/*************************************************
 		sng:24/feb/2011
