@@ -5,8 +5,17 @@ require_once("classes/class.country.php");
 require_once("classes/class.company.php");
 require_once("classes/class.transaction.php");
 require_once("classes/class.magic_quote.php");
+require_once("classes/class.deal_support.php");
+$deal_support = new deal_support();
 ///////////////////////////////////////////////////////
 $g_view['msg'] = "";
+/*******************
+sng:28/sep/2012
+We have changed the signature of the admin_search_for_deal. We now support pagination.
+However, we are not using any pagination here. We just get the first 100 matching records
+********************/
+$g_view['start_offset'] = 0;
+$g_view['num_to_fetch'] = 100;
 /////////////////////////////////////////////
 if(isset($_POST['action'])&&($_POST['action']=="del")){
 	//first delete the transaction
@@ -16,8 +25,8 @@ if(isset($_POST['action'])&&($_POST['action']=="del")){
 	}
 	//now do the search result again
 	$g_view['data_count'] = 0;
-	$g_view['data'] = array();
-	$success = $g_trans->admin_search_for_deal($_POST,$g_view['data'],$g_view['data_count']);
+	$g_view['data'] = NULL;
+	$success = $g_trans->admin_search_for_deal($_POST,$g_view['start_offset'],$g_view['num_to_fetch'],$g_view['data'],$g_view['data_count']);
 	if(!$success){
 		die("Cannot get deal data");
 	}
@@ -25,8 +34,8 @@ if(isset($_POST['action'])&&($_POST['action']=="del")){
 ///////////////////////////////////////
 if(isset($_POST['action'])&&($_POST['action']=="search_deal")){
 	$g_view['data_count'] = 0;
-	$g_view['data'] = array();
-	$success = $g_trans->admin_search_for_deal($_POST,$g_view['data'],$g_view['data_count']);
+	$g_view['data'] = NULL;
+	$success = $g_trans->admin_search_for_deal($_POST,$g_view['start_offset'],$g_view['num_to_fetch'],$g_view['data'],$g_view['data_count']);
 	if(!$success){
 		die("Cannot get deal data");
 	}
@@ -34,8 +43,8 @@ if(isset($_POST['action'])&&($_POST['action']=="search_deal")){
 
 if(isset($_POST['action'])&&($_POST['action']=="search_deal_by_id")){
 	$g_view['data_count'] = 0;
-	$g_view['data'] = array();
-	$success = $g_trans->admin_search_for_deal($_POST,$g_view['data'],$g_view['data_count']);
+	$g_view['data'] = NULL;
+	$success = $g_trans->admin_search_for_deal($_POST,$g_view['start_offset'],$g_view['num_to_fetch'],$g_view['data'],$g_view['data_count']);
 	if(!$success){
 		die("Cannot get deal data");
 	}
@@ -102,7 +111,18 @@ $success = $g_company->get_all_industry_for_sector($_POST['sector'],$g_view['ind
 if(!$success){
 	die("Cannot get industry list");
 }
-//////////////////////////////////////////////////////////
+/****************************************************
+sng:28/sep/2012
+Now deals can have exact value, as well as fuzzy value (in the form of range id). In fact, even if exact value is specified,
+the range is calculated and stored. In front end, we filter by the range. We do the same here and get rid of min value and max value inputs
+*********************/
+$g_view['deal_size_filter_list'] = array();
+$g_view['deal_size_filter_list_count'] = 0;
+$success = $deal_support->front_get_deal_value_range_list($g_view['deal_size_filter_list'],$g_view['deal_size_filter_list_count']);
+if(!$success){
+	die("Cannot get deal size filter list");
+}
+/******************************************************/
 $g_view['heading'] = "Search for Transaction";
 $g_view['content_view'] = "admin/deal_search_view.php";
 include("admin/content_view.php");

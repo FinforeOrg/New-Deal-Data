@@ -212,196 +212,204 @@ class transaction{
     /********************************************************************************/
     
     
-    /***
+    /**************************************
     function to search for deal record
     This is for ADMIN
-    sng:12/may/2010, full search
-	
-	sng:20/jun/2011
-	Admin can now type the deal id to search for the deal
-	
-	sng:14/feb/2012
-	We now have value range id for each deal that show the fuzzy deal value. These are predefined.
-	Sometime, we only have value range id and deal value is 0
-	If both deal value and value range id is 0, the deal value is undisclosed.
-	
-	We no longer have a single company associated with a deal. Now we have multiple companies
-    ***/
-    public function admin_search_for_deal($search_params_arr,&$data_arr,&$data_count){
-        global $g_mc;
-        
-       /* $q = "SELECT t.id,t.value_in_billion,t.date_of_deal,deal_cat_name,deal_subcat1_name,deal_subcat2_name,c.name as company_name FROM ".TP."transaction AS t LEFT JOIN ".TP."company AS c ON ( t.company_id = c.company_id )";*/
+    
+    ******************************/
+    public function admin_search_for_deal($search_params_arr,$start_offset,$num_to_fetch,&$data_arr,&$data_count){
+        $db = new db();
+        /************************************************
+		sng:28/sep/2012
+		Now we have one or more companies associated with a deal. If company is given, we filter on it.
+		We use the country/sector/industry of the participating companies when filtering by country/sector/industry
 		
-		$q = "SELECT t.id,t.value_in_billion,t.date_of_deal,deal_cat_name,deal_subcat1_name,deal_subcat2_name,t.value_range_id,vrm.short_caption as fuzzy_value_short_caption,vrm.display_text as fuzzy_value FROM ".TP."transaction AS t LEFT JOIN ".TP."transaction_value_range_master as vrm ON (t.value_range_id=vrm.value_range_id)";
+		Deals can have concrete value or just deal value range id. In fact, even if value is given, range id is stored.
+		We now get rid of min and max value inputs and using the deal value range dropdown
 		
-		$search_name = mysql_real_escape_string($search_params_arr['company_name']);
-        if($search_name!=""){
-			$q.= " right join (select distinct trc.transaction_id from ".TP."transaction_companies as trc left join ".TP."company as com on(trc.company_id=com.company_id) where com.name like '".$search_name."%') as p on(t.id=p.transaction_id)";
-            /**$q.=" and c.name LIKE '".$search_name."%'";*/
-        }
+		Admin can now type the deal id to search for the deal
 		
-		$where_clause = "WHERE 1=1";
+		Show all, active/inactive, announced/failed
 		
-		if(isset($search_params_arr['deal_id'])&&$search_params_arr['deal_id']!=""){
-            $where_clause.=" and t.id = '".$search_params_arr['deal_id']."'";
-        }
+		We take this from front_deal_search_paged
+		************************************************/
+		$filter_by_company_attrib = "";
 		
-        if($search_params_arr['deal_cat_name']!=""){
-            $where_clause.=" and t.deal_cat_name = '".$search_params_arr['deal_cat_name']."'";
-        }
-        if($search_params_arr['deal_subcat1_name']!=""){
-            $where_clause.=" and t.deal_subcat1_name = '".$search_params_arr['deal_subcat1_name']."'";
-        }
-        if($search_params_arr['deal_subcat2_name']!=""){
-            $where_clause.=" and t.deal_subcat2_name = '".$search_params_arr['deal_subcat2_name']."'";
-        }
-        if($search_params_arr['year']!=""){
-            $where_clause.=" and year(t.date_of_deal) = '".$search_params_arr['year']."'";
-        }
-        /******
-        sng:13/sep/2010
-        we also need to search on deal value
-        ***/
-        if($search_params_arr['value_from']!=""){
-            $where_clause.=" and t.value_in_billion >= '".$search_params_arr['value_from']."'";
-        }
-        if($search_params_arr['value_to']!=""){
-            $where_clause.=" and t.value_in_billion <= '".$search_params_arr['value_to']."'";
-        }
-        /***
-        sng:31/aug/2010
-        We also need to search on sector
-        ***/
-        /************************************************************************
-        if($search_params_arr['sector']!=""){
-            $q.=" and c.sector = '".$search_params_arr['sector']."'";
-        }
-        if($search_params_arr['industry']!=""){
-            $q.=" and c.industry = '".$search_params_arr['industry']."'";
-        }
-        ******************************************************************************/
-        /**********
-        sng:8/jan/2011
-        Transaction table now store sector and industry in csv format, so we no longer search for company sector/industry
-        *******/
-        if($search_params_arr['sector']!=""){
-            $where_clause.=" and t.deal_sector like '%".$search_params_arr['sector']."%'";
-        }
-        if($search_params_arr['industry']!=""){
-            $where_clause.=" and t.deal_industry like '%".$search_params_arr['industry']."%'";
-        }
-        /******************/
-        /**********
-		sng:14/feb/2012
-		We now have list of participants
-		*************/
-        /***
-        country and region
-        if country is specified, region is overridden
-        **/
-        $country_filter = "";
-        if($search_params_arr['country']!=""){
-            /***************
-            sng:8/jan/2011
-            No more the country of the HQ of the company doing the deal. Now use deal_country (which is a csv)
-            $country_filter = "c.hq_country='".$search_params_arr['country']."'";
-            ********/
-            $country_filter = "t.deal_country LIKE '%".$search_params_arr['country']."%'";
-        }else{
-            if($search_params_arr['region']!=""){
-                //get the country names for this region name
-                $region_q = "select cm.name from ".TP."region_master as rm left join ".TP."region_country_list as rc on(rm.id=rc.region_id) left join ".TP."country_master as cm on(rc.country_id=cm.id) where rm.name='".$search_params_arr['region']."'";
-                $region_q_res = mysql_query($region_q);
-                if(!$region_q_res){
-                    return false;
-                }
-                /***********************************************************************
-                sng:8/jan/2011
-                No more the country of the HQ of the company doing the deal. Now use deal_country (which is a csv)
-                So now that we have got the individual countries of the region. let us create a OR clause and
-                for each country of the region, try to match it in deal_country. Since any one country from the region needs to
-                match, we use a OR
-                So say, region is BRIC. Then country filter is 
-                (deal_country like '%Brazil%' OR deal_country like '%Russia%' OR deal_country like '%India%' OR deal_country like '%China%')
-                
-                $region_country_csv = "";
-                $region_q_res_cnt = mysql_num_rows($region_q_res);
-                if($region_q_res_cnt > 0){
-                    while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
-                        $region_country_csv.=",'".$region_q_res_row['name']."'";
-                    }
-                    $region_country_csv = substr($region_country_csv,1);
-                    $country_filter = "c.hq_country IN(".$region_country_csv.")";
-                }
-                *********/
-                $region_q_res_cnt = mysql_num_rows($region_q_res);
-                $region_clause = "";
-                if($region_q_res_cnt > 0){
-                    while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
-                        $region_clause.="|t.deal_country LIKE '%".$region_q_res_row['name']."%'";
-                    }
-                    $region_clause = substr($region_clause,1);
-                    $region_clause = str_replace("|"," OR ",$region_clause);
-                    $country_filter = "(".$region_clause.")";
-                }
-                /*******************************************************************/
-            }
-        }
-        if($country_filter!=""){
-            $where_clause.=" and ".$country_filter;
-        }
-        
-		$q = $q." ".$where_clause;
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        //////////////////////////////////////////////////
-        $data_count = mysql_num_rows($res);
-        if(0==$data_count){
-            return true;
-        }
-        //////////////////////////////////
-		require_once("classes/class.transaction_company.php");
-		$g_trans_comp = new transaction_company();
-        for($i=0;$i<$data_count;$i++){
-            $data_arr[$i] = mysql_fetch_assoc($res);
-            /**
-            sng:13/apr/2010
-            we magic quote company name
-            **/
-            $data_arr[$i]['company_name'] = $g_mc->db_to_view($data_arr[$i]['company_name']);
-            //set bankers and law firms
-            $transaction_id = $data_arr[$i]['id'];
-            $data_arr[$i]['banks'] = array();
-            $data_cnt = 0;
-            $success = $this->get_all_partner($transaction_id,"bank",$data_arr[$i]['banks'],$data_cnt);
-            if(!$success){
-                return false;
-            }
-            ///////////////////////////
-            $data_arr[$i]['law_firms'] = array();
-            $data_cnt = 0;
-            $success = $this->get_all_partner($transaction_id,"law firm",$data_arr[$i]['law_firms'],$data_cnt);
-            if(!$success){
-                return false;
-            }
+		if(isset($search_params_arr['company_name'])&&($search_params_arr['company_name']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="name like '".mysql_real_escape_string($search_params_arr['company_name'])."%'";
 			
-			if(($data_arr[$i]['value_in_billion']==0)&&($data_arr[$i]['value_range_id']==0)){
-				$data_arr[$i]['fuzzy_value'] = "Not disclosed";
-				$data_arr[$i]['fuzzy_value_short_caption'] = "n/d";
+            
+        }else{
+			if(isset($search_params_arr['country'])&&($search_params_arr['country']!="")){
+				if($filter_by_company_attrib != ""){
+					$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+				}
+				$filter_by_company_attrib.="hq_country='".mysql_real_escape_string($search_params_arr['country'])."'";
+			}else{
+				/**********
+				might check region. Associated with a region is one or more countries
+				We can use IN clause, that is hq_country IN (select country names for the given region), but it seems that
+				it is much faster if we first get the country names and then create the condition with OR, that is
+				(hq_country='Brazil' OR hq_country='Russia') etc
+				***********/
+				if(isset($search_params_arr['region'])&&($search_params_arr['region']!="")){
+					//get the country names for this region name
+					$region_q = "SELECT ctrym.name FROM ".TP."region_master AS rgnm LEFT JOIN ".TP."region_country_list AS rcl ON ( rgnm.id = rcl.region_id ) LEFT JOIN ".TP."country_master AS ctrym ON ( rcl.country_id = ctrym.id )
+WHERE rgnm.name = '".mysql_real_escape_string($search_params_arr['region'])."'";
+					$region_q_res = mysql_query($region_q);
+					if(!$region_q_res){
+						
+                    	return false;
+                	}
+					$region_q_res_cnt = mysql_num_rows($region_q_res);
+					$region_clause = "";
+					if($region_q_res_cnt > 0){
+						while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
+                        	$region_clause.="|hq_country='".mysql_real_escape_string($region_q_res_row['name'])."'";
+                    	}
+						$region_clause = substr($region_clause,1);
+						$region_clause = str_replace("|"," OR ",$region_clause);
+						$region_clause = "(".$region_clause.")";
+					}
+					if($region_clause!=""){
+						if($filter_by_company_attrib != ""){
+							$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+						}
+						$filter_by_company_attrib.=$region_clause;
+					}
+				}
 			}
 			
-			/**************************
-			sng:1/feb/2012
-			get the deal participants, just the names
-			*************************/
-			$data_arr[$i]['participants'] = NULL;
-			$success = $g_trans_comp->get_deal_participants($transaction_id,$data_arr[$i]['participants']);
+			/*********************************************************/
+			if(isset($search_params_arr['sector'])&&($search_params_arr['sector']!="")){
+				if($filter_by_company_attrib != ""){
+					$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+				}
+				$filter_by_company_attrib.="sector='".mysql_real_escape_string($search_params_arr['sector'])."'";
+			}
+			
+			if(isset($search_params_arr['industry'])&&($search_params_arr['industry']!="")){
+				if($filter_by_company_attrib != ""){
+					$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+				}
+				$filter_by_company_attrib.="industry='".mysql_real_escape_string($search_params_arr['industry'])."'";
+			}
+			/*************************************************/
+		}
+		/***********************
+		Now we insert the snippets
+		*******************/
+		$q = "SELECT t.id as deal_id,value_in_billion,t.value_range_id,t.admin_verified,vrm.short_caption as fuzzy_value_short_caption,vrm.display_text as fuzzy_value,date_of_deal,deal_cat_name,deal_subcat1_name,deal_subcat2_name,target_company_name,seller_company_name FROM ";
+		
+		if($filter_by_company_attrib != ""){
+			$q.="(SELECT DISTINCT transaction_id from ".TP."transaction_companies as fca_tc left join ".TP."company as fca_c on(fca_tc.company_id=fca_c.company_id) where fca_c.type='company' AND ".$filter_by_company_attrib.") AS fca LEFT JOIN ";
+		}
+		
+		$q.="".TP."transaction AS t ";
+		
+		if($filter_by_company_attrib != ""){
+			$q.="ON (fca.transaction_id=t.id) ";
+		}
+		
+		$q.=" LEFT JOIN ".TP."transaction_value_range_master as vrm ON (t.value_range_id=vrm.value_range_id)";
+		
+		/*******************************
+		end of snippets
+		*********************************/
+		
+        $q.=" WHERE 1=1";
+		
+		if(isset($search_params_arr['deal_id'])&&$search_params_arr['deal_id']!=""){
+            $q.=" and t.id = '".$search_params_arr['deal_id']."'";
+        }
+        /************************************************************************************/
+        if(isset($search_params_arr['deal_cat_name'])&&($search_params_arr['deal_cat_name']!="")){
+            $q.=" and t.deal_cat_name = '".$search_params_arr['deal_cat_name']."'";
+        }
+        if(isset($search_params_arr['deal_subcat1_name'])&&($search_params_arr['deal_subcat1_name']!="")){
+            $q.=" and t.deal_subcat1_name = '".$search_params_arr['deal_subcat1_name']."'";
+        }
+        if(isset($search_params_arr['deal_subcat2_name'])&&($search_params_arr['deal_subcat2_name']!="")){
+            $q.=" and t.deal_subcat2_name = '".$search_params_arr['deal_subcat2_name']."'";
+        }
+        /*****************************************************************************/
+        if(isset($search_params_arr['year'])&&($search_params_arr['year']!="")){
+            $q.=" and year(t.date_of_deal) = '".$search_params_arr['year']."'";
+        }
+        
+		/**************************************************************************************/
+		if(isset($search_params_arr['value_range_id'])&&($search_params_arr['value_range_id']!="")){
+			if($search_params_arr['value_range_id']=="0"){
+				//looking for 'undisclosed'
+				$q.=" and t.value_in_billion=0.0 AND t.value_range_id=0";
+			}else{
+				$q.=" and t.value_range_id='".$search_params_arr['value_range_id']."'";
+			}
+        }
+        /*******************************************************************************/
+        $q.=" order by date_of_deal desc,t.id desc";
+        /***
+        The ordering by data of transaction in descending order is ok but what happens when the dates are same? It seems that the ordering then is random. So we
+        add another tie breaker - the order in which the deals were entered
+        /*******************************************************/
+        $q.=" limit ".$start_offset.",".$num_to_fetch;
+		
+        
+        $ok = $db->select_query($q);
+        if(!$ok){
+            return false;
+        }
+        
+        $data_count = $db->row_count();
+        if(0==$data_count){
+            //no data, no need to proceed
+            return true;
+        }
+		$data_arr = $db->get_result_set_as_array();
+		
+		require_once("classes/class.transaction_company.php");
+		$g_trans_comp = new transaction_company();
+		
+        for($k=0;$k<$data_count;$k++){
+			/**************
+			if we do not have exact value or fuzzy value, the short caption is n/d for undisclosed
+			***************/
+			if(($data_arr[$k]['value_in_billion']==0)&&($data_arr[$k]['value_range_id']==0)){
+				$data_arr[$k]['fuzzy_value'] = "Not disclosed";
+				$data_arr[$k]['fuzzy_value_short_caption'] = "n/d";
+			}
+            //set bankers and law firms
+            $transaction_id = $data_arr[$k]['deal_id'];
+            
+            
+			$data_arr[$k]['banks'] = array();
+			$data_cnt = 0;
+			$success = $this->get_all_partner($transaction_id,"bank",$data_arr[$k]['banks'],$data_cnt);
 			if(!$success){
 				return false;
 			}
+			/******************************************/
+			$data_arr[$k]['law_firms'] = array();
+			$data_cnt = 0;
+			$success = $this->get_all_partner($transaction_id,"law firm",$data_arr[$k]['law_firms'],$data_cnt);
+			if(!$success){
+				return false;
+			}
+			
+			/**************************
+			get the deal participants, just the names
+			*************************/
+			$data_arr[$k]['participants'] = NULL;
+			$success = $g_trans_comp->get_deal_participants($transaction_id,$data_arr[$k]['participants']);
+			if(!$success){
+				return false;
+			}
+            
         }
+        //echo $q;
         return true;
     }
     

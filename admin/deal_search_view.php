@@ -168,12 +168,27 @@ function sector_changed(){
 	<td>
 	Year: <input name="year" type="text" style="width:80px;" value="<?php echo $_POST['year'];?>" />
 	</td>
+	<?php
+	/****************************************************
+	sng:28/sep/2012
+	Now deals can have exact value, as well as fuzzy value (in the form of range id). In fact, even if exact value is specified,
+	the range is calculated and stored. In front end, we filter by the range. We do the same here and get rid of min value and max value inputs
+	*********************/
+	?>
 	<td>
-	Value from: <input name="value_from" type="text" style="width:80px;" value="<?php echo $_POST['value_from'];?>" /> ($ bn)
+	<select name="value_range_id" id="value_range_id" style="width: 200px;">
+	<option value="">Refine by Size</option>
+	<?php
+	for($j=0;$j<$g_view['deal_size_filter_list_count'];$j++){
+		?>
+		<option value="<?php echo $g_view['deal_size_filter_list'][$j]['value_range_id'];?>" <?php if($_POST['value_range_id']==$g_view['deal_size_filter_list'][$j]['value_range_id']){?>selected="selected"<?php } ?> ><?php echo $g_view['deal_size_filter_list'][$j]['display_text'];?></option>
+		<?php
+	}
+	?>
+	<option value="0" <?php if($_POST['value_range_id']=="0"){?>selected="selected"<?php } ?>>undisclosed value</option>
+	</select>
 	</td>
-	<td>
-	to: <input name="value_to" type="text" style="width:80px;" value="<?php echo $_POST['value_to'];?>" /> ($ bn)
-	</td>
+	
 	<td style="text-align:right;"><input type="submit" name="submit" value="search" /></td>
 	</tr>
 	</table>
@@ -194,7 +209,7 @@ support for jumping directly to deal record using the deal id. Basically this is
 <td>
 <form method="post" action="">
 <input type="hidden" name="action" value="search_deal_by_id" />
-Do you know the deal id? Then type it here and jump to the record: <input type="text" name="deal_id" value="" />
+Do you know the deal id? Then type it here and jump to the record: <input type="text" name="deal_id" value="<?php echo $_POST['deal_id'];?>" />
 <input type="submit" value="Search" />
 </form>
 </td>
@@ -267,20 +282,18 @@ if($g_view['data_count']==0){
 			<?php
 		}
 		?><br />
-		<a href="" onclick="return deal_bank_popup('<?php echo $g_view['data'][$i]['id'];?>');">Manage</a>
+		<a href="" onclick="return deal_bank_popup('<?php echo $g_view['data'][$i]['deal_id'];?>');">Manage</a>
 		<?php
 		/****
 		sng:25/may/2010
 		if there is at least one bank, show add banker
-		
-		sng:05/dec/2011
-		since we do not have members associated with deals in data-cx, we do not use it
+		********/
 		if($bank_cnt > 0){
-			
-			<br /><a href="" onclick="return deal_add_banker_popup('<?php echo $g_view['data'][$i]['id'];?>');">Add Banker</a>
-			
+			?>
+			<br /><a href="" onclick="return deal_add_banker_popup('<?php echo $g_view['data'][$i]['deal_id'];?>');">Add Banker</a>
+			<?php
 		}
-		***/
+		
 		?>
 		</td>
 		<td>
@@ -301,21 +314,17 @@ if($g_view['data_count']==0){
 		
 		?>
 		<br />
-		<a href="" onclick="return deal_lawfirm_popup('<?php echo $g_view['data'][$i]['id'];?>');">Manage</a>
+		<a href="" onclick="return deal_lawfirm_popup('<?php echo $g_view['data'][$i]['deal_id'];?>');">Manage</a>
 		<?php
 		/****
 		sng:25/may/2010
 		if there is at least one law firm, show add lawyer
-		
-		sng:05/dec/2011
-		since we do not have members associated with deals in data-cx, we do not use it
-		
+		**********/
 		if($law_cnt > 0){
-			
-			<br /><a href="" onclick="return deal_add_lawyer_popup('<?php echo $g_view['data'][$i]['id'];?>');">Add Lawyer</a>
-			
+			?>
+			<br /><a href="" onclick="return deal_add_lawyer_popup('<?php echo $g_view['data'][$i]['deal_id'];?>');">Add Lawyer</a>
+			<?php
 		}
-		***/
 		?>
 		</td>
 		<?php
@@ -329,12 +338,12 @@ if($g_view['data_count']==0){
 		?>
 		<td>
 		<form method="post" action="deal_case_study.php">
-		<input type="hidden" name="transaction_id" value="<?php echo $g_view['data'][$i]['id'];?>" />
+		<input type="hidden" name="transaction_id" value="<?php echo $g_view['data'][$i]['deal_id'];?>" />
 		<input type="submit" value="Case Studies" />
 		</form>
 		<br />
 		<form method="post" action="deal_documents.php">
-		<input type="hidden" name="transaction_id" value="<?php echo $g_view['data'][$i]['id'];?>" />
+		<input type="hidden" name="transaction_id" value="<?php echo $g_view['data'][$i]['deal_id'];?>" />
 		<input type="submit" value="Documents" />
 		</form>
 		</td>
@@ -343,14 +352,14 @@ if($g_view['data_count']==0){
 		?>
 		<td>
 		<form method="post" action="deal_edit.php">
-		<input type="hidden" name="deal_id" value="<?php echo $g_view['data'][$i]['id'];?>" />
+		<input type="hidden" name="deal_id" value="<?php echo $g_view['data'][$i]['deal_id'];?>" />
 		<input type="submit" value="Edit" />
 		</form>
 		</td>
 		<td>
 		<form method="post" action="" onsubmit="return confirm_deletion();">
 		<input type="hidden" name="action" value="del" />
-		<input type="hidden" name="deal_id" value="<?php echo $g_view['data'][$i]['id'];?>" />
+		<input type="hidden" name="deal_id" value="<?php echo $g_view['data'][$i]['deal_id'];?>" />
 		
 		<input type="hidden" name="company_name" value="<?php echo $g_mc->view_to_view($_POST['company_name']);?>" />
 		<input type="hidden" name="sector" value="<?php echo $_POST['sector'];?>" />
@@ -365,10 +374,13 @@ if($g_view['data_count']==0){
 		/****
 		sng:13/nov/2010
 		added 2 fields
+		
+		sng:28/sep/2012
+		We no longer use value from and value to. We now have dropdown of ranges, like we have in front end deal search.
+		That supports deals having concrete value as well as fuzzy value
 		***/
 		?>
-		<input type="hidden" name="value_from" value="<?php echo $_POST['value_from'];?>" />
-		<input type="hidden" name="value_to" value="<?php echo $_POST['value_to'];?>" />
+		
 		<input type="submit" value="delete" />
 		</form>
 		</td>
