@@ -6,6 +6,12 @@ This class contains all the functions related to membership registration, member
 require_once("classes/class.magic_quote.php");
 
 class member{
+	/******************
+	sng:28/sep/2012
+	thumbnauls must fit within a bounding box. We define the constants here
+	******************/
+	private $thumb_fit_width = 121;
+	private $thumb_fit_height = 121;
 	///////////////////////////////designation related code start//////////////////////////////////////
 	/***
 	sng:23/apr/2010
@@ -1933,7 +1939,7 @@ class member{
 	This is for home email and photo
 	******/
 	public function update_my_profile_2_via_edit($member_id,$data_arr,$img_field_name,$image_destination_path,&$validation_passed,&$err_arr){
-		global $g_mc;
+		
 		require_once("classes/class.image_util.php");
 		$g_img = new image_util();
 		
@@ -1975,22 +1981,14 @@ class member{
 			$curr_img = $row['profile_img'];
 			//now try to upload the image
 			$upload_img_name = time()."_".clean_filename(basename($_FILES[$img_field_name]['name']));
-			$upload_path = $image_destination_path."/".$upload_img_name;
+			
 			$upload_src = $_FILES[$img_field_name]['tmp_name'];
-			/***********************************
-			sng:18/may/2012
-			***/
-			$ok = $g_img->is_valid_image_file($upload_img_name);
-			if(!$ok){
-				return false;
-			}
-			/****************************/
-			$success = move_uploaded_file($upload_src,$upload_path);
-			if(!$success){
-				return false;
-			}
-			//create thumbnail
-			$success = $g_img->create_thumbnail($image_destination_path,$upload_img_name,121,121,$image_destination_path."/thumbnails",false);
+			/******************
+			sng:28/sep/2012
+			We now directly create the logo thumb. The function checks whether the uploaded img is image file or not
+			****************/
+			$success = $g_img->create_resized($upload_src,$image_destination_path."/thumbnails",$upload_img_name,$this->thumb_fit_width,$this->thumb_fit_height,false);
+			
 			if(!$success){
 				return false;
 			}
@@ -2003,15 +2001,19 @@ class member{
 			///////////////////
 			//delete prev image if any
 			if($curr_img != ""){
-				unlink($image_destination_path."/".$curr_img);
-				unlink($image_destination_path."/thumbnails".$curr_img);
+				/*************
+				sng:28/sep/2012
+				since we no longer create the larger image, no need to delete that. Just
+				delete the thumb
+				***********/
+				unlink($image_destination_path."/thumbnails/".$curr_img);
 			}
 			//image taken care of
 		}
 		/*************************
 		now update the record
 		/************************************/
-		$q = "update ".TP."member set home_email='".$data_arr['home_email']."' where mem_id='".$member_id."'";
+		$q = "update ".TP."member set home_email='".mysql_real_escape_string($data_arr['home_email'])."' where mem_id='".$member_id."'";
 		$result = mysql_query($q);
 		if(!$result){
 			return false;
@@ -2117,8 +2119,12 @@ class member{
 		$validation_passed = true;
 		return true;
 	}
-	
+	/**********************
+	sng:28/sep/2012
+	No longer used. The thing that we have in front end use update_my_profile_2_via_edit
+	*******************/
 	public function update_profile_photo_via_edit($member_id,$img_field_name,$image_destination_path,&$validation_passed,&$err_arr){
+		return false;
 		require_once("classes/class.image_util.php");
 		$g_img = new image_util();
 		
@@ -2160,7 +2166,7 @@ class member{
 		}
 		////////////////////////////////
 		//create thumbnail
-		$success = $g_img->create_thumbnail($image_destination_path,$upload_img_name,121,121,$image_destination_path."/thumbnails",false);
+		$success = $g_img->create_thumbnail($image_destination_path,$upload_img_name,$this->thumb_fit_width,$this->thumb_fit_height,$image_destination_path."/thumbnails",false);
 		if(!$success){
 			return false;
 		}

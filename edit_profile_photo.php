@@ -1,4 +1,9 @@
 <?php
+/**************
+sng:28/sep/2012
+No longer used since we no longer create a separate page to edit photo
+****************/
+die("do not use");
 require_once("include/global.php");
 require_once("check_mem_login.php");
 require_once("classes/class.member.php");

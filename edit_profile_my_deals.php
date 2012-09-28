@@ -8,17 +8,10 @@ $g_view['err'] = array();
 $g_view['msg'] = "";
 $g_view['validation_passed'] = false;
 ///////////////////////////////////////////////////////
-if(isset($_POST['action'])&&($_POST['action']=="change_photo")){
-	$success = $g_mem->update_profile_photo_via_edit($g_view['member_id'],"profile_img","uploaded_img/profile",$g_view['validation_passed'],$g_view['err']);
-	if(!$success){
-		die("Cannot update profile");
-	}
-	if($g_view['validation_passed']){
-		$g_view['msg'] = "Profile updated";
-	}else{
-		//nothing
-	}
-}
+/**************
+sng:28/sep/2012
+When I am viewing my deals, I am not changing my photo
+*****************/
 ////////////////////////////////////////////////////////////
 $g_view['deal_data'] = array();
 $g_view['deal_count'] = 0;
