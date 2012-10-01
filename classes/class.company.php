@@ -10,6 +10,12 @@ require_once("classes/class.image_util.php");
 require_once("classes/db.php");
 class company{
 	
+	/*********************
+	sng:28/sep/2012
+	We need uniformity in the logo thumbnail size, so we define constants here
+	************/
+	private $thumb_fit_width = 200;
+	private $thumb_fit_height = 200;
 	
 	public function get_all_company_list(&$data_arr,&$data_count){
 		global $g_mc;
@@ -498,80 +504,15 @@ class company{
 		return true;
 	}
 	
+	/******************
+	sng:28/sep/2012
+	This was used when we wanted to have logo for seller company / target company in transaction table.
+	However, we solved that by storing all the logo names in serialized form for a deal.
+	
+	Now we have one or more participating companies for deal (each with its own logo) so this is no longer needed
+	*********************/
 	public function edit_extra_company_logo($deal_id,$data_arr,$img_field_name,$image_destination_path,&$validation_passed,&$err_arr){
-		$img_obj = new image_util();
-		global $g_mc;
-		
-		//validation
-		$validation_passed = true;
-		
-		if(!$validation_passed){
-			//no need to proceed
-			return true;
-		}
-		$company_type = $_POST['company_type'];
-		if($company_type=="target"){
-			$logo_field = "target_company_logo";
-		}else{
-			if($company_type=="seller"){
-				$logo_field = "seller_company_logo";
-			}else{
-				return false;
-			}
-		}
-		///////////////////////////////////
-		if($_FILES[$img_field_name]['name']!=""){
-			if($data_arr['current_logo']!=''){
-				unlink($image_destination_path."/".$data_arr['current_logo']);
-				unlink($image_destination_path."/thumbnails/".$data_arr['current_logo']);
-			}
-			/***
-			sng:23/sep/2010
-			cannot have space in logo file name else problem when downloading to powerpoint
-			
-			sng:16/aug/2011
-			we remove anything that is not alpha numeric or dot
-			***/
-			$noblank = clean_filename(basename($_FILES[$img_field_name]['name']));
-			$upload_img_name = time()."_".$noblank;
-			$upload_path = $image_destination_path."/".$upload_img_name;
-			$upload_src = $_FILES[$img_field_name]['tmp_name'];
-			/***********************************
-			sng:18/may/2012
-			***/
-			$ok = $g_img->is_valid_image_file($upload_img_name);
-			if(!$ok){
-				return false;
-			}
-			/****************************/
-			$success = move_uploaded_file($upload_src,$upload_path);
-			if(!$success){
-				return false;
-			}
-			//create thumbnail
-			/***
-			we create thumb of size 200 X 200
-			***/
-			$success = $img_obj->create_thumbnail($image_destination_path,$upload_img_name,200,200,$image_destination_path."/thumbnails",false);
-			if(!$success){
-				return false;
-			}
-		}
-		else{
-			$upload_img_name = $data_arr['backup_logo'];
-		}
-		//////////////////////////////////////////////////////////////
-		//update
-		$q = "update ".TP."transaction set ".$logo_field."='".$upload_img_name."' where id='".$deal_id."'";
-		$result = mysql_query($q);
-		if(!$result){
-			//echo mysql_error();
-			return false;
-		}
-		/////////////////
-		//data inserted
-		$validation_passed = true;
-		return true;
+		return false;
 	}
 	
 	/*****
@@ -887,12 +828,11 @@ class company{
 	
 	
 	public function add_company($data_arr,$img_field_name,$image_destination_path,&$validation_passed,&$err_arr){
-	       $img_obj = new image_util();
-		global $g_mc;
-		$company_name = $g_mc->view_to_db($data_arr['name']);
+	    $img_obj = new image_util();
+		
 		//validation
 		$validation_passed = true;
-		if($company_name == ""){
+		if($data_arr['name'] == ""){
 			$err_arr['name'] = "Please specify the name";
 			$validation_passed = false;
 		}
@@ -902,7 +842,7 @@ class company{
 			$validation_passed = false;
 		}
 		
-		if(($company_name != "")&&($data_arr['type'] != "")){
+		if(($data_arr['name'] != "")&&($data_arr['type'] != "")){
 			//check for duplicate company name
 			/***
 			sng:01/may/2010
@@ -912,7 +852,7 @@ class company{
 			
 			The problem is, we can do that test only when we have both the name and type
 			*********/
-			$q = "select count(*) as cnt from ".TP."company where name='".$company_name."' and type='".$data_arr['type']."'";
+			$q = "select count(*) as cnt from ".TP."company where name='".mysql_real_escape_string($data_arr['name'])."' and type='".$data_arr['type']."'";
 			$res = mysql_query($q);
 			if(!$res){
 				return false;
@@ -954,28 +894,12 @@ class company{
 				***/
 				$noblank = clean_filename(basename($_FILES[$img_field_name]['name']));
 				$upload_img_name = time()."_".$noblank;
-				$upload_path = $image_destination_path."/".$upload_img_name;
+				/******************
+				sng:1/oct/2012
+				We now directly create the logo thumb. The function checks whether the uploaded img is image file or not
+				****************/
 				$upload_src = $_FILES[$img_field_name]['tmp_name'];
-				/***********************************
-				sng:18/may/2012
-				***/
-				$ok = $g_img->is_valid_image_file($upload_img_name);
-				if(!$ok){
-					return false;
-				}
-				/****************************/
-				$success = move_uploaded_file($upload_src,$upload_path);
-				if(!$success){
-					return false;
-				}
-				////////////////////////////////
-				//create thumbnail
-				/***
-				sng:10/jun/2010
-				On 26/apr/2010 we changed edit to
-				we create thumb of size 200 X 200
-				***/
-				$success = $img_obj->create_thumbnail($image_destination_path,$upload_img_name,200,200,$image_destination_path."/thumbnails",false);
+				$success = $img_obj->create_resized($upload_src,$image_destination_path."/thumbnails",$upload_img_name,$this->thumb_fit_width,$this->thumb_fit_height,false);
 				if(!$success){
 					return false;
 				}
@@ -986,7 +910,7 @@ class company{
 		sng:18/feb/2012
 		Since admin is entering the data, we treat it as verified
 		************************/
-		$q = "insert into ".TP."company set name='".$company_name."',type='".$data_arr['type']."',industry='".$data_arr['industry']."',sector='".$data_arr['sector']."',hq_country='".$data_arr['hq_country']."',logo='".$upload_img_name."',brief_desc='".$g_mc->view_to_db($data_arr['brief_desc'])."',admin_verified='y'";
+		$q = "insert into ".TP."company set name='".mysql_real_escape_string($data_arr['name'])."',type='".mysql_real_escape_string($data_arr['type'])."',industry='".mysql_real_escape_string($data_arr['industry'])."',sector='".mysql_real_escape_string($data_arr['sector'])."',hq_country='".mysql_real_escape_string($data_arr['hq_country'])."',logo='".$upload_img_name."',brief_desc='".mysql_real_escape_string($data_arr['brief_desc'])."',admin_verified='y'";
 		$result = mysql_query($q);
 		if(!$result){
 			//echo mysql_error();
@@ -1006,13 +930,12 @@ class company{
 	algorithm to generate abbreviated name (by taking first letter of each word).
 	***/
 	public function add_bank_lawfirm($data_arr,$img_field_name,$image_destination_path,&$validation_passed,&$err_arr){
-	       $img_obj = new image_util();
-		global $g_mc;
-		$company_name = $g_mc->view_to_db($data_arr['name']);
-		$abbreviated_name = $g_mc->view_to_db($data_arr['short_name']);
+		
+	    $img_obj = new image_util();
+		
 		//validation
 		$validation_passed = true;
-		if($company_name == ""){
+		if($data_arr['name'] == ""){
 			$err_arr['name'] = "Please specify the name";
 			$validation_passed = false;
 		}
@@ -1022,7 +945,7 @@ class company{
 			$validation_passed = false;
 		}
 		
-		if(($company_name != "")&&($data_arr['type'] != "")){
+		if(($data_arr['name'] != "")&&($data_arr['type'] != "")){
 			//check for duplicate company name
 			/***
 			sng:01/may/2010
@@ -1032,7 +955,7 @@ class company{
 			
 			The problem is, we can do that test only when we have both the name and type
 			*********/
-			$q = "select count(*) as cnt from ".TP."company where name='".$company_name."' and type='".$data_arr['type']."'";
+			$q = "select count(*) as cnt from ".TP."company where name='".mysql_real_escape_string($data_arr['name'])."' and type='".$data_arr['type']."'";
 			$res = mysql_query($q);
 			if(!$res){
 				return false;
@@ -1063,27 +986,14 @@ class company{
 				***/
 				$noblank = clean_filename(basename($_FILES[$img_field_name]['name']));
 				$upload_img_name = time()."_".$noblank;
-				$upload_path = $image_destination_path."/".$upload_img_name;
+				/******************
+				sng:28/sep/2012
+				We now directly create the logo thumb. The function checks whether the uploaded img is image file or not
+				****************/
 				$upload_src = $_FILES[$img_field_name]['tmp_name'];
-				/***********************************
-				sng:18/may/2012
-				***/
-				$ok = $g_img->is_valid_image_file($upload_img_name);
-				if(!$ok){
-					return false;
-				}
-				/****************************/
-				$success = move_uploaded_file($upload_src,$upload_path);
-				if(!$success){
-					return false;
-				}
-				////////////////////////////////
-				//create thumbnail
-				/***
-				sng:9/jul/2010
-				The logo thumbnail is 200 by 200
-				****/
-				$success = $img_obj->create_thumbnail($image_destination_path,$upload_img_name,200,200,$image_destination_path."/thumbnails",false);
+				
+				
+				$success = $img_obj->create_resized($upload_src,$image_destination_path."/thumbnails",$upload_img_name,$this->thumb_fit_width,$this->thumb_fit_height,false);
 				if(!$success){
 					return false;
 				}
@@ -1094,7 +1004,7 @@ class company{
 		sng:18/feb/2012
 		Since admin is entering the data, we treat it as verified
 		************************/
-		$q = "insert into ".TP."company set name='".$company_name."',short_name='".$abbreviated_name."',type='".$data_arr['type']."',logo='".$upload_img_name."',admin_verified='y'";
+		$q = "insert into ".TP."company set name='".mysql_real_escape_string($data_arr['name'])."',short_name='".mysql_real_escape_string($data_arr['short_name'])."',type='".mysql_real_escape_string($data_arr['type'])."',logo='".$upload_img_name."',admin_verified='y'";
 		$result = mysql_query($q);
 		if(!$result){
 			//echo mysql_error();
@@ -1108,14 +1018,11 @@ class company{
 	
 	public function edit_company($company_id,$data_arr,$img_field_name,$image_destination_path,&$validation_passed,&$err_arr){
 	    $img_obj = new image_util();
-		global $g_mc;
-		
-		$company_name = $g_mc->view_to_db($data_arr['name']);
 		
 		//validation
 		$validation_passed = true;
 		
-		if($company_name == ""){
+		if($data_arr['name'] == ""){
 			$err_arr['name'] = "Please specify the name";
 			$validation_passed = false;
 		}
@@ -1124,7 +1031,7 @@ class company{
 			$err_arr['type'] = "Please specify the company type";
 			$validation_passed = false;
 		}
-		if(($company_name != "")&&($data_arr['type'] != "")){
+		if(($data_arr['name'] != "")&&($data_arr['type'] != "")){
 			//check for duplicate company name, considering other companies, and same type
 			/***
 			sng:01/may/2010
@@ -1134,7 +1041,7 @@ class company{
 			
 			The problem is, we can do that test only when we have both the name and type
 			*********/
-			$q = "select count(name) as cnt from ".TP."company where name='".$company_name."' and type='".$data_arr['type']."' and company_id!='".$company_id."'";
+			$q = "select count(name) as cnt from ".TP."company where name='".mysql_real_escape_string($data_arr['name'])."' and type='".$data_arr['type']."' and company_id!='".$company_id."'";
 			
 			$res = mysql_query($q);
 			if(!$res){
@@ -1187,27 +1094,13 @@ class company{
 				***/
 				$noblank = clean_filename(basename($_FILES[$img_field_name]['name']));
 				$upload_img_name = time()."_".$noblank;
-				$upload_path = $image_destination_path."/".$upload_img_name;
+				/******************
+				sng:28/sep/2012
+				We now directly create the logo thumb. The function checks whether the uploaded img is image file or not
+				****************/
 				$upload_src = $_FILES[$img_field_name]['tmp_name'];
-				/***********************************
-				sng:18/may/2012
-				***/
-				$ok = $g_img->is_valid_image_file($upload_img_name);
-				if(!$ok){
-					return false;
-				}
-				/****************************/
-				$success = move_uploaded_file($upload_src,$upload_path);
-				if(!$success){
-					return false;
-				}
-				////////////////////////////////
-				//create thumbnail
-				/***
-				sng:26/apr/2010
-				we create thumb of size 200 X 200
-				***/
-				$success = $img_obj->create_thumbnail($image_destination_path,$upload_img_name,200,200,$image_destination_path."/thumbnails",false);
+				$success = $img_obj->create_resized($upload_src,$image_destination_path."/thumbnails",$upload_img_name,$this->thumb_fit_width,$this->thumb_fit_height,false);
+				
 				if(!$success){
 					return false;
 				}
@@ -1225,7 +1118,7 @@ class company{
 		sng:6/feb/2011
 		support for private_note
 		**/
-		$q = "update ".TP."company set name= '".$company_name."',type='".$data_arr['type']."',industry='".$data_arr['industry']."',sector='".$data_arr['sector']."',hq_country='".$data_arr['hq_country']."',logo='".$upload_img_name."',brief_desc='".$g_mc->view_to_db($data_arr['brief_desc'])."',private_note='".$g_mc->view_to_db($data_arr['private_note'])."' where company_id='".$company_id."'";
+		$q = "update ".TP."company set name= '".mysql_real_escape_string($data_arr['name'])."',type='".mysql_real_escape_string($data_arr['type'])."',industry='".mysql_real_escape_string($data_arr['industry'])."',sector='".mysql_real_escape_string($data_arr['sector'])."',hq_country='".mysql_real_escape_string($data_arr['hq_country'])."',logo='".$upload_img_name."',brief_desc='".mysql_real_escape_string($data_arr['brief_desc'])."',private_note='".mysql_real_escape_string($data_arr['private_note'])."' where company_id='".$company_id."'";
 		$result = mysql_query($q);
 		if(!$result){
 			//echo mysql_error();
@@ -1243,15 +1136,11 @@ class company{
 	********/
 	public function edit_bank_lawfirm($company_id,$data_arr,$img_field_name,$image_destination_path,&$validation_passed,&$err_arr){
 	    $img_obj = new image_util();
-		global $g_mc;
-		
-		$company_name = $g_mc->view_to_db($data_arr['name']);
-		$abbreviated_name = $g_mc->view_to_db($data_arr['short_name']);
 		
 		//validation
 		$validation_passed = true;
 		
-		if($company_name == ""){
+		if($data_arr['name'] == ""){
 			$err_arr['name'] = "Please specify the name";
 			$validation_passed = false;
 		}
@@ -1260,7 +1149,7 @@ class company{
 			$err_arr['type'] = "Please specify the company type";
 			$validation_passed = false;
 		}
-		if(($company_name != "")&&($data_arr['type'] != "")){
+		if(($data_arr['name'] != "")&&($data_arr['type'] != "")){
 			//check for duplicate company name, considering other companies, and same type
 			/***
 			sng:01/may/2010
@@ -1270,7 +1159,7 @@ class company{
 			
 			The problem is, we can do that test only when we have both the name and type
 			*********/
-			$q = "select count(name) as cnt from ".TP."company where name='".$company_name."' and type='".$data_arr['type']."' and company_id!='".$company_id."'";
+			$q = "select count(name) as cnt from ".TP."company where name='".mysql_real_escape_string($data_arr['name'])."' and type='".$data_arr['type']."' and company_id!='".$company_id."'";
 			
 			$res = mysql_query($q);
 			if(!$res){
@@ -1299,8 +1188,11 @@ class company{
 				/***********
 				sng:20/sep/2011
 				adding a guard condition
+				
+				sng:1/oct/2012
+				now we create the thumbnail directly. We no longer store the uploaded image
 				******************/
-				if(file_exists($image_destination_path."/".$data_arr['backup_logo'])) unlink($image_destination_path."/".$data_arr['backup_logo']);
+				
 				if(file_exists($image_destination_path."/thumbnails/".$data_arr['backup_logo'])) unlink($image_destination_path."/thumbnails/".$data_arr['backup_logo']);
 				}
 				/***
@@ -1312,27 +1204,13 @@ class company{
 				***/
 				$noblank = clean_filename(basename($_FILES[$img_field_name]['name']));
 				$upload_img_name = time()."_".$noblank;
-				$upload_path = $image_destination_path."/".$upload_img_name;
+				/******************
+				sng:1/oct/2012
+				We now directly create the logo thumb. The function checks whether the uploaded img is image file or not
+				****************/
 				$upload_src = $_FILES[$img_field_name]['tmp_name'];
-				/***********************************
-				sng:18/may/2012
-				***/
-				$ok = $g_img->is_valid_image_file($upload_img_name);
-				if(!$ok){
-					return false;
-				}
-				/****************************/
-				$success = move_uploaded_file($upload_src,$upload_path);
-				if(!$success){
-					return false;
-				}
-				////////////////////////////////
-				//create thumbnail
-				/***
-				sng:26/apr/2010
-				we create thumb of size 200 X 200
-				***/
-				$success = $img_obj->create_thumbnail($image_destination_path,$upload_img_name,200,200,$image_destination_path."/thumbnails",false);
+				$success = $img_obj->create_resized($upload_src,$image_destination_path."/thumbnails",$upload_img_name,$this->thumb_fit_width,$this->thumb_fit_height,false);
+				
 				if(!$success){
 					return false;
 				}
@@ -1353,7 +1231,7 @@ class company{
 		sng:6/feb/2011
 		support for private note
 		**/
-		$q = "update ".TP."company set name= '".$company_name."',short_name='".$abbreviated_name."',type='".$data_arr['type']."',logo='".$upload_img_name."', is_top_firm='".$data_arr['is_top_firm']."',private_note='".$g_mc->view_to_db($data_arr['private_note'])."' where company_id='".$company_id."'";
+		$q = "update ".TP."company set name= '".mysql_real_escape_string($data_arr['name'])."',short_name='".mysql_real_escape_string($data_arr['short_name'])."',type='".$data_arr['type']."',logo='".$upload_img_name."', is_top_firm='".$data_arr['is_top_firm']."',private_note='".mysql_real_escape_string($data_arr['private_note'])."' where company_id='".$company_id."'";
 		$result = mysql_query($q);
 		if(!$result){
 			//echo mysql_error();
