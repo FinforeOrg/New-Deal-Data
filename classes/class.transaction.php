@@ -2979,8 +2979,11 @@ WHERE rgnm.name = '".mysql_real_escape_string($search_data['region'])."'";
 		/***********************
 		sng:2/may/2012
 		We now store the source urls in multiple rows. We need the technique used for banks or law firms
+		
+		sng:1/oct/2012
+		Just a litle tweak. Since we no longer use the company_id for the transaction record, no need to do a join on that and no need to fetch logo using that
 		***********************/
-		$q = "select t.id as deal_id,t.*,c.logo,e.*,n.note,takeover_name,'participants' as `participants`,'banks' as `banks`,'law_firms' as `law_firms`,'sources' as `sources`,'docs' as `docs`,vrm.short_caption as fuzzy_value_short_caption,vrm.display_text as fuzzy_value,m.work_email,m.member_type from ".TP."transaction as t left join ".TP."company as c on(t.company_id=c.company_id) left join ".TP."transaction_extra_detail as e on(t.id=e.transaction_id) left join ".TP."transaction_note as n on(t.id=n.transaction_id) left join ".TP."takeover_type_master as k on(e.takeover_id=k.takeover_id) LEFT JOIN ".TP."transaction_value_range_master as vrm ON (t.value_range_id=vrm.value_range_id) left join ".TP."member as m on(t.added_by_mem_id=m.mem_id) where t.id='".$deal_id."'";
+		$q = "select t.id as deal_id,t.*,e.*,n.note,takeover_name,'participants' as `participants`,'banks' as `banks`,'law_firms' as `law_firms`,'sources' as `sources`,'docs' as `docs`,vrm.short_caption as fuzzy_value_short_caption,vrm.display_text as fuzzy_value,m.work_email,m.member_type from ".TP."transaction as t left join ".TP."transaction_extra_detail as e on(t.id=e.transaction_id) left join ".TP."transaction_note as n on(t.id=n.transaction_id) left join ".TP."takeover_type_master as k on(e.takeover_id=k.takeover_id) LEFT JOIN ".TP."transaction_value_range_master as vrm ON (t.value_range_id=vrm.value_range_id) left join ".TP."member as m on(t.added_by_mem_id=m.mem_id) where t.id='".$deal_id."'";
          
         $result = $db->select_query($q);
         
