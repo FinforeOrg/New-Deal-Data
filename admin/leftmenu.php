@@ -111,8 +111,10 @@
 		We just show a minimum entry common to all type of deals and then show the edit form, where we
 		are keeping all the complexities.
 		d.add(72,70,'Add','deal_add.php');
-		*****************/
+		sng:1/oct/2012
+		For now, we do not allow admin to add deal. In future, even if we allow, it will be the detailed template of front end
 		d.add(child_level,block_level,'Add','simple_deal_add.php');child_level++;
+		*****************/
         d.add(child_level,block_level,'Search','deal_search.php');child_level++;
 		d.add(child_level,block_level,'Inactive','inactive_deal_list.php');child_level++;
 		d.add(child_level,block_level,'Unverified by admin','unverified_by_admin_deal_list.php');child_level++;

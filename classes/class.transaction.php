@@ -701,9 +701,12 @@ WHERE rgnm.name = '".mysql_real_escape_string($search_params_arr['region'])."'";
 	
 	sng:18/feb/2012
 	ONLY TO BE USED IN ADMIN SECTION
+	
+	sng:1/oct/2012
+	For now, we do not allow admin to add deal. In future, even if we allow, it will be the detailed template of front end
 	*****************/
 	public function add_deal_simple($data_arr,&$validation_passed,&$new_transaction_id,&$err_arr){
-        
+        die("DO NOT USE");
         global $g_mc;
         
         /***

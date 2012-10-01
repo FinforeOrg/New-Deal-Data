@@ -1,4 +1,9 @@
 <?php
+/************
+sng:1/oct/2012
+For now, we do not allow admin to add deal. In future, even if we allow, it will be the detailed template of front end
+*****/
+die("DO NOT USE");
 include("../include/global.php");
 require_once ("admin/checklogin.php");
 require_once("classes/class.company.php");
