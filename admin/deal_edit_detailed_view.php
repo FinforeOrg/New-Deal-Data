@@ -21,6 +21,9 @@ the top header part
 the tabbed panes
 ****************/
 ?>
+<table width="100%">
+<tr>
+<td>
 <div id="edit_deal_detailed" class="TabbedPanels">
 	<ul class="TabbedPanelsTabGroup">
 		<li class="TabbedPanelsTab" tabindex="0">Tab 1</li>
@@ -31,10 +34,39 @@ the tabbed panes
 		Tab 1 hello
 		</div>
 		<div class="TabbedPanelsContent">
-		Tab 2 hello
+		<?php require("admin/deal_edit_snippets/deal_sources.php");?>
 		</div>
 	</div>
 </div>
+</td>
+</tr>
+</table>
 <script>
 var tabbed_deal_page = new Spry.Widget.TabbedPanels("edit_deal_detailed");
+//get the original definition
+var pp = tabbed_deal_page.showPanel;
+//now write our own definition which is invoked
+tabbed_deal_page.showPanel = function(elementOrIndex){
+	if (typeof elementOrIndex == "number")
+		tpIndex = elementOrIndex;
+	else // Must be the element for the tab or content panel.
+		tpIndex = this.getTabIndex(elementOrIndex);
+
+	//call the original function, that is apply the function on our
+	//tabbed panel object with the data
+	pp.apply(tabbed_deal_page,[elementOrIndex]);
+	//now that the tab is loaded, check which tab is loaded and trigger
+	
+	switch(tpIndex){
+		case 0:
+			//tab 1
+			break;
+		case 1:
+			//sources
+			fetch_deal_sources_for_admin();
+			break;
+		default:
+			//do nothing
+	}
+}
 </script>

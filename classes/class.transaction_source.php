@@ -90,6 +90,12 @@ class transaction_source{
 	/*****************************
 	sng:2/may/2012
 	In case a new source url is specified during edit. We add the url to the list of deal sources
+	
+	Note: This is called by transaction_suggestion::front_submit_sources()
+	The workflow is - we first save the 'source url' as suggestion and then add to the sources for the deal. That is why
+	we do not store this again as 'suggestion'.
+	
+	This means - DO NOT CALL THIS DIRECTLY. GO VIA SUGGESTION FIRST
 	*********************/
 	public function front_add_source_for_deal($deal_id,$source_url,&$validation_passed,&$err_arr){
 		$db = new db();
@@ -129,6 +135,23 @@ class transaction_source{
 			return false;
 		}
 		return true;
+	}
+	
+	/**************
+	sng:3/oct/2012
+	Normally we first store the suggestion and then add to the source.
+	The case of deletion by admin is different. There we first delete and then store some 'suggestion' that we deleted stuff (using the status_note)
+	(if we implement that feature)
+	************/
+	public function admin_delete_deal_source($source_id){
+		$db = new db();
+		$q = "delete from ".TP."transaction_sources where id='".$source_id."'";
+		$ok = $db->mod_query($q);
+		if(!$ok){
+			return false;
+		}else{
+			return true;
+		}
 	}
 }
 ?>
