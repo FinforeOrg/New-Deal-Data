@@ -36,7 +36,7 @@ for($i=0;$i<$group_data_count;$i++){
 	}
 	?>
 	</div>
-	<div style="text-align:right;margin-top:10px;"><?php echo $group_data_arr[$i]['suggested_by'];?> on <?php echo $group_data_arr[$i]['date_suggested'];?></div>
+	<div style="text-align:right;margin-top:10px;"><?php echo $group_data_arr[$i]['suggested_by'];?> on <?php echo $group_data_arr[$i]['suggested_on'];?></div>
 	<div class="hr_div"></div>
 	<?php
 }

@@ -132,6 +132,7 @@ function submit_frm_edit_source(){
 		$('result_frm_edit_source').html('sending...');
 		$.post('ajax/suggest_deal_correction/source.php',$('#frm_edit_source').serialize(),function(result){
 			$('#result_frm_edit_source').html(result);
+			fetch_suggested_sources();
 		});
 	}
 }
