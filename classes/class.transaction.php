@@ -3097,6 +3097,55 @@ WHERE rgnm.name = '".mysql_real_escape_string($search_data['region'])."'";
 		}
 		return true;
 	}
+	/******************
+	sng:1/oct/2012
+	For admin to show the heading during the deal edit
+	**************/
+	public function admin_get_min_deal_detail_for_edit_heading($deal_id,&$deal_data_arr,&$deal_found){
+		
+		$db = new db();
+        
+        if($deal_id==""){
+            $deal_found = false;
+            return true;
+        }
+        /***********
+		sng:3/oct/2012
+		minor correction: without value_range_id, the convert_deal_value_for_display_round() cannot show fuzzy value even if the deal has only fuzzy value
+		***********/
+		$q = "select t.id as deal_id,deal_cat_name,deal_subcat1_name,deal_subcat2_name,value_in_billion,t.value_range_id,date_of_deal,'participants' as `participants`,vrm.short_caption as fuzzy_value_short_caption,vrm.display_text as fuzzy_value from ".TP."transaction as t LEFT JOIN ".TP."transaction_value_range_master as vrm ON (t.value_range_id=vrm.value_range_id)  where t.id='".$deal_id."'";
+         
+        $result = $db->select_query($q);
+        
+        if(!$result){
+			//echo $db->error();
+            return false;
+        }
+		
+		if(!$db->has_row()){
+            $deal_found = false;
+            return true;
+        }
+        //////////////////////////////////
+        $deal_data_arr = $db->get_row();
+        $deal_found = true;
+        
+		/**************
+		sng:1/feb/2012
+		participating companies data
+		Use the transaction_company method
+		****************/
+		$deal_data_arr['participants'] = NULL;
+		require_once("classes/class.transaction_company.php");
+		$g_trans_comp = new transaction_company();
+		
+		$ok = $g_trans_comp->get_deal_participants_detailed($deal_data_arr['deal_id'],$deal_data_arr['participants']);
+		
+		if(!$ok){
+            return false;
+        }
+		return true;
+	}
     /*******************
 	sng:18/sep/2012
 	No longer needed. In the new look, we get all the members associated with a deal

@@ -250,3 +250,20 @@ div.chart {
 .jqplot-yaxis {
     display:none;
 }
+/******************************
+sng:1/oct/2012
+For showing minimal data deal header
+****/
+.deal_page_h1{
+	width:75%;
+	text-align:left;
+	padding:10px 0 10px 0;
+	font: bold 20px/26px Arial, Helvetica, sans-serif;
+}
+.deal_page_h2{
+	width:75%;
+	text-align:left;
+	padding:10px 0 10px 0;
+	font: bold 16px/16px Arial, Helvetica, sans-serif;
+}
+/********************************************/
