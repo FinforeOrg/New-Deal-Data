@@ -404,8 +404,13 @@ label of the textbox.
 sng:30/apr/2012
 We now need to store the original submission of note in suggestion. For that we
 need the mem who suggested the deal and the date added on
+
+sng:5/oct/2012
+This has now moved to another class
 *************************/
-$trans->update_note($new_transaction_id,$suggestion_mem_id,$date_time_now,$_POST['additional_deal_details_note']);
+require_once("classes/class.transaction_note.php");
+$trans_note = new transaction_note();
+$trans_note->set_note($new_transaction_id,$suggestion_mem_id,$date_time_now,$_POST['additional_deal_details_note']);
 
 /****************
 companies

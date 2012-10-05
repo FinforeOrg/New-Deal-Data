@@ -51,10 +51,13 @@ class transaction_suggestion{
 		sng:27/apr/2012
 		we also update the deal note. We no longer need admin intervention.
 		Let us see how this works out
+		
+		sng:5/oct/2012
+		We have moved this funciton to new class
 		***********************/
-		require_once("classes/class.transaction.php");
-		$trans = new transaction();
-		$ok = $trans->front_append_to_note($deal_id,$note);
+		require_once("classes/class.transaction_note.php");
+		$trans_note = new transaction_note();
+		$ok = $trans_note->front_append_to_note($deal_id,$note);
 		
 		$status_note = "suggested";
 		if($ok){
@@ -993,6 +996,9 @@ class transaction_suggestion{
 	Since this is not addition of note via correction, is_correction is n
 	and we do not put any status note
 	
+	This is called when we change the note transaction::update_note.
+	Those function first set the note and then call this function to notify.
+	Do not call this directly.
 	************************/
 	public function note_added_via_deal_submission($deal_id,$member_id,$deal_added_on,$note){
 		$db = new db();

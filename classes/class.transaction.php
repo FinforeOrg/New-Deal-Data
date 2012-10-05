@@ -521,178 +521,8 @@ WHERE rgnm.name = '".mysql_real_escape_string($search_params_arr['region'])."'";
 	We have changed the workflow. We now allow admin to enter a min detail and then go to edit
     ***/
     public function add_deal($data_arr,&$validation_passed,&$new_transaction_id,&$err_arr){
-		die("do not use");
-        @session_start();
-        global $g_mc;
-        //$company_name = $g_mc->view_to_db($data_arr['name']);
-        //validation
-        /***
-        sng:8/may/2010
-        We now allow admin to type the deal company name. That opens a hint list and admin select a name
-        This set the hidden company_id
-        Now, if no name is typed, no company id is set so we first check for name.
-        If the name is there, we check if the id is there or not since the company may not
-        be in the database
-        ****/
-        $validation_passed = true;
-        if($data_arr['deal_company_name'] == ""){
-            $err_arr['company_id'] = "Please specify the company name";
-            $validation_passed = false;
-        }else{
-            if($data_arr['company_id'] == ""){
-                $err_arr['company_id'] = "The company was not found. Create it first.";
-                $validation_passed = false;
-            }
-        }
+		die("NO LONGER USED");
         
-        if($data_arr['value_in_billion'] == ""){
-            $err_arr['value_in_billion'] = "Please specify the deal value";
-            $validation_passed = false;
-        }
-        
-        if($data_arr['date_of_deal'] == ""){
-            $err_arr['date_of_deal'] = "Please specify the date of deal";
-            $validation_passed = false;
-        }
-        if($data_arr['deal_cat_name'] == ""){
-            $err_arr['deal_cat_name'] = "Please specify the deal category";
-            $validation_passed = false;
-        }
-        if($data_arr['deal_subcat1_name'] == ""){
-            $err_arr['deal_subcat1_name'] = "Please specify the deal subcategory1";
-            $validation_passed = false;
-        }
-        if($data_arr['deal_subcat2_name'] == ""){
-            $err_arr['deal_subcat2_name'] = "Please specify the deal subcategory2";
-            $validation_passed = false;
-        }
-        /****
-        sng:1/apr/2010
-        we check target country, industry, company only in case of mergers and acquisitions deal
-        **/
-        if(($data_arr['deal_cat_name']=="M and A")||($data_arr['deal_cat_name']=="M&A")){
-            if($data_arr['target_company_id']==""){
-                //check if the name is specified or not
-                if($data_arr['target_company_name']==""){
-                    $err_arr['target_company_name'] = "Please specify the target company";
-                    $validation_passed = false;
-                }
-            }
-            //else target company selected
-            if($data_arr['target_country'] == ""){
-                $err_arr['target_country'] = "Please specify the target country";
-                $validation_passed = false;
-            }
-            if($data_arr['target_sector'] == ""){
-                $err_arr['target_sector'] = "Please specify the target sector";
-                $validation_passed = false;
-            }
-        }
-        /***
-        sng:18/may/2010
-        Coupon may be there, may not be there, so no need to check
-        *********/
-        /****
-        if($data_arr['coupon'] == ""){
-            $err_arr['coupon'] = "Please specify the coupon";
-            $validation_passed = false;
-        }
-        *********/
-        /////////////////////////////////////
-        if(!$validation_passed){
-            //no need to proceed
-            return true;
-        }
-        ///////////////////////////////////////////////////////
-        /****
-        sng: 30/mar/2010
-        We no longer use domain, we use sector and industry, so we do not use domain any more here
-        ***********/
-        /* check for defaul logos */
-        
-        /* first make sure logos are added in consecutive order */
-        $defFound = false;
-        $newLogos = array();
-        if (is_array($_SESSION['logos'])) {
-           foreach ($_SESSION['logos'] as $key=>$logo) {
-               $newLogos[] = array('fileName'=>$logo['fileName'], 'default'=>$logo['default']);
-               if ($logo['default'] == 1) {
-                   $defFound = true;
-               }
-           } 
-            if (!$defFound) {
-               foreach ($newLogos as $key=>$logo) {
-                   $newLogos[$key]['default'] =1; 
-                   break;
-               }  
-            }
-        }
-
-        
-        //insert data
-        $q = "insert into ".TP."transaction set 
-              company_id='".$data_arr['company_id']."', 
-              value_in_billion='".$data_arr['value_in_billion']."',
-              deal_country='".$data_arr['deal_country']."',
-              deal_sector='".$data_arr['deal_sector']."',
-              deal_industry='".$data_arr['deal_industry']."',
-              currency='".$data_arr['currency']."',
-              exchange_rate='".$data_arr['exchange_rate']."',
-              value_in_billion_local_currency='".$data_arr['value_in_billion_local_currency']."',
-              date_of_deal='".$data_arr['date_of_deal']."',
-              deal_cat_name='".$data_arr['deal_cat_name']."',
-              deal_subcat1_name='".$data_arr['deal_subcat1_name']."',
-              deal_subcat2_name='".$data_arr['deal_subcat2_name']."',
-              coupon='".$data_arr['coupon']."',
-              base_fee='".$data_arr['base_fee']."',
-              incentive_fee='".$data_arr['incentive_fee']."',
-              current_rating='".$data_arr['current_rating']."',
-              ev_ebitda_ltm='".$data_arr['ev_ebitda_ltm']."',
-              ev_ebitda_1yr='".$data_arr['ev_ebitda_1yr']."',
-              30_days_premia='".$data_arr['30_days_premia']."',
-              1_day_price_change='".$data_arr['1_day_price_change']."',
-              discount_to_last='".$data_arr['discount_to_last']."',
-              discount_to_terp='".$data_arr['discount_to_terp']."',
-              maturity_date='".$data_arr['maturity_date']."',
-              target_company_id='".$data_arr['target_company_id']."',
-              target_company_name='".$g_mc->view_to_db($data_arr['target_company_name'])."',
-              target_country='".$data_arr['target_country']."',
-              target_sector='".$data_arr['target_sector']."',
-              seller_company_name='".$g_mc->view_to_db($data_arr['seller_company_name'])."',
-              seller_country='".$data_arr['seller_country']."',
-              seller_sector='".$data_arr['seller_sector']."',
-              logos='".serialize($newLogos)."'
-              ";
-        $result = mysql_query($q);
-        if(!$result){
-            //echo $q;
-            //echo mysql_error();
-            return false;
-        }
-        /////////////////
-        //data inserted
-        /********************************************
-        sng:21/may/2010
-        try to update the note
-        **********************************/
-        $deal_id = mysql_insert_id();
-        $new_transaction_id = $deal_id;
-        $this->update_note($deal_id,$data_arr['note']);
-        //never mind if there is error, this is not that important
-		/*******************************
-		sng:4/feb/2011
-		try to update the private note
-		********/
-		$this->update_private_note($deal_id,$data_arr['deal_private_note']);
-		//never mind if error
-        /*******************
-        sng:8/jul/2010
-        try to update the sources
-        ****************/
-        $this->update_sources($deal_id,$data_arr['sources']);
-        //never mind if there is error, this is not that important
-        $validation_passed = true;
-        return true;
     }
 	
 	/****************
@@ -1132,8 +962,12 @@ WHERE rgnm.name = '".mysql_real_escape_string($search_params_arr['region'])."'";
 		//we ignore any errors here
 		/*****************************
 		additional details is stored as a note in transaction_note
+		sng:5/oct/2012
+		This has now moved to another class
 		********************************/
-		$this->update_note($new_transaction_id,$mem_id,$date_time_now,$data['additional_details']);
+		require_once("classes/class.transaction_note.php");
+		$trans_note = new transaction_note();
+		$trans_note->set_note($new_transaction_id,$mem_id,$date_time_now,$data['additional_details']);
 		/**********************
 		regulatory links are converted to csv and stored in transaction_sources
 		even if no regulatory link is specified, the regulatory_links array is posted with blank elements
@@ -1438,170 +1272,12 @@ WHERE rgnm.name = '".mysql_real_escape_string($search_params_arr['region'])."'";
 	
 	sng: 17/jun/2011
 	Do not use this. Now the steps are replicated in admin/edit_deal_data.php
+	
+	sng:5/oct/2012
+	We now have new look for admin deal edit. It is more like front end
     ******/
     public function edit_deal($deal_id,$data_arr,&$validation_passed,&$err_arr){
-		$validation_passed = false;
-		return;
-		
-        global $g_mc;
-        
-        $validation_passed = true;
-        
-        if($data_arr['deal_company_name'] == ""){
-            $err_arr['company_id'] = "Please specify the company name";
-            $validation_passed = false;
-        }else{
-            if($data_arr['company_id'] == ""){
-                $err_arr['company_id'] = "The company was not found. Create it first.";
-                $validation_passed = false;
-            }
-        }
-        
-        if($data_arr['value_in_billion'] == ""){
-            $err_arr['value_in_billion'] = "Please specify the deal value";
-            $validation_passed = false;
-        }
-        
-        if($data_arr['date_of_deal'] == ""){
-            $err_arr['date_of_deal'] = "Please specify the date of deal";
-            $validation_passed = false;
-        }
-        if($data_arr['deal_cat_name'] == ""){
-            $err_arr['deal_cat_name'] = "Please specify the deal category";
-            $validation_passed = false;
-        }
-        if($data_arr['deal_subcat1_name'] == ""){
-            $err_arr['deal_subcat1_name'] = "Please specify the deal subcategory1";
-            $validation_passed = false;
-        }
-        if($data_arr['deal_subcat2_name'] == ""){
-            $err_arr['deal_subcat2_name'] = "Please specify the deal subcategory2";
-            $validation_passed = false;
-        }
-        /****
-        sng:1/apr/2010
-        we check target country, industry, company only in case of mergers and acquisitions deal
-        **/
-        if(($data_arr['deal_cat_name']=="M and A")||($data_arr['deal_cat_name']=="M&A")){
-            if($data_arr['target_company_id']==""){
-                //check if the name is specified or not
-                if($data_arr['target_company_name']==""){
-                    $err_arr['target_company_name'] = "Please select the target company or specify it's name";
-                    $validation_passed = false;
-                }
-            }
-            if($data_arr['target_country'] == ""){
-                $err_arr['target_country'] = "Please specify the target country";
-                $validation_passed = false;
-            }
-            if($data_arr['target_sector'] == ""){
-                $err_arr['target_sector'] = "Please specify the target sector";
-                $validation_passed = false;
-            }
-        }
-        /***
-        sng:18/may/2010
-        coupon may be there or may not be there, so no need to validate
-        *******/
-        /******
-        if($data_arr['coupon'] == ""){
-            $err_arr['coupon'] = "Please specify the coupon";
-            $validation_passed = false;
-        }
-        **********/
-        /////////////////////////////////////
-        if(!$validation_passed){
-            //no need to proceed
-            return true;
-        }
-        $newLogos = array();
-        if (is_array($_SESSION['logos'])) {
-            $defaultSet = false;
-           foreach ($_SESSION['logos'] as $key=>$logo) {
-               if ($logo['default']) {
-                  $defaultSet = true; 
-               }
-           }
-           if (!$defaultSet) {
-               foreach ($_SESSION['logos'] as $key=>$logo) {
-                  $_SESSION['logos'][$key]['default'] = true;
-                  break; 
-               }
-           } 
-                       
-           foreach ($_SESSION['logos'] as $key=>$logo) {
-               $newLogos[] = array('fileName'=>$logo['fileName'], 'default'=>$logo['default']);
-           }     
-        }
-        ///////////////////////////////////////////////////////
-        //update data
-        $q = "update ".TP."transaction set
-                company_id='".$data_arr['company_id']."',
-              value_in_billion='".$data_arr['value_in_billion']."',
-              deal_country='".$data_arr['deal_country']."',
-              deal_sector='".$data_arr['deal_sector']."',
-              deal_industry='".$data_arr['deal_industry']."',
-              currency='".$data_arr['currency']."',
-              exchange_rate='".$data_arr['exchange_rate']."',
-              value_in_billion_local_currency='".$data_arr['value_in_billion_local_currency']."',
-              date_of_deal='".$data_arr['date_of_deal']."',
-              base_fee='".$data_arr['base_fee']."',
-              incentive_fee='".$data_arr['incentive_fee']."',
-              deal_cat_name='".$data_arr['deal_cat_name']."',
-              deal_subcat1_name='".$data_arr['deal_subcat1_name']."',
-              deal_subcat2_name='".$data_arr['deal_subcat2_name']."',
-              coupon='".$data_arr['coupon']."',
-              maturity_date='".$data_arr['maturity_date']."',
-              current_rating='".$data_arr['current_rating']."',
-              1_day_price_change='".$data_arr['1_day_price_change']."',
-              discount_to_last='".$data_arr['discount_to_last']."',
-              discount_to_terp='".$data_arr['discount_to_terp']."',
-              target_company_id='".$data_arr['target_company_id']."',
-              target_company_name='".$g_mc->view_to_db($data_arr['target_company_name'])."',
-              target_country='".$data_arr['target_country']."',
-              target_sector='".$data_arr['target_sector']."',
-			  target_industry='".$data_arr['target_industry']."',
-              seller_company_name='".$g_mc->view_to_db($data_arr['seller_company_name'])."',
-              seller_country='".$data_arr['seller_country']."',
-              seller_sector='".$data_arr['seller_sector']."',
-			  seller_industry='".$data_arr['seller_industry']."',
-              ev_ebitda_ltm='".$data_arr['ev_ebitda_ltm']."',
-              ev_ebitda_1yr='".$data_arr['ev_ebitda_1yr']."',
-              30_days_premia='".$data_arr['30_days_premia']."',
-              logos='".serialize($newLogos)."'
-              where id='".$deal_id."'";
-              
-        $result = mysql_query($q);
-        if(!$result){
-            //echo mysql_error();
-            return false;
-        }
-        /////////////////
-        //data inserted
-        /********************************************
-        sng:21/may/2010
-        try to update the note
-        **********************************/
-        $this->update_note($deal_id,$data_arr['note']);
-        //never mind if there is error, this is not that important
-        /*******************
-        sng:8/jul/2010
-        try to update the sources
-        ****************/
-        $this->update_sources($deal_id,$data_arr['sources']);
-        //never mind if there is error, this is not that important
-        /**************************************************
-        sng:15/5/2010
-        If the deal value is changed, update the adjusted values
-        **********/
-        if($data_arr['value_in_billion']!=$data_arr['current_value_in_billion']){
-            $success = $this->update_adjusted_values_for_deal($deal_id);
-            if(!$success){
-                return false;
-            }
-        }
-        $validation_passed = true;
-        return true;
+		die("NO LONGER USED");
     }
     public function update_adjusted_values_for_deal($deal_id){
         //update adjusted values for all the partners of type bank
@@ -4072,103 +3748,21 @@ LIMIT ".$start_offset." , ".$num_to_fetch;
 	function delete_note_suggested_on_deal($note_id)
 	***********************/
     
-    /****
-    sng:21/may2010
-    The note is in different table with same transaction id
-    if the id is found, update, else insert
-	
-	sng:17/jun/2011
-	Made this public. We will access this from other points also. We also use mysql_real_escape_string instead of magic quote
-	
-	sng:30/apr/2012
-	we need to notify suggestion that we are adding a deal and this is the original submission for note.
-	We need two extra arguments - mem id who added the deal and the date of addition
-    **********/
-    public function update_note($deal_id,$member_id,$deal_added_on,$note){
-        
-        $q = "select count(*) as cnt from ".TP."transaction_note where transaction_id='".$deal_id."'";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $row = mysql_fetch_assoc($res);
-        if(0==$row['cnt']){
-            //not found, insert
-            $note_q = "insert into ".TP."transaction_note set transaction_id='".$deal_id."', note='".mysql_real_escape_string($note)."'";
-        }else{
-            $note_q = "update ".TP."transaction_note set note='".mysql_real_escape_string($note)."' where transaction_id='".$deal_id."'";
-        }
-        $result = mysql_query($note_q);
-        if(!$result){
-            return false;
-        }
-		
-		require_once("classes/class.transaction_suggestion.php");
-		$trans_suggest = new transaction_suggestion();
-		$ok = $trans_suggest->note_added_via_deal_submission($deal_id,$member_id,$deal_added_on,$note);
-		/*********
-		never mind if error
-		**********/
-        return true;
-    }
-	/**************************
-	sng:27/apr/2012
-	We need a way to allow members to add to the note.
-	************************/
-	public function front_append_to_note($deal_id,$note){
-        $db = new db();
-		
-        $q = "select note from ".TP."transaction_note where transaction_id='".$deal_id."'";
-        $ok = $db->select_query($q);
-		if(!$ok){
-			return false;
-		}
-		if(!$db->has_row()){
-			//not found, insert
-			$note_q = "insert into ".TP."transaction_note set transaction_id='".$deal_id."', note='".mysql_real_escape_string($note)."'";
-		}else{
-			//there is existing note, we get the note and append the suggestion to it and store
-			$row = $db->get_row();
-			$curr_note = $row['note'];
-			$new_note = $curr_note."\r\n".$note;
-			$note_q = "update ".TP."transaction_note set note='".mysql_real_escape_string($new_note)."' where transaction_id='".$deal_id."'";
-		}
-		
-		
-        $ok = $db->mod_query($note_q);
-        if(!$ok){
-            return false;
-        }
-        return true;
-    }
-	/****
-    sng:4/feb/2011
-    The private note is in different table with same transaction id
-    if the id is found, update, else insert
-	
-	sng:17/jun/2011
-	Made this public, will access from other points
-    **********/
-    public function update_private_note($deal_id,$note){
-        global $g_mc;
-        $q = "select count(*) as cnt from ".TP."transaction_private_note where transaction_id='".$deal_id."'";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $row = mysql_fetch_assoc($res);
-        if(0==$row['cnt']){
-            //not found, insert
-            $note_q = "insert into ".TP."transaction_private_note set transaction_id='".$deal_id."', note='".$g_mc->view_to_db($note)."'";
-        }else{
-            $note_q = "update ".TP."transaction_private_note set note='".$g_mc->view_to_db($note)."' where transaction_id='".$deal_id."'";
-        }
-        $result = mysql_query($note_q);
-        if(!$result){
-            return false;
-        }
-        return true;
-    }
+    /***************************
+	sng:5/oct/2012
+	We have moved this to class transaction_note. There its name is set_note
+	public function update_note($deal_id,$member_id,$deal_added_on,$note)
+	****************************/
+	/***************
+	sng:5/oct/2012
+	We have moved this to class transaction_note
+	public function front_append_to_note($deal_id,$note)
+	************/
+	/******************
+	sng:5/oct/2012
+	We have moved this to class transaction_note. There the method is set_private_note
+	public function update_private_note($deal_id,$note)
+	*****************/
     
     /****
     sng:08/jul/2010
