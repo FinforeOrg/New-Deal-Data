@@ -79,6 +79,51 @@ class transaction_note{
         }
         return true;
     }
+	
+	/******************
+	sng:5/oct/2012
+	Admin can directly append to the notes. We do not use the transaction_suggestion::front_submit_note because we are not sure
+	whether the front end submissions will add to the note (currently we do that but later might change, so we use another function)
+	
+	We use a notification to add this submission as a suggestion
+	******************/
+	public function admin_update_note($deal_id,$note,$append){
+        $db = new db();
+		if($append){
+			$q = "select note from ".TP."transaction_note where transaction_id='".$deal_id."'";
+			$ok = $db->select_query($q);
+			if(!$ok){
+				return false;
+			}
+			if(!$db->has_row()){
+				//not found, insert
+				$note_q = "insert into ".TP."transaction_note set transaction_id='".$deal_id."', note='".mysql_real_escape_string($note)."'";
+			}else{
+				//there is existing note, we get the note and append the suggestion to it and store
+				$row = $db->get_row();
+				$curr_note = $row['note'];
+				$new_note = $curr_note."\r\n".$note;
+				$note_q = "update ".TP."transaction_note set note='".mysql_real_escape_string($new_note)."' where transaction_id='".$deal_id."'";
+			}
+		}else{
+			$note_q = "insert into ".TP."transaction_note set transaction_id='".$deal_id."', note='".mysql_real_escape_string($note)."'";
+		}
+        $time_now = date("Y-m-d H:i:s");
+        $ok = $db->mod_query($note_q);
+        if(!$ok){
+            return false;
+        }
+		/**************
+		now send the notification
+		****************/
+		require_once("classes/class.transaction_suggestion.php");
+		$trans_suggest = new transaction_suggestion();
+		$ok = $trans_suggest->note_added_via_admin($deal_id,0,$time_now,$note);
+		/*********
+		never mind if error
+		**********/
+        return true;
+    }
 	/****
     sng:4/feb/2011
     The private note is in different table with same transaction id

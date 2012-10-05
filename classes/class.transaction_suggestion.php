@@ -996,7 +996,7 @@ class transaction_suggestion{
 	Since this is not addition of note via correction, is_correction is n
 	and we do not put any status note
 	
-	This is called when we change the note transaction::update_note.
+	This is called when we change the note transaction_note::set_note.
 	Those function first set the note and then call this function to notify.
 	Do not call this directly.
 	************************/
@@ -1011,6 +1011,30 @@ class transaction_suggestion{
 		}
 		
 		$q = "insert into ".TP."transaction_note_suggestions set deal_id='".$deal_id."', suggested_by='".$member_id."', date_suggested='".$deal_added_on."', note='".mysql_real_escape_string($note)."',is_correction='".$is_correction."'";
+		
+		$ok = $db->mod_query($q);
+		/***********
+		no need to hang the system if error
+		************/
+		return true;
+	}
+	
+	/*************************
+	sng:5/oct/2012
+	Notification when admin add to deal note
+	Do not call directly
+	*************/
+	public function note_added_via_admin($deal_id,$member_id,$added_on,$note){
+		$db = new db();
+		
+		$q = "";
+		$is_correction = 'y';
+		if($note==""){
+			//nothing to add
+			return true;
+		}
+		$status_note = "added";
+		$q = "insert into ".TP."transaction_note_suggestions set deal_id='".$deal_id."', suggested_by='".$member_id."', date_suggested='".$added_on."', note='".mysql_real_escape_string($note)."',status_note='".$status_note."',is_correction='".$is_correction."'";
 		
 		$ok = $db->mod_query($q);
 		/***********
@@ -1636,10 +1660,13 @@ class transaction_suggestion{
 	
 	Since we use this table to store the original suggestion also, we need a flag, get_original. If get_original then
 	we check for is_correction=n (or exclude the corrective records)
+	
+	sng:5/oct/2012
+	We need 'suggested_by'. If that is 0, then it means it was submitted by admin
 	*****************/
 	public function fetch_notes($deal_id,$get_original,&$data_arr,&$data_count){
 		$db = new db();
-		$q = "select date_suggested,note,status_note,member_type,work_email from ".TP."transaction_note_suggestions as n left join ".TP."member as m on(n.suggested_by=m.mem_id) where deal_id='".$deal_id."'";
+		$q = "select suggested_by,date_suggested,note,status_note,member_type,work_email from ".TP."transaction_note_suggestions as n left join ".TP."member as m on(n.suggested_by=m.mem_id) where deal_id='".$deal_id."'";
 		
 		if($get_original){
 			$q.=" and is_correction='n'";

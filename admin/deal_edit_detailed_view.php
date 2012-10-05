@@ -1,3 +1,11 @@
+<style type="text/css">
+.hr_div
+{
+	height:10px;
+	margin-top:20px;
+	border-top:1px solid #CCCCCC;
+}
+</style>
 <script src="../js/SpryTabbedPanels.js" type="text/javascript"></script>
 <link href="../css/SpryTabbedPanels.css" rel="stylesheet" type="text/css" />
 <?php
@@ -26,12 +34,12 @@ the tabbed panes
 <td>
 <div id="edit_deal_detailed" class="TabbedPanels">
 	<ul class="TabbedPanelsTabGroup">
-		<li class="TabbedPanelsTab" tabindex="0">Tab 1</li>
+		<li class="TabbedPanelsTab" tabindex="0">Notes</li>
 		<li class="TabbedPanelsTab" tabindex="0">Sources</li>
 	</ul>
 	<div class="TabbedPanelsContentGroup">
 		<div class="TabbedPanelsContent">
-		Tab 1 hello
+		<?php require("admin/deal_edit_snippets/deal_notes.php");?>
 		</div>
 		<div class="TabbedPanelsContent">
 		<?php require("admin/deal_edit_snippets/deal_sources.php");?>
@@ -59,7 +67,8 @@ tabbed_deal_page.showPanel = function(elementOrIndex){
 	
 	switch(tpIndex){
 		case 0:
-			//tab 1
+			//notes
+			fetch_deal_notes_for_admin();
 			break;
 		case 1:
 			//sources
@@ -69,4 +78,14 @@ tabbed_deal_page.showPanel = function(elementOrIndex){
 			//do nothing
 	}
 }
+</script>
+<script>
+<?php
+/***************
+directly calling this create issue in IE
+*****************/
+?>
+$(function(){
+	fetch_deal_notes_for_admin();
+});
 </script>
