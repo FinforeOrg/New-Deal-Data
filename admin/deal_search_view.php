@@ -351,7 +351,17 @@ if($g_view['data_count']==0){
 		/********************************************************/
 		?>
 		<td>
+		<?php
+		/********************
+		sng:6/oct/2012
+		temp change for new look edit
 		<form method="post" action="deal_edit.php">
+		<input type="hidden" name="deal_id" value="<?php echo $g_view['data'][$i]['deal_id'];?>" />
+		<input type="submit" value="Edit" />
+		</form>
+		************************/
+		?>
+		<form method="post" action="deal_edit_detailed.php">
 		<input type="hidden" name="deal_id" value="<?php echo $g_view['data'][$i]['deal_id'];?>" />
 		<input type="submit" value="Edit" />
 		</form>

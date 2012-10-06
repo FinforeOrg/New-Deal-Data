@@ -1045,6 +1045,10 @@ class transaction_suggestion{
 	
 	/*****************
 	sng:2/may/2012
+	
+	This is called when we set the sources while adding a deal (transaction_source::front_set_sources_for_deal)
+	Those function first set the sources and then call this function to notify.
+	Do not call this directly.
 	*********************/
 	public function deal_source_added_via_deal_submission($deal_id,$member_id,$deal_added_on,$data_arr){
 		$db = new db();
@@ -1080,7 +1084,93 @@ class transaction_suggestion{
 			return true;
 		}
 	}
+	/*************************
+	sng:6/oct/2012
+	Notification when admin add deal sources
+	Do not call directly
+	*************/
+	public function deal_sources_added_via_admin($deal_id,$member_id,$added_on,$data_arr){
+		$db = new db();
+		
+		$q = "";
+		$is_correction = 'y';
+		$status_note = 'added';
+		//since admin has already added the sources
+		$cnt = count($data_arr);
+		if(0 == $cnt){
+			//no data specified, return
+			return true;
+		}
+		for($i = 0;$i < $cnt; $i++){
+			/******
+			do check whether source url given or not
+			*****/
+			if($data_arr[$i] == ""){
+				//skip this
+				continue;
+			}
+			$q.=",('".$deal_id."','".$member_id."','".$added_on."','".mysql_real_escape_string($data_arr[$i])."','".$status_note."','".$is_correction."')";
+		}
+		if($q == ""){
+			//all data skipped
+			return true;
+		}
+		//get rid of the first ','
+		$q = substr($q,1);
+		$q = "insert into ".TP."transaction_sources_suggestions (deal_id,suggested_by,date_suggested,source_url,status_note,is_correction) values ".$q;
+		$ok = $db->mod_query($q);
+		if(!$ok){
+			return false;
+		}else{
+			return true;
+		}
+	}
+	/*************************
+	sng:6/oct/2012
+	Notification when admin delete deal sources
+	Do not call directly
 	
+	This is same as the above. We could use unified function
+	*************/
+	public function deal_sources_removed_via_admin($deal_id,$data_arr){
+		$db = new db();
+		
+		$q = "";
+		$is_correction = 'y';
+		$status_note = 'deleted';
+		$date_suggested = date("Y-m-d H:i:s");
+		$suggested_by = 0;
+		//admin user
+		
+		$cnt = count($data_arr);
+		if(0 == $cnt){
+			//no data specified, return
+			return true;
+		}
+		for($i = 0;$i < $cnt; $i++){
+			/******
+			do check whether source url given or not
+			*****/
+			if($data_arr[$i] == ""){
+				//skip this
+				continue;
+			}
+			$q.=",('".$deal_id."','".$suggested_by."','".$date_suggested."','".mysql_real_escape_string($data_arr[$i])."','".$status_note."','".$is_correction."')";
+		}
+		if($q == ""){
+			//all data skipped
+			return true;
+		}
+		//get rid of the first ','
+		$q = substr($q,1);
+		$q = "insert into ".TP."transaction_sources_suggestions (deal_id,suggested_by,date_suggested,source_url,status_note,is_correction) values ".$q;
+		$ok = $db->mod_query($q);
+		if(!$ok){
+			return false;
+		}else{
+			return true;
+		}
+	}
 	public function front_submit_deal_data($deal_id,$mem_id,$data_arr,&$msg){
 	
 		$db = new db();
@@ -1692,10 +1782,14 @@ class transaction_suggestion{
 	We now store each suggested source url in a row, no csv.
 	We need to show the urls sorted by date but also grouped by member. So we order by date and mem id.
 	We also store the original suggestion here (is_correction:n) so we use a flag to get the original suggestion
+	
+	sng:6/oct/2012
+	We need the status note. When admin delete a record, that is also added as suggestion with status note [deleted by admin]
+	Without showing the status note, members won't understand whether the entry was added or deleted
 	********************/
 	public function fetch_sources($deal_id,$get_original,&$data_arr,&$data_count){
 		$db = new db();
-		$q = "select suggested_by,date_suggested,source_url,member_type,work_email from ".TP."transaction_sources_suggestions as s left join ".TP."member as m on(s.suggested_by=m.mem_id) where deal_id='".$deal_id."'";
+		$q = "select suggested_by,date_suggested,source_url,status_note,member_type,work_email from ".TP."transaction_sources_suggestions as s left join ".TP."member as m on(s.suggested_by=m.mem_id) where deal_id='".$deal_id."'";
 		
 		if($get_original){
 			$q.=" and is_correction='n'";

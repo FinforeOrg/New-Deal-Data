@@ -32,7 +32,13 @@ for($i=0;$i<$group_data_count;$i++){
 	$cnt = $group_data_arr[$i]['suggested_sources_count'];
 	for($j=0;$j<$cnt;$j++){
 		$source = $group_data_arr[$i]['suggested_sources'][$j]['source_url'];
-		?><div style="padding:5px 0px 5px 0px;"><a href="<?php echo $source;?>" target="_blank"><?php echo $source;?></a></div><?php
+		/******************
+		sng:6/oct/2012
+		We need the status note. When admin delete a record, that is also added as suggestion with status note [deleted by admin]
+		Without showing the status note, members won't understand whether the entry was added or deleted
+		*******************/
+		$status_note = $group_data_arr[$i]['suggested_sources'][$j]['status_note'];
+		?><div style="padding:5px 0px 5px 0px;"><a href="<?php echo $source;?>" target="_blank"><?php echo $source;?></a><?php if($status_note!=""){echo " [".$status_note."]";}?></div><?php
 	}
 	?>
 	</div>
