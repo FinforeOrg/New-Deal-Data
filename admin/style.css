@@ -267,3 +267,24 @@ For showing minimal data deal header
 	font: bold 16px/16px Arial, Helvetica, sans-serif;
 }
 /********************************************/
+/*************************************************************
+sng:8/oct/2012
+grey table style
+********************/
+table.grey_table{
+	border-collapse: collapse;
+}
+table.grey_table th{
+	text-align: left;
+	padding: 5px 5px 5px 5px;
+	border: 1px solid #CCCCCC;
+	font-size:12px;
+	font-weight:bold;
+}
+table.grey_table td{
+	padding: 5px 5px 5px 5px;
+	border: 1px solid #CCCCCC;
+	font: 11px/28px Tahoma,Arial,Helvetica,sans-serif;
+	color: #3B3B3B;
+}
+/***********************************************************************/

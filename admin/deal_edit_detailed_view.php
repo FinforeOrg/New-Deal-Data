@@ -34,15 +34,35 @@ the tabbed panes
 <td>
 <div id="edit_deal_detailed" class="TabbedPanels">
 	<ul class="TabbedPanelsTabGroup">
-		<li class="TabbedPanelsTab" tabindex="0">Notes</li>
-		<li class="TabbedPanelsTab" tabindex="0">Sources</li>
+		<li class="TabbedPanelsTab" tabindex="0">Participants</li>
+		<li class="TabbedPanelsTab" tabindex="1">Details</li>
+		<li class="TabbedPanelsTab" tabindex="2">Advisors</li>
+		<li class="TabbedPanelsTab" tabindex="3">People</li>
+		<li class="TabbedPanelsTab" tabindex="4">Notes</li>
+		<li class="TabbedPanelsTab" tabindex="5">Sources</li>
+		<li class="TabbedPanelsTab" tabindex="6">Case Studies</li>
 	</ul>
 	<div class="TabbedPanelsContentGroup">
+		<div class="TabbedPanelsContent">
+		<?php //require("admin/deal_edit_snippets/deal_notes.php");?>Participants
+		</div>
+		<div class="TabbedPanelsContent">
+		<?php //require("admin/deal_edit_snippets/deal_notes.php");?>Details
+		</div>
+		<div class="TabbedPanelsContent">
+		<?php //require("admin/deal_edit_snippets/deal_sources.php");?>Advisors
+		</div>
+		<div class="TabbedPanelsContent">
+		<?php require("admin/deal_edit_snippets/deal_members.php");?>
+		</div>
 		<div class="TabbedPanelsContent">
 		<?php require("admin/deal_edit_snippets/deal_notes.php");?>
 		</div>
 		<div class="TabbedPanelsContent">
 		<?php require("admin/deal_edit_snippets/deal_sources.php");?>
+		</div>
+		<div class="TabbedPanelsContent">
+		<?php //require("admin/deal_edit_snippets/deal_sources.php");?>Case Studies
 		</div>
 	</div>
 </div>
@@ -67,12 +87,28 @@ tabbed_deal_page.showPanel = function(elementOrIndex){
 	
 	switch(tpIndex){
 		case 0:
+			//participants
+			break;
+		case 1:
+			//details
+			break;
+		case 2:
+			//advisors
+			break;
+		case 3:
+			//people
+			fetch_deal_members_for_admin();
+			break;
+		case 4:
 			//notes
 			fetch_deal_notes_for_admin();
 			break;
-		case 1:
+		case 5:
 			//sources
 			fetch_deal_sources_for_admin();
+			break;
+		case 6:
+			//case studies
 			break;
 		default:
 			//do nothing
@@ -80,12 +116,7 @@ tabbed_deal_page.showPanel = function(elementOrIndex){
 }
 </script>
 <script>
-<?php
-/***************
-directly calling this create issue in IE
-*****************/
-?>
 $(function(){
-	fetch_deal_notes_for_admin();
+	//by default, the first tab is highlighted, so call the initialization ajax call for first tab
 });
 </script>
