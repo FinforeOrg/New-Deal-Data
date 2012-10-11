@@ -40,5 +40,24 @@ class transaction_support{
 		$data_arr = $db->get_result_set_as_array();
 		return true;
 	}
+	
+	/********************
+	sng:16/sep/2011
+	given a deal id, get the deal type/sub type/sub sub type
+	get_deal_type-from_deal_id
+	**********************/
+	public function get_deal_type($deal_id,&$data_arr){
+		$db = new db();
+		$q = "select deal_cat_name,deal_subcat1_name,deal_subcat2_name from ".TP."transaction where id='".$deal_id."'";
+		$success = $db->select_query($q);
+		if(!$success){
+			return false;
+		}
+		if(!$db->has_row()){
+			return false;
+		}
+		$data_arr = $db->get_row();
+		return true;
+	}
 }
 ?>

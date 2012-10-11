@@ -1,9 +1,9 @@
 <?php
 require_once("../include/global.php");
 require_once ("admin/checklogin.php");
-require_once("classes/class.deal_support.php");
+require_once("classes/class.transaction_support.php");
 require_once("classes/class.transaction_company.php");
-$deal_support = new deal_support();
+$trans_support = new transaction_support();
 $deal_comp = new transaction_company();
 
 $g_view['deal_id'] = $_GET['transaction_id'];
@@ -48,7 +48,7 @@ if(isset($_POST['action'])&&($_POST['action']=="remove")){
 get deal type
 ********************************/
 $g_view['deal_type'] = NULL;
-$success = $deal_support->get_deal_type($_REQUEST['transaction_id'],$g_view['deal_type']);
+$success = $trans_support->get_deal_type($_REQUEST['transaction_id'],$g_view['deal_type']);
 if(!$success){
 	die("Cannot get deal type");
 }

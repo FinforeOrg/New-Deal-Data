@@ -77,20 +77,11 @@ class deal_support{
 	sng:16/sep/2011
 	given a deal id, get the deal type/sub type/sub sub type
 	get_deal_type-from_deal_id
-	**********************/
-	public function get_deal_type($deal_id,&$data_arr){
-		$db = new db();
-		$q = "select deal_cat_name,deal_subcat1_name,deal_subcat2_name from ".TP."transaction where id='".$deal_id."'";
-		$success = $db->select_query($q);
-		if(!$success){
-			return false;
-		}
-		if(!$db->has_row()){
-			return false;
-		}
-		$data_arr = $db->get_row();
-		return true;
-	}
+	
+	sng:10/oct/2012
+	Moved to transaction_support::get_deal_type
+	public function get_deal_type($deal_id,&$data_arr)
+	************************************/
 	
 	public function ma_merger_types(&$data_arr,&$data_count){
 		$db = new db();

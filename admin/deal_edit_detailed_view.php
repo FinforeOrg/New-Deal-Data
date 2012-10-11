@@ -36,11 +36,12 @@ the tabbed panes
 	<ul class="TabbedPanelsTabGroup">
 		<li class="TabbedPanelsTab" tabindex="0">Participants</li>
 		<li class="TabbedPanelsTab" tabindex="1">Details</li>
-		<li class="TabbedPanelsTab" tabindex="2">Advisors</li>
-		<li class="TabbedPanelsTab" tabindex="3">People</li>
-		<li class="TabbedPanelsTab" tabindex="4">Notes</li>
-		<li class="TabbedPanelsTab" tabindex="5">Sources</li>
-		<li class="TabbedPanelsTab" tabindex="6">Case Studies</li>
+		<li class="TabbedPanelsTab" tabindex="2">Financial Advisors</li>
+		<li class="TabbedPanelsTab" tabindex="3">Legal Advisors</li>
+		<li class="TabbedPanelsTab" tabindex="4">People</li>
+		<li class="TabbedPanelsTab" tabindex="5">Notes</li>
+		<li class="TabbedPanelsTab" tabindex="6">Sources</li>
+		<li class="TabbedPanelsTab" tabindex="7">Case Studies</li>
 	</ul>
 	<div class="TabbedPanelsContentGroup">
 		<div class="TabbedPanelsContent">
@@ -50,7 +51,10 @@ the tabbed panes
 		<?php //require("admin/deal_edit_snippets/deal_notes.php");?>Details
 		</div>
 		<div class="TabbedPanelsContent">
-		<?php //require("admin/deal_edit_snippets/deal_sources.php");?>Advisors
+		<?php require("admin/deal_edit_snippets/deal_financial_advisors.php");?>
+		</div>
+		<div class="TabbedPanelsContent">
+		<?php require("admin/deal_edit_snippets/deal_legal_advisors.php");?>
 		</div>
 		<div class="TabbedPanelsContent">
 		<?php require("admin/deal_edit_snippets/deal_members.php");?>
@@ -93,21 +97,26 @@ tabbed_deal_page.showPanel = function(elementOrIndex){
 			//details
 			break;
 		case 2:
-			//advisors
+			//financial advisors
+			fetch_deal_partners_for_admin("bank");
 			break;
 		case 3:
+			//legal advisors
+			fetch_deal_partners_for_admin("law firm");
+			break;
+		case 4:
 			//people
 			fetch_deal_members_for_admin();
 			break;
-		case 4:
+		case 5:
 			//notes
 			fetch_deal_notes_for_admin();
 			break;
-		case 5:
+		case 6:
 			//sources
 			fetch_deal_sources_for_admin();
 			break;
-		case 6:
+		case 7:
 			//case studies
 			break;
 		default:

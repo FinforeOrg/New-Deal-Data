@@ -5,7 +5,9 @@ require_once("classes/class.company.php");
 require_once("classes/class.transaction.php");
 require_once("classes/class.magic_quote.php");
 require_once("classes/class.deal_support.php");
+require_once("classes/class.transaction_support.php");
 $deal_support = new deal_support();
+$trans_support = new transaction_support();
 ///////////////////////////////////////////////////////
 $g_view['err'] = array();
 $g_view['msg'] = "";
@@ -91,7 +93,7 @@ sng:16/sep/2011
 We need the type of deal, because based on that, we will show the 'sellside advisor' checkbox
 *************************/
 $g_view['deal_type'] = NULL;
-$success = $deal_support->get_deal_type($_REQUEST['transaction_id'],$g_view['deal_type']);
+$success = $trans_support->get_deal_type($_REQUEST['transaction_id'],$g_view['deal_type']);
 if(!$success){
 	die("Cannot get deal type");
 }
