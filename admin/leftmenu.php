@@ -251,10 +251,17 @@
         d.add(child_level,block_level,'Finished','top_search_request_list.php?status=finished');child_level++;
         
 		/**************************************
+		block_level = child_level;
+		child_level = block_level+1;
+		
         d.add(block_level,0,'Hits','');
         d.add(child_level,block_level,'Show hits','hits.php');  child_level++;
         **********************************/
-                      
+        block_level = child_level;
+		child_level = block_level+1;
+		
+		d.add(block_level,0,'External','');
+		d.add(child_level,block_level,'Fetch companies from co-codes','fetch_companies_from_co_codes.php');child_level++;          
         document.write(d);
 
         //--> 
