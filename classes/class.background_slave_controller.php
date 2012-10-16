@@ -45,7 +45,8 @@ class background_slave_controller{
 		$cmd = "ps ".$pid;
     	$cmd_out = array();
     	exec($cmd,$cmd_out);
-    	return (count($cmd_out) >= 2);
+    	$running = (count($cmd_out) >= 2);
+		return true;
 	}
 	
 	/*******
@@ -99,5 +100,19 @@ class background_slave_controller{
 		$started = true;
 		return true;
 	}
+	
+	/**************
+	sng:16/oct/2012
+	*********/
+	public function set_status_note($slave_name,$note){
+		$db = new db();
+		$q = "update ".TP."background_slave_monitor set status_note='".mysql_real_escape_string($note)."' where slave_name='".mysql_real_escape_string($slave_name)."'";
+		$ok = $db->mod_query($updt_q);
+		if(!$ok){
+			return false;
+		}
+		return true;
+	}
+	
 }
 ?>
