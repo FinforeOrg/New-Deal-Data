@@ -186,30 +186,32 @@ $row++;
 /****
 sng:23/july/2010
 We need the country, sector, industry of the company doing the deal
+
+sng:17/oct/2012
+Now we do not have company doing the deal. We have one or more participants with their own
+country, sector, industry. Therefore, we remove the country, sector,industry columns
 *********/
 $worksheet->write($row,0,"#");
 $worksheet->write($row,1,"Participant");
-$worksheet->write($row,2,"Country");
-$worksheet->write($row,3,"Sector");
-$worksheet->write($row,4,"Industry");
 
-$worksheet->write($row,5,"Date");
-$worksheet->write($row,6,"Type");
-$worksheet->write($row,7,"Value (in million USD)");
+
+$worksheet->write($row,2,"Date");
+$worksheet->write($row,3,"Type");
+$worksheet->write($row,4,"Value (in million USD)");
 /************
 sng:5/mar/2012
 We show whether this deal is approved by admin or not
 *************/
-$worksheet->write($row,8,"Verified");
+$worksheet->write($row,5,"Verified");
 /****
 sng:1/oct/2010
 We need to show how many banks and law firms
 ***/
-$worksheet->write($row,9,"No. of Bank(s)");
-$worksheet->write($row,10,"Bank(s)");
+$worksheet->write($row,6,"No. of Bank(s)");
+$worksheet->write($row,7,"Bank(s)");
 
-$worksheet->write($row,11,"No. of Law Firm(s)");
-$worksheet->write($row,12,"Law Firm(s)");
+$worksheet->write($row,8,"No. of Law Firm(s)");
+$worksheet->write($row,9,"Law Firm(s)");
 $row++;
 /////////////////////////////////////
 //////////////////////////////////////////
@@ -218,12 +220,10 @@ for($j=0;$j<$g_view['data_count'];$j++){
 	
 	$worksheet->write($row,1,Util::deal_participants_to_csv($g_view['data'][$j]['participants']));
 	
-	$worksheet->write($row,2,$g_view['data'][$j]['hq_country']);
-	$worksheet->write($row,3,$g_view['data'][$j]['sector']);
-	$worksheet->write($row,4,$g_view['data'][$j]['industry']);
+	
 	
 	$date_data = $g_view['data'][$j]['date_of_deal'];
-	$worksheet->write($row, 5,  (float)(getDays1900($date_data)+2),$f_date);
+	$worksheet->write($row, 2,  (float)(getDays1900($date_data)+2),$f_date);
 	
 	
 	
@@ -231,7 +231,7 @@ for($j=0;$j<$g_view['data_count'];$j++){
 	sng:24/jan/2012
 	show type/sub type/sub sub type for all
 	************************************/
-	$worksheet->write($row,6,get_deal_type_for_listing($g_view['data'][$j]['deal_cat_name'],$g_view['data'][$j]['deal_subcat1_name'],$g_view['data'][$j]['deal_subcat2_name']));
+	$worksheet->write($row,3,get_deal_type_for_listing($g_view['data'][$j]['deal_cat_name'],$g_view['data'][$j]['deal_subcat1_name'],$g_view['data'][$j]['deal_subcat2_name']));
 	
 	
 	/***
@@ -243,26 +243,26 @@ for($j=0;$j<$g_view['data_count'];$j++){
 	sometime we do not have the exact value but have a range id. In that case we show the range text.
 	*******/
 	if(($g_view['data'][$j]['value_in_billion']==0.0)&&($g_view['data'][$j]['value_range_id']==0)){
-		$worksheet->write($row,7,"Not disclosed");
+		$worksheet->write($row,4,"Not disclosed");
 	}elseif($g_view['data'][$j]['value_in_billion'] > 0){
 		/***
 		sng:23/july/2010
 		We need the value as number, not text
 		$deal_value = convert_billion_to_million_for_display_round($g_view['data'][$j]['value_in_billion']);
 		*******/
-		$worksheet->write($row,7,convert_billion_to_million_for_display_round_as_num($g_view['data'][$j]['value_in_billion']),$f_float);
+		$worksheet->write($row,4,convert_billion_to_million_for_display_round_as_num($g_view['data'][$j]['value_in_billion']),$f_float);
 	}else{
 		//only value range
-		$worksheet->write($row,7,$g_view['data'][$j]['fuzzy_value']);
+		$worksheet->write($row,4,$g_view['data'][$j]['fuzzy_value']);
 	}
 	/************
 	sng:5/mar/2012
 	We show whether this deal is approved by admin or not
 	*************/
 	if($g_view['data'][$j]['admin_verified']=='y'){
-		$worksheet->write($row,8,"Yes");
+		$worksheet->write($row,5,"Yes");
 	}else{
-		$worksheet->write($row,8,"No");
+		$worksheet->write($row,5,"No");
 	}
 	/****
 	sng:1/oct/2010
@@ -277,12 +277,12 @@ for($j=0;$j<$g_view['data_count'];$j++){
 	}
 	$banks_csv = substr($banks_csv,1);
 	if($bank_cnt > 0){
-		$worksheet->write($row,9,$bank_cnt,$f_int);
+		$worksheet->write($row,6,$bank_cnt,$f_int);
 	}else{
 		//no banks
-		$worksheet->write($row,9,"n/a");
+		$worksheet->write($row,6,"n/a");
 	}
-	$worksheet->write($row,10,$banks_csv);
+	$worksheet->write($row,7,$banks_csv);
 	
 	$law_csv = "";
 	$law_cnt = count($g_view['data'][$j]['law_firms']);
@@ -291,12 +291,12 @@ for($j=0;$j<$g_view['data_count'];$j++){
 	}
 	$law_csv = substr($law_csv,1);
 	if($law_cnt > 0){
-		$worksheet->write($row,11,$law_cnt,$f_int);
+		$worksheet->write($row,8,$law_cnt,$f_int);
 	}else{
 		//no law firm
-		$worksheet->write($row,11,"n/a");
+		$worksheet->write($row,8,"n/a");
 	}
-	$worksheet->write($row,12,$law_csv);
+	$worksheet->write($row,9,$law_csv);
 	
 	$row++;
 }
