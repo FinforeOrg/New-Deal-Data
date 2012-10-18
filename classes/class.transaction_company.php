@@ -198,10 +198,17 @@ class transaction_company{
 	sng:1/feb/2012
 	Just get the names of the participants only. Used in listing codes
 	Return blank array if there is no record
+	
+	sng:18/oct/2012
+	Let us add the country/sector/industry.
+	
+	In old DD, those front end codes not only showed the company name but also showed the country/sector/industry when listing deals.
+	Those front end codes called transaction::front_deal_search_paged which in turn call this.
+	In new DD, with the concept of participants, we still need to support those codes.
 	*************/
 	public function get_deal_participants($deal_id,&$participant_list){
 		$db = new db();
-		$q = "select tc.company_id,name as company_name from ".TP."transaction_companies as tc left join ".TP."company as c on (tc.company_id=c.company_id) where transaction_id='".$deal_id."'";
+		$q = "select tc.company_id,name as company_name,hq_country,sector,industry from ".TP."transaction_companies as tc left join ".TP."company as c on (tc.company_id=c.company_id) where transaction_id='".$deal_id."'";
 		$ok = $db->select_query($q);
 		if(!$ok){
 			return false;

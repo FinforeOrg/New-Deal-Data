@@ -410,6 +410,45 @@ class Util {
 		$data = substr($data,2);
 		return $data;
 	}
+	/**********************
+	sng:18/oct/2012
+	Now that we have multiple companies for a deal, we might want to show it as a csv.
+	There are codes that used to show the company name, its country, sector, industry.
+	With participants list, we cannot have list of companies in one cell and list of sectors in another cell. We ned to show
+	the participating companies along with sector/industry
+	**********************/
+	public static function deal_participants_to_csv_with_detail($participant_list){
+		$cnt = count($participant_list);
+		if(0==$cnt){
+			return "";
+		}
+		$data = "";
+		for($i=0;$i<$cnt;$i++){
+		
+			$name = $participant_list[$i]['company_name'];
+			$hq_country = $participant_list[$i]['hq_country'];
+			$sector = $participant_list[$i]['sector'];
+			$industry = $participant_list[$i]['industry'];
+			
+			$data.=", ".$participant_list[$i]['company_name'];
+			$extra = "";
+			if(""!=$hq_country){
+				$extra.=", ".$hq_country;
+			}
+			if(""!=$sector){
+				$extra.=", ".$sector;
+			}
+			if(""!=$industry){
+				$extra.=", ".$industry;
+			}
+			if(""!=$extra){
+				$extra = substr($extra,2);
+				$data.="[".$extra."]";
+			}
+		}
+		$data = substr($data,2);
+		return $data;
+	}
 	/**************************
 	sng:7/sep/2012
 	filter deal_size:

@@ -268,9 +268,14 @@ Need different variation of these Volumes' charts?  Use our <a href="/issuance_d
         <tbody>
             <tr>
                 <th>Rank</th>
-                <th >Company</th>
-                <th >Country</th>
-                <th >Industry</th>
+                <th >Participant</th>
+                <?php
+				/************
+				sng:18/oct/2012
+				Now that we have one or more participants (with their own country/sector/industry)
+				we cannot have separate columns
+				**********/
+				?>
                 <th >Deal Type</th>
                 <th >Date</th>
                 <th >Size $bn <input type="radio" name="download_pptx_top_ten[]" style="float:right" value="<?php echo $table['dataForPost']?>"/></th>
@@ -281,9 +286,14 @@ Need different variation of these Volumes' charts?  Use our <a href="/issuance_d
             foreach ($table['data'] as $key2=>$res) : ?>
                 <tr>
                     <td><?php echo $i ?></td>
-                    <td><?php echo $res['company_name'] ?></td>
-                    <td><?php echo $res['hq_country'] ?></td>
-                    <td><?php echo $res['industry'] ?></td> 
+					<?php
+					/*********************
+					sng:18/oct/2012
+					Show participants list with sector/industry
+					***********/
+					?>
+                    <td><?php echo Util::deal_participants_to_csv_with_detail($res['participants']);?></td>
+                    
                     <td><?php
                         if ($res['deal_cat_name'] == 'M&A')
                             echo $res['deal_subcat1_name'] . ' M&A';
