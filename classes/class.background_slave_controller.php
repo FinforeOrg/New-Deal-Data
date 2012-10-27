@@ -106,7 +106,7 @@ class background_slave_controller{
 	*********/
 	public function set_status_note($slave_name,$note){
 		$db = new db();
-		$q = "update ".TP."background_slave_monitor set status_note='".mysql_real_escape_string($note)."' where slave_name='".mysql_real_escape_string($slave_name)."'";
+		$updt_q = "update ".TP."background_slave_monitor set status_note='".mysql_real_escape_string($note)."' where slave_name='".mysql_real_escape_string($slave_name)."'";
 		$ok = $db->mod_query($updt_q);
 		if(!$ok){
 			return false;

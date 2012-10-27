@@ -2,12 +2,16 @@
 /***********
 It is assumed that at any given time, there is at most one running instance
 *************/
-require_once(dirname(dirname(__FILE__))."/include/global.php");
-require_once("classes/class.background_slave_controller.php");
+require_once(dirname(dirname(__FILE__))."/include/config.php");
+require_once(FILE_PATH."/include/minimal_bootstrap.php");
+
+require_once(FILE_PATH."/classes/class.background_slave_controller.php");
 $master = new background_slave_controller();
 
 $worker_name = "fetch_company_data_co_codes";
 $master->set_status_note($worker_name,"started, fetching remote file");
+
+
 /***************************************************************
 fetch the csv file
 ****/
