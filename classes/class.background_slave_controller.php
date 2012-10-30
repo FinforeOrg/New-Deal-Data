@@ -17,10 +17,13 @@ class background_slave_controller{
 	running: set to true if the process is running
 	
 	return false on db error or if slave record not found
+	
+	sng:30/oct/2012
+	If not running, we also need to know when it ran last
 	**********/
-	public function is_running($slave_name,&$running){
+	public function is_running($slave_name,&$running,&$last_triggered){
 		$db = new db();
-		$q = "select pid from ".TP."background_slave_monitor where slave_name='".mysql_real_escape_string($slave_name)."'";
+		$q = "select pid,last_triggered from ".TP."background_slave_monitor where slave_name='".mysql_real_escape_string($slave_name)."'";
 		$ok = $db->select_query($q);
 		if(!$ok){
 			return false;
@@ -33,6 +36,7 @@ class background_slave_controller{
 			return false;
 		}
 		$row = $db->get_row();
+		$last_triggered = $row['last_triggered'];
 		$pid = $row['pid'];
 		if(""==$pid){
 			//the process is not running
@@ -58,7 +62,8 @@ class background_slave_controller{
 	public function trigger_slave($slave_name,&$started,&$msg){
 		$db = new db();
 		$already_running = false;
-		$ok = $this->is_running($slave_name,$already_running);
+		$last_triggered = "";
+		$ok = $this->is_running($slave_name,$already_running,$last_triggered);
 		if(!$ok){
 			return false;
 		}
