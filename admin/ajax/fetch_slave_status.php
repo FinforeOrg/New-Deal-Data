@@ -46,7 +46,7 @@ if($still_running){
 	if($last_triggered==="0000-00-00 00:00:00"){
 		$status_arr['msg'] = "Yet to run";
 	}else{
-		$status_arr['msg'] = "Last searched ".date("Y-m-d H:i:s");
+		$status_arr['msg'] = "Last searched ".$last_triggered;
 	}
 }
 echo json_encode($status_arr);
