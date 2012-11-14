@@ -3602,8 +3602,10 @@ class member{
 		mysql_query($q);
 		/****************************
 		delete from chosen logos but do not delete the logos itself (others might be using those logos)
+		sng:14/nov/2012
+		We are now using tombstone_preferred_logos instead of tombstone_chosen_logos
 		*********/
-		$q = "delete from ".TP."chosen_logos where mem_id='".$mem_id."'";
+		$q = "delete from ".TP."preferred_logos where mem_id='".$mem_id."'";
 		mysql_query($q);
 		/****************************
 		delete from favourite tombstone but not the tombstone

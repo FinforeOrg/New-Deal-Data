@@ -121,16 +121,11 @@ class transaction{
     }
     
     public function get_user_chosen_logos() {
-        if (!isset($_SESSION['mem_id'])) {
-            return array();
-        }
-        $tableName  = TP.'chosen_logos';       
-        $q  = "SELECT logos FROM {$tableName} WHERE mem_id = {$_SESSION['mem_id']} LIMIT 1";
-        $res = mysql_query($q);
-        $result = mysql_fetch_assoc($res);
-        if (is_array($result)) {
-            return unserialize($result['logos']);
-        }
+		/*********
+		sng:14/nov/2012
+		Nobody use this function. Everybody use the function in class deal_support
+		*****/
+		die("No longer in use");
     }
     public function add_category_type_subtype($data_arr,&$validation_passed,&$err_arr){
         $validation_passed = true;
