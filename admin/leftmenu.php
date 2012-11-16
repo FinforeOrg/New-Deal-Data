@@ -139,7 +139,11 @@
 		********************************/
 		d.add(child_level,block_level,'List case studies','list_case_studies.php');child_level++;
 		d.add(child_level,block_level,'List documents','list_deal_docs.php');child_level++;
+		/************
+		sng:16/nov/2012
+		We no longer use this.
 		d.add(child_level,block_level,'Participant notification','manage_deal_participant_notification.php');child_level++;
+		**************/
 		
 		block_level = child_level;
 		child_level = block_level+1;

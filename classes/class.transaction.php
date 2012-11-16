@@ -1719,11 +1719,10 @@ WHERE rgnm.name = '".mysql_real_escape_string($search_params_arr['region'])."'";
         $validation_passed = true;
 		/*****************************************************
 		sng:15/sep/2011
-		*********/
-		require_once("classes/class.deal_support.php");
-		$support = new deal_support();
-		$support->notify_participants($data_arr['partner_id'],$data_arr['transaction_id']);
-		//since this is just a notification, never mind if this is success or failure
+		
+		sng:16/nov/2012
+		We no longer notify the syndicates that their bank/law firm has been added to a deal
+		We assume that nobody does spurious additions (that requires notification)
 		/********************************************************/
         return true;
     }
@@ -2112,6 +2111,9 @@ WHERE rgnm.name = '".mysql_real_escape_string($search_params_arr['region'])."'";
         
         sng:2/dec/2010
         Now when sector and industry is given, we use the deal_sector, deal_industry attribute of transaction
+		
+		sng:14/nov/2012
+		We now have participating companies and we check the sector/industry of those. We have already done the changes
         *********/
         /**********************************************************************
         sng:13/jan/2011
