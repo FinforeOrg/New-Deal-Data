@@ -1140,7 +1140,11 @@ ttm.type AS dealType, ttm.subtype2 AS dealSubtype2, ttm.subtype1 as dealSubtype1
             $c = $trans->getTombstonesForFirm(@$_SESSION['company_id'], 0,5);
             if (sizeOf($c)) {
                 foreach ($c as $deal) {
-                    $trans->front_get_deal_detail($deal['transaction_id'], $details, $qqq);
+					/************
+					sng:16/Nov/2012
+					We now use transaction::front_get_deal_detail_extra
+					*************/
+                    $trans->front_get_deal_detail_extra($deal['transaction_id'], $details, $qqq);
                     $transactions[] = $details;
                 }
             }

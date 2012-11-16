@@ -390,14 +390,29 @@ To see the detail of the deals that your competitors may talk about, use our <a 
                 <input type="hidden" name="download_pptx_cross[]" value="<?php echo $table['dataForPost']?>" />
                 <table cellspacing="0" cellpadding="0" border="0" width="100%"  class="zebraTable">
                     <tr>
-                        <?php if ($key !== 'M&A') : ?><th>Company</th><?php else :?> <th>Buyer</th><th>Target</th> <?php endif?>
+						<?php
+						/***********
+						sng:16/Nov/2012
+						Now we have one or more participants instead of company/buyer/seller associated with a deal
+						***********/
+						?>
+						<th>Participant</th>
                         <th >Date </th>
                         <th >Size $bn</th>
                         <th >Details</th>
                     </tr>
                     <?php foreach ($table['data'] as $data) : ?>
                     <tr>
-                        <?php if ($key !== 'M&A') : ?><td><?php echo $data['company_name']?></td><?php else :?> <td><?php echo $data['company_name']?></td><td><?php echo $data['target_company_name']?></td> <?php endif?>
+					<?php
+					/**********
+					sng:16/Nov/2012
+					Now we have one or more participants instead of company/buyer/seller associated with a deal
+					
+					Show participants list with sector/industry
+					************/
+					?>
+					<td><?php echo Util::deal_participants_to_csv_with_detail($data['participants']);?></td>
+                        
                         
                         <td><?php echo date('M Y', strtotime($data['date_of_deal']))?></td>
                         <td>$<?php echo number_format($data['value_in_billion'],2)?></td>
