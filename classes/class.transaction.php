@@ -8,9 +8,12 @@ class transaction{
         $this->savedSearches = new SavedSearches();
         $this->savedSearches->getFavoriteTombstones();
     }
-    
+    /***********
+	sng:19/nov/2012
+	We need to order by type/subtype and then by display order of subtype 2
+	***************/
     public function getCategoryTree() {
-        $q = "select * from ".TP."transaction_type_master ";
+        $q = "select * from ".TP."transaction_type_master order by type,subtype1,subtype2_display_order";
         $res = mysql_query($q);
         $ret = array();
         if (!$res) {
@@ -102,23 +105,7 @@ class transaction{
         return true;
     }
     /////////////////////////////////////////////////////////////////////////////
-    public function get_all_category_type_subtype(&$data_arr,&$data_count){
-        $q = "select  * from ".TP."transaction_type_master order by type, subtype1, subtype2";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $data_count = mysql_num_rows($res);
-        if($data_count == 0){
-            //no recs
-            return true;
-        }
-        //recs so
-        while($row = mysql_fetch_assoc($res)){
-            $data_arr[] = $row;
-        }
-        return true;
-    }
+	
     
     public function get_user_chosen_logos() {
 		/*********
@@ -127,55 +114,9 @@ class transaction{
 		*****/
 		die("No longer in use");
     }
-    public function add_category_type_subtype($data_arr,&$validation_passed,&$err_arr){
-        $validation_passed = true;
-        if($data_arr['type']==""){
-            $validation_passed = false;
-            $err_arr['type'] = "specify type";
-        }
-        
-        if($data_arr['subtype1']==""){
-            $validation_passed = false;
-            $err_arr['subtype1'] = "specify sub type";
-        }
-        
-        if($data_arr['subtype2']==""){
-            $validation_passed = false;
-            $err_arr['subtype2'] = "specify sub sub type or n/a";
-        }
-        
-        //////////////////////////////////////////////////
-        if(($data_arr['type']!="")&&($data_arr['subtype1']!="")&&($data_arr['subtype2']!="")){
-            
-            //check if the trio is already there ot not
-            $q = "select count(*) as cnt from ".TP."transaction_type_master where type='".$data_arr['type']."' and subtype1='".$data_arr['subtype1']."' and subtype2='".$data_arr['subtype2']."'";
-            $res = mysql_query($q);
-            if(!$res){
-                return false;
-            }
-            ////////////////////////////
-            $row = mysql_fetch_assoc($res);
-            if($row['cnt']!=0){
-                //the trio is there
-                $validation_passed = false;
-                $err_arr['type'] = "These type/subtype are already there";
-            }
-        }
-        //////////////////////////////////////////////////////////////////
-        if(!$validation_passed){
-            return true;
-        }
-        ///////////////////////////////
-        //insert
-        $q = "insert into ".TP."transaction_type_master set type='".$data_arr['type']."', subtype1='".$data_arr['subtype1']."', subtype2='".$data_arr['subtype2']."'";
-        $result = mysql_query($q);
-        if(!$result){
-            return false;
-        }
-        return true;
-    }
     
-/////////////////////////////////////Select all category type end/////////////////////////////////////////////////////////////////
+    
+
 
     /*********************************************************************************
     sng:23/july/2010

@@ -1455,6 +1455,15 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_param['region'])."'";
 			$q.=" INNER JOIN (SELECT DISTINCT transaction_id from ".TP."transaction_companies as fca_tc left join ".TP."company as fca_c on(fca_tc.company_id=fca_c.company_id) where fca_c.type='company' AND ".$filter_by_company_attrib.") AS fca ON (t.id=fca.transaction_id) ";
 		}
 		$q.=" WHERE partner_type = '".$stat_param['partner_type']."'";
+		/*************
+		sng:23/nov/2012
+		Let us add another filter on transaction - exclude_partner_id.
+		This allows us to use the same code to get league table for my competitors (we just exclude self)
+		Used in class oneStop::getFifthTableResults
+		****************/
+		if(isset($stat_param['exclude_partner_id'])&&($stat_param['exclude_partner_id']!="")){
+			$q.=" and p.partner_id!='".$stat_param['exclude_partner_id']."'";
+		}
         //////////////////////////////////////////
         //filter on transaction types
         if($stat_param['deal_cat_name']!=""){
@@ -1516,15 +1525,26 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_param['region'])."'";
         $q.=" GROUP BY partner_id";
         ///////////////////////////////////////
         //the ranking ordering
-        $ranking_by = "";
-        if($stat_param['ranking_criteria']=="num_deals") $ranking_by = "num_deals";
-        else if($stat_param['ranking_criteria']=="total_deal_value") $ranking_by = "total_deal_value";
-        else if($stat_param['ranking_criteria']=="total_adjusted_deal_value") $ranking_by = "total_adjusted_deal_value";
+		/**********************
+		sng:23/nov/2012
+		Let us tweak the ordering.
+		By default, let us rank by number of deals, then by total deal value
+		(if 2 firms has done same num of deals, then see who made more valuable deals)
+		
+		If the ranking is by total deal value, then order by total deal value, then by adjusted deal value
+		(if 2 firms has made same amount of money, then see who had more, if individual shares are considered)
+		
+		If the ranking is by total adjusted deal value, then order by total adjusted deal value, then by total deal value
+		(if 2 firms has made same amount of money individually, then see who has worked on more valuable deals)
+		*******************/
+        $ranking_by = "num_deals DESC, total_deal_value DESC";
+        if($stat_param['ranking_criteria']=="num_deals") $ranking_by = "num_deals DESC, total_deal_value DESC";
+        else if($stat_param['ranking_criteria']=="total_deal_value") $ranking_by = "total_deal_value DESC, total_adjusted_deal_value DESC";
+        else if($stat_param['ranking_criteria']=="total_adjusted_deal_value") $ranking_by = "total_adjusted_deal_value DESC, total_deal_value DESC";
         if($ranking_by != ""){
-            $q.=" ORDER BY ".$ranking_by." DESC";
+            $q.=" ORDER BY ".$ranking_by;
         }
         $q.=" limit ".$start_offset.",".$num_to_fetch.") AS stat LEFT JOIN ".TP."company AS c ON ( stat.partner_id = c.company_id )";
-
         $res = mysql_query($q);
         if(!$res){
             //echo mysql_error();

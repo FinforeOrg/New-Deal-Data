@@ -985,121 +985,101 @@ ttm.type AS dealType, ttm.subtype2 AS dealSubtype2, ttm.subtype1 as dealSubtype1
               $_POST[$key] = $val;
           }
       }
-      
+      /************
+	  sng:23/nov/2012
+	  We use the statistics class because it has support for the concept of participants and active deals and in calculations etc
+	  We need to send the correct param keys and values
+	  year: can be in a range like 2009-2010 or it may be a single like 2009
+	  deal_cat_name
+	  deal_subcat1_name
+	  deal_subcat2_name
+	  sector
+	  industry
+	  country
+	  partner_type
+	  exclude_partner_id
+	  ranking_criteria: total_adjusted_deal_value (so that the sort is on total adjusted deal value, then by total deal value
+	  ****************/
       static function getFifthTableResults() {
-          self::loadOptions('table5');
-          
-          $dateFilter = '';
-          if (preg_match("/(\d+)-(\d+)/", $_POST['year4'], $matches )) {
-            $dateFilter = " AND year( t.date_of_deal )>='{$matches[1]}' AND year(date_of_deal)<='{$matches[2]}'";  
-            //var_dump($matches);  
-          } elseif(strlen($_POST['year4'])) {
-            $dateFilter = "AND year( t.date_of_deal )='{$_POST['year4']}'";   
-          } 
-          
-          $deal_subcat2_name = self::$_dealType['subtype2']; 
-          $deal_subcat1_name = self::$_dealType['subtype1']; 
-          if ($deal_subcat1_name == '') {
-            $deal_subcat1_name = 'Completed';  
-          }
-          $deal_industry = self::$_industry['industry'];
-          $deal_country = self::$_country['countryName'];       
-          $userCompanyId = @$_SESSION['company_id'];
-          $catFilter = " AND deal_subcat2_name = '$deal_subcat2_name' ";
-           if (self::$_dealType['subtype2'] == '') {
-                $catFilter =  " AND deal_subcat1_name = '$deal_subcat1_name'";
-           }           
-          $q1 = "SELECT 
-                num_deals, 
-                partner_id,
-                partner_type, 
-                total_adjusted_deal_value, 
-                total_deal_value, 
-                name AS firm_name,
-                deal_country,
-                deal_industry, 
-                deal_subcat2_name
-            FROM (
-
-            SELECT count( * ) AS num_deals, partner_id, partner_type, sum( adjusted_value_in_billion ) AS 
-            total_adjusted_deal_value, sum( value_in_billion ) AS total_deal_value, deal_country, deal_industry, deal_subcat2_name
-            FROM __TP__transaction_partners AS p
-            LEFT JOIN __TP__transaction AS t ON ( p.transaction_id = t.id )
-            WHERE partner_type = (SELECT type FROM __TP__company WHERE company_id = $userCompanyId LIMIT 1)
-             $catFilter             
-            AND deal_industry LIKE '$deal_industry'
-            AND deal_country LIKE '$deal_country'
-            $dateFilter
-            AND partner_id <> $userCompanyId
-            GROUP BY partner_id
-            ORDER BY total_adjusted_deal_value DESC, total_deal_value DESC
-            LIMIT 0 , 3
-            ) AS stat
-            LEFT JOIN tombstone_company AS c ON ( stat.partner_id = c.company_id ) ";
-          //dump($q1);   
-          if ($res = query($q1)) {
-               while($row = mysql_fetch_assoc($res)) {
-                   $dt[] =  $row;
-               }
-               if (self::$_dealType['type'] == 'M&A') {
-                    $deal_subcat2_name = $deal_subcat1_name . ' M&A';    
-               }
-               if (self::$_dealType['subtype2'] == '') {
-                    $deal_subcat2_name = $deal_subcat1_name;
-               }
-               $returnData['table1']['data'] = $dt;
-               $returnData['table1']['label'] = "$deal_country, $deal_industry, $deal_subcat2_name, {$_POST['year4']}";
-          }
-          
-          //dump($q1);
-          $deal_type = self::$_dealType['type']; 
-          $deal_sector = self::$_industry['sector'];
-          $deal_region = self::$_country['regionName'];              
-            
-            $q2 = "SELECT 
-                num_deals, 
-                partner_id, 
-                total_adjusted_deal_value, 
-                total_deal_value, 
-                name AS firm_name,
-                deal_country,
-                deal_industry,
-                partner_type, 
-                deal_subcat2_name
-            FROM (
-
-            SELECT count( * ) AS num_deals, partner_id, partner_type, sum( adjusted_value_in_billion ) AS 
-            total_adjusted_deal_value, sum( value_in_billion ) AS total_deal_value, deal_country, deal_industry, deal_subcat2_name
-            FROM tombstone_transaction_partners AS p
-            LEFT JOIN __TP__transaction AS t ON ( p.transaction_id = t.id )
-            LEFT JOIN __TP__company AS c ON ( t.company_id = c.company_id )
-            LEFT JOIN __TP__country_master cm ON ( c.hq_country = cm.name )
-            LEFT JOIN __TP__region_country_list rcl ON ( cm.id = rcl.country_id )
-            LEFT JOIN __TP__region_master rm ON ( rcl.region_id = rm.id )            
-            WHERE partner_type = (SELECT type FROM tombstone_company WHERE company_id = $userCompanyId LIMIT 1)
-            AND deal_cat_name = '$deal_type'
-            AND deal_sector LIKE '$deal_sector'
-            AND rm.name LIKE '$deal_region'
-            $dateFilter
-            AND partner_id <> $userCompanyId
-            GROUP BY partner_id
-            ORDER BY total_adjusted_deal_value  DESC, total_deal_value DESC
-            LIMIT 0 , 3
-            ) AS stat
-            LEFT JOIN __TP__company AS c ON ( stat.partner_id = c.company_id ) ";
-          //dump($q2);
-          if ($res2 = query($q2)) {
-               while($row = mysql_fetch_assoc($res2)) {
-                   $dt2[] =  $row;
-               }
-               if (self::$_dealType['type'] == 'M&A') {
-                    $deal_subcat2_name = self::$_dealType['subtype1'] . ' M&A';    
-               }               
-               $returnData['table2']['data'] = $dt2;
-               $returnData['table2']['label'] = "$deal_region, $deal_sector, $deal_type, {$_POST['year4']}";
-
-          }
-         return $returnData;                           
+	  	require_once("classes/class.statistics.php");
+		$stat = new statistics();
+		
+	  	self::loadOptions('table5');
+		$deal_subcat2_name = self::$_dealType['subtype2'];
+		$deal_subcat1_name = self::$_dealType['subtype1'];
+		if ($deal_subcat1_name == '') {
+			$deal_subcat1_name = 'Completed';
+		}
+		$deal_industry = self::$_industry['industry'];
+		$deal_country = self::$_country['countryName'];
+		$userCompanyId = @$_SESSION['company_id'];
+		
+	  	$stat_param = array();
+		$stat_param['year'] = $_POST['year4'];
+		$stat_param['deal_subcat2_name'] = $deal_subcat2_name;
+		$stat_param['deal_subcat1_name'] = $deal_subcat1_name;
+		$stat_param['industry'] = $deal_industry;
+		$stat_param['country'] = $deal_country;
+		/***********
+		sng:23/nov/2012
+		Here we are taking a shortcut. We assume that the caller has validated that the logged in user
+		is a banker or lawyer, who works in a bank or law firm. We have the user type in session
+		so we call a nifty function to get the company type instead of getting the company id of the user and then querying
+		the company table to get the company type
+		*********************/
+		$stat_param['partner_type'] = company_type_from_membership_type($_SESSION['member_type']);
+		$stat_param['exclude_partner_id'] = $userCompanyId;
+		$stat_param['ranking_criteria'] = "total_adjusted_deal_value";
+		
+		$start_offset = 0;
+		$num_to_fetch = 3;
+		
+		$dt = NULL;
+		$dt_count = 0;
+		$ok = $stat->front_generate_league_table_for_firms_paged($stat_param,$start_offset,$num_to_fetch,$dt,$dt_count);
+		if($ok){
+			if (self::$_dealType['type'] == 'M&A') {
+				$deal_subcat2_name = $deal_subcat1_name . ' M&A';    
+			}
+			if (self::$_dealType['subtype2'] == '') {
+				$deal_subcat2_name = $deal_subcat1_name;
+			}
+			$returnData['table1']['data'] = $dt;
+			$returnData['table1']['label'] = "$deal_country, $deal_industry, $deal_subcat2_name, {$_POST['year4']}";
+		}
+		/**************
+		IMP: CLEAR STAT PARAMS FOR ANOTHER QUERY, SINCE THE CONDITIONS WILL BE DIFFERENT
+		****************/
+		$deal_type = self::$_dealType['type'];
+		$deal_sector = self::$_industry['sector'];
+		$deal_region = self::$_country['regionName'];
+		$userCompanyId = @$_SESSION['company_id'];
+		
+		$stat_param = array();
+		$stat_param['deal_cat_name'] = $deal_type;
+		$stat_param['sector'] = $deal_sector;
+		$stat_param['region'] = $deal_region;
+		
+		$stat_param['partner_type'] = company_type_from_membership_type($_SESSION['member_type']);
+		$stat_param['exclude_partner_id'] = $userCompanyId;
+		$stat_param['ranking_criteria'] = "total_adjusted_deal_value";
+		
+		$start_offset = 0;
+		$num_to_fetch = 3;
+		
+		$dt2 = NULL;
+		$dt2_count = 0;
+		
+		$ok = $stat->front_generate_league_table_for_firms_paged($stat_param,$start_offset,$num_to_fetch,$dt2,$dt2_count);
+		
+		if($ok){
+			if (self::$_dealType['type'] == 'M&A') {
+				$deal_subcat2_name = self::$_dealType['subtype1'] . ' M&A';    
+			}               
+			$returnData['table2']['data'] = $dt2;
+			$returnData['table2']['label'] = "$deal_region, $deal_sector, $deal_type, {$_POST['year4']}";
+		}
+        return $returnData;                        
       }
       
       static function loadRequestById($id) {

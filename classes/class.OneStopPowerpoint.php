@@ -299,9 +299,14 @@ class OneStopPowerpoint {
     public function addRecentDealsSlide()
     {
         $slide = $this->createSlide();
-        
+        /*************
+		sng:21/nov/2012
+		We now have one or more participants ((with their own country/sector/industry)
+		we cannot have separate columns
+		We will show all as csv
+		***************/
         $headers = array(
-            'Rank', 'Company', 'Country', 'Industry', 'Deal Type', 'Date', 'Size $bn'
+            'Rank', 'Participant', 'Deal Type', 'Date', 'Size $bn'
         );
 
         
@@ -409,21 +414,21 @@ class OneStopPowerpoint {
 
             foreach ($c as $deal) {
                 $details = array();
-                @$this->_transaction->front_get_deal_detail($deal['transaction_id'], $details, $qqq);
+                @$this->_transaction->front_get_deal_detail_extra($deal['transaction_id'], $details, $qqq);
                 $transactions[] = $details;
             }
-
+			/***********
+			sng:20/nov/2012
+			Now we no longer use company, buyer, target of the transaction table. Now we have one or more
+			participants with roles.
+			We change the headings to 'Participants'
+			**************/
+			$headers = array(
+				'Participants', 'Date', 'Size $bn'
+			);
             if ('M&A' == $_POST['deal_cat_name']) {
-                $headers = array(
-                    'Buyer', 'Target', 'Date', 'Size $bn'
-                );
-
                 $data = $this->getCrossSellingDataFromTransactions($transactions, true);
             } else {
-                $headers = array(
-                    'Company', 'Date', 'Size $bn'
-                );
-
                 $data = $this->getCrossSellingDataFromTransactions($transactions);                
             }
             
@@ -433,7 +438,15 @@ class OneStopPowerpoint {
         
         $this->setSlideTitle($slide, 'Related Transactions of Our Firm');
     }
-    
+    /****************
+	sng:20/nov/2012
+	Now we have one or more participants with roles
+	The $transactions contains data that has the participants (with roles).
+	I think we will not require isMA flag, but ok, we keep it
+	in case we need it later
+	
+	We need to use the util function to create the list of participants
+	******************/
     public function getCrossSellingDataFromTransactions($transactions, $isMA = false)
     {
         $newData = array();
@@ -442,25 +455,24 @@ class OneStopPowerpoint {
         }
         
         foreach ($transactions as $transaction) {
-            if ($isMA) {
-                $newData[] = array(
-                    $transaction['company_name'],
-                    $transaction['target_company_name'],
-                    date('M Y', strtotime($transaction['date_of_deal'])),
-                    number_format((double) $transaction['value_in_billion'], 2)
-                );                
-            } else {
-                $newData[] = array(
-                    $transaction['company_name'],
-                    date('M Y', strtotime($transaction['date_of_deal'])),
-                    number_format((double) $transaction['value_in_billion'], 2)
-                );                  
-            }
+			$newData[] = array(
+				Util::deal_participants_to_csv_with_detail($transaction['participants']),
+				date('M Y', strtotime($transaction['date_of_deal'])),
+				number_format((double) $transaction['value_in_billion'], 2)
+			); 
         }
         
         return $newData;
     }
-    
+    /****************
+	sng:21/nov/2012
+	Now we have one or more participants with roles
+	The $transactions contains data that has the participants (with roles).
+	I think we will not require isMA flag, but ok, we keep it
+	in case we need it later
+	
+	We need to use the util function to create the list of participants
+	******************/
     public function parseRecentDealsValues($vals)
     {
         $newData = array();
@@ -477,9 +489,7 @@ class OneStopPowerpoint {
 
             $newData[] = array(
                 ($idx + 1),
-                $val['company_name'],
-                $val['hq_country'],
-                $val['industry'],
+                Util::deal_participants_to_csv_with_detail($val['participants']),
                 $cat,
                 date("M Y", strtotime($val['date_of_deal'])),
                 number_format((double) $val['value_in_billion'], 2)
@@ -683,7 +693,11 @@ class OneStopPowerpoint {
     
     public function serveFile() 
     {
-        $fileName = date('YmdHis') . rand(1, 999) . '.pptx';
+		/**********
+		This was storing the file in root folder.
+		Changed it a bit so that it is more like download_ppt.php
+		***********/
+        $fileName = FILE_PATH."/generatedPresentations/one_stop_meeting_".date('His') . rand(1, 99999) . '.pptx';
         $objWriter = PHPPowerPoint_IOFactory::createWriter($this->_ppObj, 'PowerPoint2007');
         $objWriter->save($fileName);
         $this->setHeaders($fileName);

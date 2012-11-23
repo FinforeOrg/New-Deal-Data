@@ -416,6 +416,9 @@ class Util {
 	There are codes that used to show the company name, its country, sector, industry.
 	With participants list, we cannot have list of companies in one cell and list of sectors in another cell. We ned to show
 	the participating companies along with sector/industry
+	
+	sng:20/nov/2012
+	We also add the role (if there is one)
 	**********************/
 	public static function deal_participants_to_csv_with_detail($participant_list){
 		$cnt = count($participant_list);
@@ -444,6 +447,15 @@ class Util {
 			if(""!=$extra){
 				$extra = substr($extra,2);
 				$data.="[".$extra."]";
+			}
+			/*********
+			sng:20/nov/2012
+			We check with role_id. That is more accurate
+			*********/
+			$role_id = $participant_list[$i]['role_id'];
+			$role_name = $participant_list[$i]['role_name'];
+			if($role_id!=0){
+				$data.=": ".$role_name;
 			}
 		}
 		$data = substr($data,2);
