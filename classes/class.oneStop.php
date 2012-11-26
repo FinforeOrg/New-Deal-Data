@@ -178,6 +178,11 @@ ttm.type AS dealType, ttm.subtype2 AS dealSubtype2, ttm.subtype1 as dealSubtype1
           }            
           $dealITypeID2 = $dealITypeID; 
           if ($dealITypeID == 0) {
+		  	/***************
+			sng:24/Nov/2012
+			Probable data bomb!
+			This is dependent on the fact that record with id=18 is M&A , Completed in the table transaction_type_master
+			*********************/
               $dealITypeID2 = 18;
           }
           

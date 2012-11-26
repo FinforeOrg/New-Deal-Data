@@ -288,6 +288,14 @@
 			$_POST['deal_size'] = Util::decode_deal_size($_POST['deal_size']);
             $queryWhereClauses.=" and value_in_billion".$_POST['deal_size'];
         }
+		/**************
+		sng:26/nov/2012
+		We need to exclude inactive deals
+		We exclude 'announced' Debt / Equity deals and M&A deals that are explicitly marked (in_calculation=0)
+		We use the alias t to mark the transaction table (just to be safe since other tables can have those fields)
+		****************/
+		$queryWhereClauses.=" and t.is_active='y' and t.in_calculation='1'";
+		
         /**************
 		sng:16/aug/2012
 		Now that we have participants for a deal, we do not check the deal_country csv fields for the deal.
@@ -351,16 +359,28 @@ WHERE rgnm.name = '".mysql_real_escape_string($_POST['region'])."'";
 		}
 		/********************************************************/
         $queryWhereClauses.=" GROUP BY partner_id";
-
-        $ranking_by = '';
-        if ($_POST['ranking_criteria'] != '') {
-            $ranking_by = $_POST['ranking_criteria'];
+		
+		/**********************
+		sng:26/nov/2012
+		Let us tweak the ordering.
+		By default, let us rank by number of deals, then by total deal value
+		(if 2 firms has done same num of deals, then see who made more valuable deals)
+		
+		If the ranking is by total deal value, then order by total deal value, then by adjusted deal value
+		(if 2 firms has made same amount of money, then see who had more, if individual shares are considered)
+		
+		If the ranking is by total adjusted deal value, then order by total adjusted deal value, then by total deal value
+		(if 2 firms has made same amount of money individually, then see who has worked on more valuable deals)
+		*******************/
+        $ranking_by = "num_deals DESC, total_deal_value DESC";
+		
+        if($_POST['ranking_criteria']=="num_deals") $ranking_by = "num_deals DESC, total_deal_value DESC";
+        else if($_POST['ranking_criteria']=="total_deal_value") $ranking_by = "total_deal_value DESC, total_adjusted_deal_value DESC";
+        else if($_POST['ranking_criteria']=="total_adjusted_deal_value") $ranking_by = "total_adjusted_deal_value DESC, total_deal_value DESC";
+        if($ranking_by != ""){
+            $queryWhereClauses.=" ORDER BY ".$ranking_by;
         }
-
-        if($ranking_by != ''){
-            $queryWhereClauses.=" ORDER BY ".$ranking_by." DESC";
-        }
-
+		
         $query = '
             select * from (
                 SELECT num_deals, partner_id, total_adjusted_deal_value, total_deal_value, name AS firm_name,  @rownum := @rownum + 1 AS rank
