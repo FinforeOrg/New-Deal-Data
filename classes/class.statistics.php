@@ -8,451 +8,113 @@ require_once("classes/class.stat_help.php");
 require_once("classes/db.php");
 
 class statistics{
-    public function get_home_page_chart_list_paged($start_offset,$num_to_fetch,&$data_arr,&$data_count){
-        global $g_mc;
-        $q = "select id,name,generated_on from ".TP."charts order by name limit ".$start_offset.",".$num_to_fetch;
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $data_count = mysql_num_rows($res);
-        if($data_count == 0){
-            //no recs
-            return true;
-        }
-        //recs so
-        while($row = mysql_fetch_assoc($res)){
-            $row['name'] = $g_mc->db_to_view($row['name']);
-            $data_arr[] = $row;
-        }
-        return true;
-    }
+	/***************
+	sng:27/nov/2012
+	We no longer use admin created charts in home page
+	public function get_home_page_chart_list_paged($start_offset,$num_to_fetch,&$data_arr,&$data_count)
+	public function get_home_page_chart_data($id,&$data_arr)
+	public function delete_home_page_chart($chart_id,&$msg)
+	public function generate_&nbsp;&nbsp;&nbsp;&nbsp;($param_arr,&$validation_passed,&$err_arr)
+	public function update_home_page_chart_image($id,$param_arr,&$validation_passed,&$err_arr)
+	private function home_page_chart_image($id,$param_arr,&$validation_passed,&$err_arr)
+	****************/
     
-    public function get_top_firms_list_paged($start_offset,$num_to_fetch,&$data_arr,&$data_count){
-        global $g_mc;
-        $q = "select id,caption,company_type,generated_on from ".TP."top_firms_by_criteria order by caption limit ".$start_offset.",".$num_to_fetch;
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $data_count = mysql_num_rows($res);
-        if($data_count == 0){
-            //no recs
-            return true;
-        }
-        //recs so
-        while($row = mysql_fetch_assoc($res)){
-            $row['caption'] = $g_mc->db_to_view($row['caption']);
-            $data_arr[] = $row;
-        }
-        return true;
-    }
+	
+	
+	/****************************************************
+    sng:01/oct/2010
+    A private function to create a preset charts that are to be shown by default in the issuance data page
+	private function issuance_page_chart_image($id,$param_arr,&$validation_passed,&$err_arr)
     
-    public function get_home_page_chart_data($id,&$data_arr){
-        global $g_mc;
-        $q = "select * from ".TP."charts where id='".$id."'";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $row = mysql_fetch_assoc($res);
-        $data_arr['id'] = $row['id'];
-        $data_arr['name'] = $g_mc->db_to_view($row['name']);
-        $data_arr['img'] = $row['img'];
-        $data_arr['containerId'] = $row['containerId'];
-        //unserialize the params, name not required since we got the name
-        $temp_arr = unserialize($row['params']);
-        $data_arr['partner_type'] = $temp_arr['partner_type'];
-        $data_arr['deal_cat_name'] = $temp_arr['deal_cat_name'];
-        $data_arr['deal_subcat1_name'] = $temp_arr['deal_subcat1_name'];
-        $data_arr['deal_subcat2_name'] = $temp_arr['deal_subcat2_name'];
-        $data_arr['year'] = $temp_arr['year'];
-        $data_arr['region'] = $temp_arr['region'];
-        $data_arr['country'] = $temp_arr['country'];
-        $data_arr['sector'] = $temp_arr['sector'];
-        $data_arr['industry'] = $temp_arr['industry'];
-        $data_arr['ranking_criteria'] = $temp_arr['ranking_criteria'];
-        return true;
-    }
-    
-    public function get_top_firms_data($id,&$data_arr){
-        global $g_mc;
-        $q = "select * from ".TP."top_firms_by_criteria where id='".$id."'";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $row = mysql_fetch_assoc($res);
-        $data_arr['id'] = $row['id'];
-        $data_arr['caption'] = $g_mc->db_to_view($row['caption']);
-        $data_arr['company_type'] = $row['company_type'];
-        //the firm data are in id1|firm1|stat1]id2|firm2|stat2]
-        $firm_data_arr = explode("]",$row['firm_data']);
-        $data_arr['firms'] = array();
-        $firm_count = count($firm_data_arr);
-        for($a=0;$a<$firm_count;$a++){
-            $data_arr['firms'][$a] = explode("|",$firm_data_arr[$a]);
-            $data_arr['firms'][$a][1] = $g_mc->db_to_view($data_arr['firms'][$a][1]);
-        }
-        
-        //unserialize the params, name not required since we got the name
-        $temp_arr = unserialize($row['params']);
-        $data_arr['partner_type'] = $temp_arr['partner_type'];
-        $data_arr['deal_cat_name'] = $temp_arr['deal_cat_name'];
-        $data_arr['deal_subcat1_name'] = $temp_arr['deal_subcat1_name'];
-        $data_arr['deal_subcat2_name'] = $temp_arr['deal_subcat2_name'];
-        $data_arr['year'] = $temp_arr['year'];
-        $data_arr['region'] = $temp_arr['region'];
-        $data_arr['country'] = $temp_arr['country'];
-        $data_arr['sector'] = $temp_arr['sector'];
-        $data_arr['industry'] = $temp_arr['industry'];
-        $data_arr['ranking_criteria'] = $temp_arr['ranking_criteria'];
-        return true;
-    }
-    
-    public function delete_home_page_chart($chart_id,&$msg){
-        /***
-        sng:26/may/2010
-        Hoame page chart can be assigned to a firm. If so, do not delete.
-        This means, we take a ref to msg and set it from here
-        *******/
-        $q = "select count(*) as cnt from ".TP."firm_chart where chart_id='".$chart_id."'";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $row = mysql_fetch_assoc($res);
-        if($row['cnt'] > 0){
-            $msg = "Cannot delete. The chart is associated with a firm";
-            return true;
-        }
-        /////////////////////////////////////////
-        //get chart img first
-        $q = "select img from ".TP."charts where id='".$chart_id."'";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $row = mysql_fetch_assoc($res);
-        $img = $row['img'];
-        if(($img!="")&&file_exists(FILE_PATH."/admin/charts/".$img)){
-            unlink(FILE_PATH."/admin/charts/".$img);
-        }
-        //now delete record
-        $q = "delete from ".TP."charts where id='".$chart_id."'";
-        $result = mysql_query($q);
-        if(!$result) return false;
-        else{
-            $msg = "Chart deleted";
-            return true;
-        }
-    }
-    
-    public function delete_top_firms($id,&$msg){
-        
-        //delete record
-        $q = "delete from ".TP."top_firms_by_criteria where id='".$id."'";
-        $result = mysql_query($q);
-        if(!$result) return false;
-        else{
-            $msg = "Deleted";
-            return true;
-        }
-    }
-    
-    public function delete_firm_chart($id,&$msg){
-        
-        $q = "delete from ".TP."firm_chart where id='".$id."'";
-        $result = mysql_query($q);
-        if(!$result) return false;
-        else{
-            $msg = "Deleted";
-            return true;
-        }
-    }
-    
-    public function generate_home_page_chart_image($param_arr,&$validation_passed,&$err_arr){
-        return $this->home_page_chart_image(0,$param_arr,$validation_passed,$err_arr);
-        
-    }
-    
-    public function update_home_page_chart_image($id,$param_arr,&$validation_passed,&$err_arr){
-        return $this->home_page_chart_image($id,$param_arr,$validation_passed,$err_arr);
-    }
-    
-    public function generate_top_firms($param_arr,&$validation_passed,&$err_arr){
-        return $this->top_firms_per_criteria(0,$param_arr,$validation_passed,$err_arr);
-    }
-    public function update_top_firms($id,$param_arr,&$validation_passed,&$err_arr){
-        return $this->top_firms_per_criteria($id,$param_arr,$validation_passed,$err_arr);
-    }
-    /***
     sng:01/oct/2010
     to generate preset issuance charts
-    ***/
-    public function generate_issuance_page_chart_image($param_arr,&$validation_passed,&$err_arr){
-        return $this->issuance_page_chart_image(0,$param_arr,$validation_passed,$err_arr);
-    }
-    public function update_issuance_page_chart_image($id,$param_arr,&$validation_passed,&$err_arr){
-        return $this->issuance_page_chart_image($id,$param_arr,$validation_passed,$err_arr);
-    }
-    public function get_issuance_page_chart_list_paged($start_offset,$num_to_fetch,&$data_arr,&$data_count){
-        global $g_mc;
-        $q = "select id,name,generated_on from ".TP."issuance_charts order by name limit ".$start_offset.",".$num_to_fetch;
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $data_count = mysql_num_rows($res);
-        if($data_count == 0){
-            //no recs
-            return true;
-        }
-        //recs so
-        while($row = mysql_fetch_assoc($res)){
-            $row['name'] = $g_mc->db_to_view($row['name']);
-            $data_arr[] = $row;
-        }
-        return true;
-    }
-    public function delete_issuance_page_chart($chart_id,&$msg){
-        
-        //get issuance chart img first
-        $q = "select img from ".TP."issuance_charts where id='".$chart_id."'";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $row = mysql_fetch_assoc($res);
-        $img = $row['img'];
-        if(($img!="")&&file_exists(FILE_PATH."/admin/charts/".$img)){
-            unlink(FILE_PATH."/admin/charts/".$img);
-        }
-        //now delete record
-        $q = "delete from ".TP."issuance_charts where id='".$chart_id."'";
-        $result = mysql_query($q);
-        if(!$result) return false;
-        else{
-            $msg = "Chart deleted";
-            return true;
-        }
-    }
-    public function get_issuance_page_chart_data($id,&$data_arr){
-        global $g_mc;
-        $q = "select * from ".TP."issuance_charts where id='".$id."'";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $row = mysql_fetch_assoc($res);
-        $data_arr['id'] = $row['id'];
-        $data_arr['name'] = $g_mc->db_to_view($row['name']);
-        $data_arr['img'] = $row['img'];
-        //unserialize the params, name not required since we got the name
-        $temp_arr = unserialize($row['params']);
-        
-        $data_arr['deal_cat_name'] = $temp_arr['deal_cat_name'];
-        $data_arr['deal_subcat1_name'] = $temp_arr['deal_subcat1_name'];
-        $data_arr['deal_subcat2_name'] = $temp_arr['deal_subcat2_name'];
-        
-        $data_arr['region'] = $temp_arr['region'];
-        $data_arr['country'] = $temp_arr['country'];
-        $data_arr['sector'] = $temp_arr['sector'];
-        $data_arr['industry'] = $temp_arr['industry'];
-        $data_arr['deal_size'] = $temp_arr['deal_size'];
-        /*************
-        sng:10/jan/2011
-        we have added 2 fields
-        *******/
-        $data_arr['month_division'] = $temp_arr['month_division'];
-        $data_arr['month_division_list'] = $temp_arr['month_division_list'];
-        return true;
-    }
-    /*************************************************/
+	public function generate_issuance_page_chart_image($param_arr,&$validation_passed,&$err_arr)
+	
+	public function update_issuance_page_chart_image($id,$param_arr,&$validation_passed,&$err_arr)
+	
+	public function get_issuance_page_chart_list_paged($start_offset,$num_to_fetch,&$data_arr,&$data_count)
+	
+	public function delete_issuance_page_chart($chart_id,&$msg)
+	
+	public function get_issuance_page_chart_data($id,&$data_arr)
+	
+	sng:27/nov/2012
+	We no longer show pre-generated issuance data chart in front end so these are not needed
+	---------------
+	sng:04/oct/2010
+	
+	sng:27/nov/2012
+	Not used anywhere
+	public function front_get_random_issuance_charts($num_chart,&$data_arr,&$num_charts_found)
+	*********************************************/
     
-    public function assign_chart_to_firm($chart_id,$param_arr,&$validation_passed,&$err_arr){
-        $validation_passed = true;
-        if($param_arr['assign_firm_name']==""){
-            $validation_passed = false;
-            $err_arr['assign_company_id'] = "Please specify the firm";
-        }else{
-            if($param_arr['assign_company_id']==""){
-                $validation_passed = false;
-                $err_arr['assign_company_id'] = "The firm was not found";
-            }
-        }
-        if(!$validation_passed){
-            return true;
-        }
-        /////////////////////////////
-        //check if this chart is assigned to this firm or not
-        $q = "select count(*) as cnt from ".TP."firm_chart where company_id='".$param_arr['assign_company_id']."' and chart_id='".$chart_id."'";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $row = mysql_fetch_assoc($res);
-        if($row['cnt']>0){
-            $validation_passed = false;
-            $err_arr['assign_company_id'] = "The chart has already been assigned to this firm";
-            return true;
-        }
-        /////////////////////////////////
-        //insert the record
-        $q = "insert into ".TP."firm_chart set company_id='".$param_arr['assign_company_id']."', company_type='".$param_arr['company_type']."', chart_id='".$chart_id."'";
-        $result = mysql_query($q);
-        if(!$result){
-            return false;
-        }
-        $validation_passed = true;
-        return true;
-    }
     
-	/**************
+	
+	/*************************
+	sng:27/nov/2012
+	We no longer use admin created charts and assign it to a firm
+	public function firm_chart_list_paged($start_offset,$num_to_fetch,&$data_arr,&$data_count)
+	public function delete_firm_chart($id,&$msg)
+	public function assign_chart_to_firm($chart_id,$param_arr,&$validation_passed,&$err_arr)
+	
 	sng:22/sep/2011
 	Given a chart, we need to show which firms are associated with the chart
-	*************/
-	public function firms_associated_with_chart($chart_id,&$data_arr,&$data_count){
-		global $g_db;
-		$q = "select f.id,name from ".TP."firm_chart as f left join ".TP."company as c on(f.company_id=c.company_id) where chart_id='".$chart_id."'";
-		$success = $g_db->select_query($q);
-		if(!$success){
-			return false;
-		}
-		$data_count = $g_db->row_count();
-		if(0 == $data_count){
-			//no data
-			return true;
-		}
-		$data_arr = $g_db->get_result_set_as_array();
-		return true;
-	}
-	/*******************
+	public function firms_associated_with_chart($chart_id,&$data_arr,&$data_count)
+	
 	sng:26/sep/2011
 	Given a chart and associated firms, admin may want to dissociate a firm from a chart (maybe
 	after entering new deal data, the chart does not highlight the firm
-	***********************/
-	public function remove_firm_from_chart($firm_assoc_id){
-		global $g_db;
-		$q = "delete from ".TP."firm_chart where id='".$firm_assoc_id."'";
-		$success = $g_db->mod_query($q);
-		return $success;
-	}
+	public function remove_firm_from_chart($firm_assoc_id)
 	
-    public function firm_chart_list_paged($start_offset,$num_to_fetch,&$data_arr,&$data_count){
-        global $g_mc;
-        $q = "select f.id,company_type,chart_id,c.name as company_name,r.name as chart_name,r.img, r.containerId, r.id as chartId from ".TP."firm_chart as f left join ".TP."company as c on(f.company_id=c.company_id) left join ".TP."charts as r on(f.chart_id=r.id) order by company_name limit ".$start_offset.",".$num_to_fetch;
-        $res = mysql_query($q);
-        
-        if(!$res){
-            //echo mysql_error();
-            return false;
-        }
-        $data_count = mysql_num_rows($res);
-        if($data_count == 0){
-            //no recs
-            return true;
-        }
-        //recs so
-        for($i=0;$i<$data_count;$i++){
-            $data_arr[$i] = mysql_fetch_assoc($res);
-            $data_arr[$i]['company_name'] = $g_mc->db_to_view($data_arr[$i]['company_name']);
-            $data_arr[$i]['chart_name'] = $g_mc->db_to_view($data_arr[$i]['chart_name']);
-        }
-        return true;
-    } 
+	public function front_get_charts_for_firm($firm_id,&$data_arr,&$data_count)
+	******************************/
+     
     /////////////////////////////////////////FRONT END FUNCTIONS STARTS/////////////////
-    public function front_get_home_page_charts(&$data_arr){
-        global $g_mc;
-        //get 2 random charts
-        $q = "select id,name,img,generated_on from ".TP."charts order by rand() limit 0,2";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        //there may not be any charts
-        while($row = mysql_fetch_assoc($res)){
-            $row['name'] = $g_mc->db_to_view($row['name']);
-            $data_arr[] = $row;
-        }
-        return true;
-    }
+	/*********************
+	sng:27/nov/2012
+	We no longer show two pre-created charts on home page so no longer need this
+	public function front_get_home_page_charts(&$data_arr)
+	*********************/
+    
     
     /*******
     sng:4/jan/2011
     We will show a slideshow of the homepage chart images, so we get all the image and names
+	
+	sng:27/nov/2012
+	We now have League table generator in home page so we no longer need this
+	public function front_get_all_home_page_charts(&$data_arr,&$data_count)
     *****/
-    public function front_get_all_home_page_charts(&$data_arr,&$data_count){
-        global $g_mc;
-        
-        $q = "select name,img from ".TP."charts order by generated_on desc";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $data_count = mysql_num_rows($res);
-        if(0 == $data_count){
-            //no charts
-            return true;
-        }
-        for($i=0;$i<$data_count;$i++){
-            $data_arr[$i] = mysql_fetch_assoc($res);
-            $data_arr[$i]['name'] = $g_mc->db_to_view($data_arr[$i]['name']);
-        }
-        return true;
-    }
     
-    /***
-    type: bank or law firm
-    **/
-    public function front_get_top_firms_per_criteria($type,&$data_arr,&$data_count){
-        global $g_mc;
-        $q = "select * from ".TP."top_firms_by_criteria where company_type='".$type."'";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $data_count = mysql_num_rows($res);
-        if(0==$data_count){
-            return true;
-        }
-        ///////////////////
-        for($i=0;$i<$data_count;$i++){
-            $row = mysql_fetch_assoc($res);
-            $data_arr[$i] = array();
-            $data_arr[$i]['caption'] = $g_mc->db_to_view($row['caption']);
-            //the firms are in firm_data, separated by ]. We separate each
-            $firm_data_tokens = explode("]",$row['firm_data']);
-            //how many tokens
-            $data_arr[$i]['firm_count'] = count($firm_data_tokens);
-            if(0==$data_arr[$i]['firm_count']){
-                $data_arr[$i]['firm_data_arr'] = NULL;
-                continue;
-            }
-            $data_arr[$i]['firm_data_arr'] = $firm_data_tokens;
-            //each firm data contains id and name, separated by |. We do not tokenize here
-        }
-        return true;
-    }
     
-    public function front_get_charts_for_firm($firm_id,&$data_arr,&$data_count){
-        global $g_mc;
-        $q = "select f.*,c.name,c.img,c.containerId, c.id from ".TP."firm_chart as f left join ".TP."charts as c on(f.chart_id=c.id) where company_id='".$firm_id."'";
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $data_count = mysql_num_rows($res);
-        if(0==$data_count){
-            return true;
-        }
-        ///////////////////
-        for($i=0;$i<$data_count;$i++){
-            $data_arr[$i] = mysql_fetch_assoc($res);
-            $data_arr[$i]['name'] = $g_mc->db_to_view($data_arr[$i]['name']);
-        }
-        return true;
-    }
+    /******************
+	sng:27/nov/2012
+	we no longer have this concept of top banks per criteria. It is admin who marks some banks as 'top'
+	
+	type: bank or law firm
+	public function front_get_top_firms_per_criteria($type,&$data_arr,&$data_count)
+	
+	
+	public function generate_top_firms($param_arr,&$validation_passed,&$err_arr)
+	public function update_top_firms($id,$param_arr,&$validation_passed,&$err_arr)
+	
+	
+    sng:27/may/2010
+    This is a support to get top 5 firms given a criteria and store the list. This way, the list can be shown again and again without
+    recomputation. Example, a top 5 banks for Equity in year 2009 wil not change
+    
+    private function top_firms_per_criteria($id,$param_arr,&$validation_passed,&$err_arr)
+	
+	public function delete_top_firms($id,&$msg)
+	
+	public function get_top_firms_data($id,&$data_arr)
+	
+	public function get_top_firms_list_paged($start_offset,$num_to_fetch,&$data_arr,&$data_count)
+	*******************/
+    
+    
+    
+    
     /////////////////////////////////////////FRONT END FUNCTIONS ENDS///////////////////
     
     /////////////////////////////////////STAT FOR MEMBERS FRONT STARTS/////////////
@@ -483,83 +145,7 @@ class statistics{
     }
     /////////////////////////////////////STAT FOR MEMBERS FRONT ENDS////////////////////
     
-    private function home_page_chart_image($id,$param_arr,&$validation_passed,&$err_arr){
-        global $g_mc,$g_barchart;
-        //validation
-        $validation_passed = true;
-        
-        if($param_arr['name']==""){
-            $validation_passed = false;
-            $err_arr['name'] = "Please specify the chart caption";
-        }
-        if($param_arr['partner_type']==""){
-            $validation_passed = false;
-            $err_arr['partner_type'] = "Please specify partner type";
-        }
-        if($param_arr['deal_cat_name']==""){
-            $validation_passed = false;
-            $err_arr['deal_cat_name'] = "Please specify type of deal";
-        }
-        //sub cat and sub sub cat are optional
-        if($param_arr['year']==""){
-            $validation_passed = false;
-            $err_arr['year'] = "Please specify the year";
-        }
-        //country, region, sector, industry optional
-        if($param_arr['ranking_criteria']==""){
-            $validation_passed = false;
-            $err_arr['ranking_criteria'] = "Please specify the ranking criteria";
-        }
-        if(!$validation_passed){
-            //no need to proceed
-            return true;
-        }
-        //////////////////////////////////////////////////////////////////////
-        //we need to get the data
-        $num_values = 0;
-        $max_value = 0;
-        $data_arr = array();
-        $stat_params = array();
-        /******
-        sng:29/sep/2010
-        this function is called only when admin is adding / updating home page chart
-        Now that form sends id of a date range row instead of year
-        Problem is, generate_ranking is also used by many other functions and we cannot change the
-        behaviour. So we send a flag in the param_arr year_is_date_range_id with value of y
-        **********************/
-        $param_arr['year_is_date_range_id'] = 'y';
-        $today = date("Y-m-d H:i:s");
-        require_once(dirname(__FILE__) . '/class.leagueTableChart.php');
-        $chart = new leagueTableChart($param_arr);
-        $chart->setName(md5($param_arr['name'] . $today));
-        //$chart->setTitle($param_arr['name']);
-        
-        $chartMarkup =  base64_encode($chart->getHtml(true));
-        
-        $serialized_param = serialize($param_arr);
-        //we insert into db if id is 0, else this is an update operation
-        
-        if($id==0){
-            $q = "insert into ".TP."charts ";
-        }else{
-            $q = "update ".TP."charts ";
-        }
-        
-        $q .= sprintf("set name ='%s', img='%s', params = '%s', generated_on = '%s', containerId = '%s'", $param_arr['name'], $chartMarkup, $serialized_param, $today, md5($param_arr['name'] . $today));
-        
-        //if this is update, we put the where clause
-        if($id!=0){
-            $q.=" where id='".$id."'";
-        }
-         
-        $result = mysql_query($q);
-        if(!$result){
-            return false;
-        }
-        /////////////////////
-        $validation_passed = true;
-        return true;
-    }
+    
     /*****
     Generate ranking data. This is basically an array where each element is an assoc array.
     Each assoc array contains 'name' and 'value', since this is the form in which barchart accept data
@@ -586,209 +172,9 @@ class statistics{
     
     *****/
     
-    /*********
-    sng:01/oct/2010
-    A private function to create a preset charts that are to be shown by default in the issuance data page
-    *********/
-    private function issuance_page_chart_image($id,$param_arr,&$validation_passed,&$err_arr){
-        global $g_mc,$g_barchart;
-        //validation
-        $validation_passed = true;
-        
-        if($param_arr['name']==""){
-            $validation_passed = false;
-            $err_arr['name'] = "Please specify the chart caption";
-        }
-        
-        if($param_arr['deal_cat_name']==""){
-            $validation_passed = false;
-            $err_arr['deal_cat_name'] = "Please specify type of deal";
-        }
-        //sub category, sub sub category, region, country, sector, industry, deal size are optional
-        if(!$validation_passed){
-            //no need to proceed
-            return true;
-        }
-        //////////////////////////////////////////////////////////////////////
-        //we need to get the data
-        $num_values = 0;
-        $max_value = 0;
-        $data_arr = array();
-        
-        $success = $this->generate_issuance_data($param_arr,$data_arr,$max_value,$num_values);
-        if(!$success){
-            return false;
-        }
-        if($num_values==0){
-            return true;
-        }
-        
-        ////////////////////////////////////////////////////////////
-        //name will be magic quoted before it is inserted in database
-        //caption cannot have any \'
-        $caption = $g_mc->view_to_view($param_arr['name']);
-        //////////////////////////////////////////////////////////////
-        //create the chart
-        $g_barchart->show_legend_detail(false);
-        $font_path_name = FILE_PATH."/font/tahoma.ttf";
-        $g_barchart->set_font($font_path_name);
-        $g_barchart->set_dimension(500,275);
-        $g_barchart->set_bar_gap(30);
-        $g_barchart->set_bar_width(40);
-        $g_barchart->set_stat_value_label_format("$%nbn");
-        
-        $img_name = "issuance_".time().".png";
-        $store_image_path_name = FILE_PATH."/admin/charts/".$img_name;
-        $g_barchart->render($data_arr,$max_value,$num_values,true,$store_image_path_name);
-        ///////////////////////////////////////////
-        //we need to store the clauses
-        $param_arr['name'] = $g_mc->view_to_db($param_arr['name']);
-        $serialized_param = serialize($param_arr);
-        //if this is an update, before inserting into db, we need the prev image name and delete that
-        if($id!=0){
-            $q = "select img from ".TP."issuance_charts where id='".$id."'";
-            $res = mysql_query($q);
-            if(!$res){
-                return false;
-            }
-            $row = mysql_fetch_assoc($res);
-            $img = $row['img'];
-        
-            if(($img!="")&&file_exists(FILE_PATH."/admin/charts/".$img)){
-                unlink(FILE_PATH."/admin/charts/".$img);
-            }
-        }
-        //we insert into db if id is 0, else this is an update operation
-        $today = date("Y-m-d H:i:s");
-        if($id==0){
-            $q = "insert into ".TP."issuance_charts ";
-        }else{
-            $q = "update ".TP."issuance_charts ";
-        }
-        
-        $q.= "set name='".$param_arr['name']."',img='".$img_name."',params='".$serialized_param."', generated_on='".$today."'";
-        //if this is update, we put the where clause
-        if($id!=0){
-            $q.=" where id='".$id."'";
-        }
-         
-        $result = mysql_query($q);
-        if(!$result){
-            return false;
-        }
-        /////////////////////
-        $validation_passed = true;
-        return true;
-    }
     
-    /***
-    sng:27/may/2010
-    This is a support to get top 5 firms given a criteria and store the list. This way, the list can be shown again and again without
-    recomputation. Example, a top 5 banks for Equity in year 2009 wil not change
-    ********/
-    private function top_firms_per_criteria($id,$param_arr,&$validation_passed,&$err_arr){
-        global $g_mc,$g_barchart;
-        //validation
-        $validation_passed = true;
-        
-        if($param_arr['caption']==""){
-            $validation_passed = false;
-            $err_arr['caption'] = "Please specify the caption";
-        }
-        if($param_arr['partner_type']==""){
-            $validation_passed = false;
-            $err_arr['partner_type'] = "Please specify company type";
-        }
-        if($param_arr['deal_cat_name']==""){
-            $validation_passed = false;
-            $err_arr['deal_cat_name'] = "Please specify type of deal";
-        }
-        //sub cat and sub sub cat are optional
-        if($param_arr['year']==""){
-            $validation_passed = false;
-            $err_arr['year'] = "Please specify the year";
-        }
-        //country, region, sector, industry optional
-        if($param_arr['ranking_criteria']==""){
-            $validation_passed = false;
-            $err_arr['ranking_criteria'] = "Please specify the ranking criteria";
-        }
-        if(!$validation_passed){
-            //no need to proceed
-            return true;
-        }
-        //////////////////////////////////////////////////////////////////////
-        //we need to get the data
-        $num_values = 0;
-        $max_value = 0;
-        $data_arr = array();
-        $stat_params = array();
-        
-        $success = $this->generate_ranking($param_arr,$data_arr,$max_value,$num_values);
-        if(!$success){
-            return false;
-        }
-        //even if there is no list, we do not return
-        //note: the generate ranking return only name value pair, that is, item name and stat value
-        //Here we need to get the id of the firm also. We do not change generate_ranking code
-        //but make db call
-        
-        $data_stream = "";
-        for($k=0;$k<$num_values;$k++){
-            $data_stream_firm_name = $data_arr[$k]['name'];
-            $data_stream_firm_value = $data_arr[$k]['value'];
-            //we magic quote for view and then add slashes
-            $temp_company_name = addslashes($g_mc->db_to_view($data_stream_firm_name));
-            //get the id from name, remember to search with company name and type (since some firm acts as bank and law firm)
-            $company_q = "select company_id from ".TP."company where type='".$param_arr['partner_type']."' and name='".$temp_company_name."'";
-            $company_q_res = mysql_query($company_q);
-            if(!$company_q_res){
-                return false;
-            }
-            $company_q_res_cnt = mysql_num_rows($company_q_res);
-            if(0 == $company_q_res_cnt){
-                //strange, the firm's id cannot be found
-                return false;
-            }
-            //found
-            $company_q_res_row = mysql_fetch_assoc($company_q_res);
-            $data_stream_firm_id = $company_q_res_row['company_id'];
-            ///////////////////////////
-            //we magic quote to view
-            $item_data = $data_stream_firm_id."|".$g_mc->db_to_view($data_stream_firm_name)."|".$data_stream_firm_value;
-            $data_stream.="]".$item_data;
-        }
-        if($data_stream != ""){
-            //remove the first ]
-            $data_stream = substr($data_stream,1);
-        }
-        ///////////////////////////////////////////////////////////////////////
-        //we need to store the clauses
-        $param_arr['caption'] = $g_mc->view_to_db($param_arr['caption']);
-        $serialized_param = serialize($param_arr);
-        
-        //we insert into db if id is 0, else this is an update operation
-        $today = date("Y-m-d H:i:s");
-        if($id==0){
-            $q = "insert into ".TP."top_firms_by_criteria ";
-        }else{
-            $q = "update ".TP."top_firms_by_criteria ";
-        }
-        
-        $q.= "set caption='".$param_arr['caption']."',firm_data='".$data_stream."',company_type='".$param_arr['partner_type']."',params='".$serialized_param."', generated_on='".$today."'";
-        //if this is update, we put the where clause
-        if($id!=0){
-            $q.=" where id='".$id."'";
-        }
-         
-        $result = mysql_query($q);
-        if(!$result){
-            return false;
-        }
-        /////////////////////
-        $validation_passed = true;
-        return true;
-    }
+    
+    
     
     /********************************************************
     sng:24/july/2010
@@ -1072,313 +458,88 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
     if the short name is there, that name is used
     ********/
     public function generate_ranking($stat_params,&$data_arr,&$max_value,&$num_values){
-        global $g_mc;
-        /*********************
-        sng:29/sep/2010
-        watch out for $stat_params['year_is_date_range_id']. If set and y, then deal year is not year but date range id.
-        get the date range values and update the query to use deal date instead of deal year and set a flag
-        ****************/
-        if(isset($stat_params['year_is_date_range_id'])&&($stat_params['year_is_date_range_id']=='y')){
-            $use_deal_date = true;
-            $deal_range_q = "select date_from,date_to from ".TP."date_range_master where id='".$stat_params['year']."'";
-            $deal_range_q_res = mysql_query($deal_range_q);
-            if(!$deal_range_q_res){
-                return false;
-            }
-            $deal_range_q_res_cnt = mysql_num_rows($deal_range_q_res);
-            if(0 == $deal_range_q_res_cnt){
-                return false;
-            }
-            $deal_range_q_res_row = mysql_fetch_assoc($deal_range_q_res);
-            $use_deal_date_from = $deal_range_q_res_row['date_from'];
-            $use_deal_date_to = $deal_range_q_res_row['date_to'];
-        }else{
-            $use_deal_date = false;
-        }
-        $filter_trans = "";
-        $filter_trans_clause = "";
-        if(isset($stat_params['deal_cat_name'])&&($stat_params['deal_cat_name']!="")){
-            $filter_trans_clause.=" and deal_cat_name='".$stat_params['deal_cat_name']."'";
-        }
-        if(isset($stat_params['deal_subcat1_name'])&&($stat_params['deal_subcat1_name']!="")){
-            $filter_trans_clause.=" and deal_subcat1_name='".$stat_params['deal_subcat1_name']."'";
-        }
-        if(isset($stat_params['deal_subcat2_name'])&&($stat_params['deal_subcat2_name']!="")){
-            $filter_trans_clause.=" and deal_subcat2_name='".$stat_params['deal_subcat2_name']."'";
-        }
-        /***********************************************************
-        sng:3/nov/2010
-        Now when sector or industry is specified, we search in transaction table
+		/*******
+		We would like to use front_generate_league_table_for_firms_paged
+		how this is different from front_generate_league_table_for_firms_paged($stat_param,$start_offset,$num_to_fetch,&$data_arr,&$data_count)?
+		params
+		1:year_is_date_range_id
+		This param is used by only one function - statistics::home_page_chart_image (see old version of stat class)
+		(deleted now since we no longer have pre-created League Table charts for home page).
 		
-		sng:10/aug/2012
-		Now we have participants for a deal and we search the deals whose participants are from the given country/sector/industry
+		Therefore, we can ignore this - $use_deal_date = false
 		
-		We have put that code down below
-        ***************/
-        
-        /*********************************************************************/
-        /***
-        sng:11/jun/2010
-        The year can be in a range like 2009-2010 or it may be a single like 2009
-        *******/
-        if(isset($stat_params['year'])&&($stat_params['year']!="")){
-            /*****
-            sng:29/sep/2010
-            if use_deal_date is true, it means, date range id was sent.
-            in that case do not use year in the stat_param
-            **********/
-            if($use_deal_date){
-                if($use_deal_date_from!="0000-00-00"){
-                    $filter_trans_clause.=" and date_of_deal>='".$use_deal_date_from."'";
-                }
-                if($use_deal_date_to!="0000-00-00"){
-                    $filter_trans_clause.=" AND date_of_deal<='".$use_deal_date_to."'";
-                }
-            }else{
-                $year_tokens = explode("-",$stat_params['year']);
-                $year_tokens_count = count($year_tokens);
-                if($year_tokens_count == 1){
-                    //singleton year
-                    $filter_trans_clause.=" and year(date_of_deal)='".$year_tokens[0]."'";
-                }
-                if($year_tokens_count == 2){
-                    //range year
-                    $filter_trans_clause.=" and year(date_of_deal)>='".$year_tokens[0]."' AND year(date_of_deal)<='".$year_tokens[1]."'";
-                }
-            }
-            ///$filter_trans_clause.=" and year(date_of_deal)='".$stat_params['year']."'";
-        }
-        /***
-        sng:23/july/2010
-        The deal size can be blank or <=valuein billion or >=value in billion
-		
-		sng:7/sep/2012
-		better pass through util::decode_deal_size
-        ********/
-        if(isset($stat_params['deal_size'])&&($stat_params['deal_size']!="")){
-			$stat_params['deal_size'] = Util::decode_deal_size($stat_params['deal_size']);
-            $filter_trans_clause.=" and value_in_billion".$stat_params['deal_size'];
-        }
-		
-		/**************
-		sng:5/sep/2012
-		We need to exclude inactive deals
-		We exclude 'announced' Debt / Equity deals and M&A deals that are explicitly marked (in_calculation=0)
-		We use the alias t to mark the transaction table (just to be safe since other tables can have those fields)
-		****************/
-		$filter_trans_clause.=" and t.is_active='y' and t.in_calculation='1'";
-        /**************************************************************************************
-        sng:1/dec/2010
-        Now when country is present, we check the transaction::deal_country field
-        Same for region
-		
-		sng:10/aug/2012
-		Now we have participants for a deal and we search the deals whose participants are from the given country/sector/industry
-        *********************/
-        $filter_by_company_attrib = "";
-		if(isset($stat_params['country'])&&($stat_params['country']!="")){
-			if($filter_by_company_attrib != ""){
-				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
-			}
-			$filter_by_company_attrib.="hq_country='".mysql_real_escape_string($stat_params['country'])."'";
+		companies.short_name: this is not fetched by LT code
+		******/
+		/****************
+		ranking_criteria: if not set, we return false
+		*******************/
+		if(!isset($stat_params['ranking_criteria'])){
+			return false;
 		}else{
-			/**********
-			might check region. Associated with a region is one or more countries
-			We can use IN clause, that is hq_country IN (select country names for the given region), but it seems that
-			it is much faster if we first get the country names and then create the condition with OR, that is
-			(hq_country='Brazil' OR hq_country='Russia') etc
-			***********/
-			if(isset($stat_params['region'])&&($stat_params['region']!="")){
-				//get the country names for this region name
-				$region_q = "SELECT ctrym.name FROM ".TP."region_master AS rgnm LEFT JOIN ".TP."region_country_list AS rcl ON ( rgnm.id = rcl.region_id ) LEFT JOIN ".TP."country_master AS ctrym ON ( rcl.country_id = ctrym.id )
-WHERE rgnm.name = '".mysql_real_escape_string($stat_params['region'])."'";
-				$region_q_res = mysql_query($region_q);
-				if(!$region_q_res){
-					
-					return false;
-				}
-				$region_q_res_cnt = mysql_num_rows($region_q_res);
-				$region_clause = "";
-				if($region_q_res_cnt > 0){
-					while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
-						$region_clause.="|hq_country='".mysql_real_escape_string($region_q_res_row['name'])."'";
-					}
-					$region_clause = substr($region_clause,1);
-					$region_clause = str_replace("|"," OR ",$region_clause);
-					$region_clause = "(".$region_clause.")";
-				}
-				if($region_clause!=""){
-					if($filter_by_company_attrib != ""){
-						$filter_by_company_attrib = $filter_by_company_attrib." AND ";
-					}
-					$filter_by_company_attrib.=$region_clause;
-				}
+			if(($stat_params['ranking_criteria']!="num_deals")&&($stat_params['ranking_criteria']!="total_deal_value")&&($stat_params['ranking_criteria']!="total_adjusted_deal_value")){
+				return false;
 			}
 		}
-			
-		if(isset($stat_params['sector'])&&($stat_params['sector']!="")){
-			if($filter_by_company_attrib != ""){
-				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
-			}
-			$filter_by_company_attrib.="sector='".mysql_real_escape_string($stat_params['sector'])."'";
-		}
-			
-		if(isset($stat_params['industry'])&&($stat_params['industry']!="")){
-			if($filter_by_company_attrib != ""){
-				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
-			}
-			$filter_by_company_attrib.="industry='".mysql_real_escape_string($stat_params['industry'])."'";
-		}
-        /*********************************************************************************************/
-        
 		/**********************
-		sng:10/aug/2012
-        Since we use the filter clause only against transaction table, why not use it directly instead of using IN clause
-		**********************/
-        if (isset($stat_params['max_date'])) {
-            $filter_trans_clause .= sprintf(' and last_edited < "%s" ', $stat_params['max_date']); 
-        }
-        /////////////////////////////////////
-        if(isset($stat_params['ranking_criteria'])&&($stat_params['ranking_criteria'] == "num_deals")){
-            $q = "SELECT deals_banks.num_deals as stat_value, .
-                    companies.company_id, 
-                    companies.name,companies.short_name 
-                  FROM (
-                    SELECT count( tp.transaction_id ) AS num_deals, 
-                        partner_id FROM ".TP."transaction_partners tp
-                        LEFT JOIN " . TP . "transaction t 
-                            ON t.id = tp.transaction_id ";
-					/*********
-					sng:10/aug/2012
-					snippet for company filter clause
-					**********/
-					if($filter_by_company_attrib!=""){
-						$q.=" INNER JOIN (SELECT DISTINCT transaction_id from ".TP."transaction_companies as fca_tc left join ".TP."company as fca_c on(fca_tc.company_id=fca_c.company_id) where fca_c.type='company' AND ".$filter_by_company_attrib.") AS fca ON (t.id=fca.transaction_id) ";
-					}                            
-                    $q.=" WHERE partner_type = '".$stat_params['partner_type']."'";
-            if($filter_trans_clause != ""){
-				/************
-				sng:10/aug/2012
-				since we already have AND
-				****/
-                $q.=$filter_trans_clause;
-            }
-            $q.=" GROUP BY partner_id ORDER BY num_deals DESC LIMIT 0, 5) AS deals_banks LEFT JOIN (SELECT company_id, name, short_name FROM ".TP."company WHERE TYPE = '".$stat_params['partner_type']."') AS companies ON ( deals_banks.partner_id = companies.company_id )";
-        }else{
-            /////////////////////////////////////////
-            if(isset($stat_params['ranking_criteria'])&&($stat_params['ranking_criteria'] == "total_deal_value")){
-                $q = "SELECT deals_assoc.total_deal_value AS stat_value, 
-                        companies.company_id, companies.name, 
-                        companies.short_name
-                        FROM (
-                            SELECT sum( t.value_in_billion ) AS total_deal_value, 
-                                tp.partner_id FROM ".TP."transaction_partners AS tp 
-                            LEFT JOIN ".TP."transaction AS t ON ( tp.transaction_id = t.id )";
-							/*********
-					sng:10/aug/2012
-					snippet for company filter clause
-					**********/
-					if($filter_by_company_attrib!=""){
-						$q.=" INNER JOIN (SELECT DISTINCT transaction_id from ".TP."transaction_companies as fca_tc left join ".TP."company as fca_c on(fca_tc.company_id=fca_c.company_id) where fca_c.type='company' AND ".$filter_by_company_attrib.") AS fca ON (t.id=fca.transaction_id) ";
-					} 
-                    $q.=" WHERE tp.partner_type = '".$stat_params['partner_type']."'";
-							
-                /************
-				sng:10/aug/2012
-				we reuse
-				****/
-                if($filter_trans_clause !=""){
-                    $q.=$filter_trans_clause;
-                }
-               
-                                
-                
-                /////////////////////////////////////////
-                $q.=" GROUP BY partner_id ORDER BY total_deal_value DESC LIMIT 0, 5) AS deals_assoc LEFT JOIN (SELECT company_id, name, short_name FROM ".TP."company WHERE TYPE = '".$stat_params['partner_type']."') AS companies ON ( deals_assoc.partner_id = companies.company_id )";
-                /////////////////////////////////////////////////////////////////////////
-                //die($q);
-            }else{
-                if(isset($stat_params['ranking_criteria'])&&($stat_params['ranking_criteria'] == "total_adjusted_deal_value")){
-                    $q = "SELECT deals_assoc.total_adjusted_deal_value as stat_value, 
-                            companies.company_id, companies.name, 
-                            companies.short_name 
-                            FROM (
-                                SELECT sum( adjusted_value_in_billion ) AS total_adjusted_deal_value, 
-                                partner_id FROM ".TP."transaction_partners tp
-                                LEFT JOIN " . TP . "transaction t 
-                                    ON t.id = tp.transaction_id ";
-							/*********
-					sng:10/aug/2012
-					snippet for company filter clause
-					**********/
-					if($filter_by_company_attrib!=""){
-						$q.=" INNER JOIN (SELECT DISTINCT transaction_id from ".TP."transaction_companies as fca_tc left join ".TP."company as fca_c on(fca_tc.company_id=fca_c.company_id) where fca_c.type='company' AND ".$filter_by_company_attrib.") AS fca ON (t.id=fca.transaction_id) ";
-					}
-                    $q.=" WHERE partner_type = '".$stat_params['partner_type']."'";
-							/************
-				sng:10/aug/2012
-				we reuse
-				****/
-                    if($filter_trans_clause != ""){
-                        $q.=$filter_trans_clause;
-                    }
-                                         
-                    $q.=" GROUP BY partner_id ORDER BY total_adjusted_deal_value DESC LIMIT 0, 5) AS deals_assoc LEFT JOIN (SELECT company_id, name, short_name FROM ".TP."company WHERE TYPE = '".$stat_params['partner_type']."') AS companies ON ( deals_assoc.partner_id = companies.company_id )";
-                }else{
-                    //unknown stat
-                    return false;
-                }
-            }
-        }
-        ///////////////////////////////////////////////////////////////////////////
-        $res = mysql_query($q);
-        if(!$res){
-			//echo $q;
-            //echo mysql_error();
-            return false;
-        }
-        $num_values = mysql_num_rows($res);
-        if($num_values == 0){
-            return true;
-        }
-        $max_value = "";
-        for($i=0;$i<$num_values;$i++){
-            $row = mysql_fetch_assoc($res);
-            $data_arr[$i] = array();
-            $data_arr[$i]['name'] = $g_mc->db_to_view($row['name']);
-            $data_arr[$i]['short_name'] = $g_mc->db_to_view($row['short_name']);
-            $data_arr[$i]['value'] = $row['stat_value'];
-            /***
-            sng:20/apr/2010
-            if the stat is deal value, then it is in billion and has a high precision, correct
-            to 2 decimal place
-            ***/
-            if($stat_params['ranking_criteria'] == "total_deal_value"){
-                //$data_arr[$i]['value'] = $data_arr[$i]['value']*1000;
-                $data_arr[$i]['value'] = round($data_arr[$i]['value'],2);
-            }
-            /***
-            sng:20/apr/2010
-            if the stat is deal value, then it is in billion and has a high precision,
-            correct to 2 decimal place
-            The values here are smaller than total deal value
-            ***/
-            if($stat_params['ranking_criteria'] == "total_adjusted_deal_value"){
-                //$data_arr[$i]['value'] = $data_arr[$i]['value']*1000;
-                $data_arr[$i]['value'] = round($data_arr[$i]['value'],2);
-            }
-            if($max_value == ""){
-                $max_value = $data_arr[$i]['value'];
-            }else{
-                if($data_arr[$i]['value'] > $max_value){
-                    $max_value = $data_arr[$i]['value'];
-                }
-            }
-        }
-        @session_start();
-        $_SESSION['lastGeneratedRankings'] = $data_arr;
-        return true;
-    }
+		num_values: ok, this is just data count, so we just pass the var as the 5th arg and we get the data
+		We take 5 records using LIMIT
+		******************/
+		$start_offset = 0;
+		$num_to_fetch = 5;
+		$temp_data = NULL;
+			
+		$ok = $this->front_generate_league_table_for_firms_paged($stat_params,$start_offset,$num_to_fetch,$temp_data,$num_values);
+		if(!$ok){
+			return false;
+		}
+		if($num_values == 0){
+			return true;
+		}
+		/***********************
+		stat_value:
+		value: is same as stat_value
+		We need only one. LT code selects all 3 
+		num_deals - count( tp.transaction_id )
+		total_deal_value - sum( t.value_in_billion )
+		total_adjusted_deal_value - sum( adjusted_value_in_billion )
+		
+		This depends upon ranking_criteria. We already checked that it exists and set correctly
+		*********************/
+		$stat_key = 'nope';
+		if($stat_params['ranking_criteria']=="num_deals"){
+			$stat_key = "num_deals";
+		}elseif($stat_params['ranking_criteria']=="total_deal_value"){
+			$stat_key = "total_deal_value";
+		}elseif($stat_params['ranking_criteria']=="total_adjusted_deal_value"){
+			$stat_key = "total_adjusted_deal_value";
+		}
+		
+		$max_value = "";
+		for($i=0;$i<$num_values;$i++){
+			$row = $temp_data[$i];
+			$data_arr[$i] = array();
+			$data_arr[$i]['name'] = $row['firm_name'];
+			$data_arr[$i]['short_name'] = $row['short_name'];
+			$data_arr[$i]['value'] = $row[$stat_key];
+			/************
+			If the stat value is total deal value or total adjusted deal value, we already get
+			the data in rounded format
+			***************/
+			
+			
+			if($max_value == ""){
+				$max_value = $data_arr[$i]['value'];
+			}else{
+				if($data_arr[$i]['value'] > $max_value){
+					$max_value = $data_arr[$i]['value'];
+				}
+			}
+		}
+		@session_start();
+		$_SESSION['lastGeneratedRankings'] = $data_arr;
+		
+		return true;
+	}
     /////////////////////////////////////////////////
     /******
     A function to generate league table for banks / law firms
@@ -1466,13 +627,13 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_param['region'])."'";
 		}
         //////////////////////////////////////////
         //filter on transaction types
-        if($stat_param['deal_cat_name']!=""){
+        if(isset($stat_param['deal_cat_name'])&&($stat_param['deal_cat_name']!="")){
             $q.=" and deal_cat_name='".$stat_param['deal_cat_name']."'";
         }
-        if($stat_param['deal_subcat1_name']!=""){
+        if(isset($stat_param['deal_subcat1_name'])&&($stat_param['deal_subcat1_name']!="")){
             $q.=" and deal_subcat1_name='".$stat_param['deal_subcat1_name']."'";
         }
-        if($stat_param['deal_subcat2_name']!=""){
+        if(isset($stat_param['deal_subcat2_name'])&&($stat_param['deal_subcat2_name']!="")){
             $q.=" and deal_subcat2_name='".$stat_param['deal_subcat2_name']."'";
         }
         
@@ -1480,7 +641,7 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_param['region'])."'";
         sng:11/jun/2010
         The year can be in a range like 2009-2010 or it may be a single like 2009
         *******/
-        if($stat_param['year']!=""){
+        if(isset($stat_param['year'])&&($stat_param['year']!="")){
             $year_tokens = explode("-",$stat_param['year']);
             $year_tokens_count = count($year_tokens);
             if($year_tokens_count == 1){
@@ -1715,26 +876,7 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_param['region'])."'";
         return true;
     }
     
-    /*************************
-    sng:04/oct/2010
-    *********************/
-    public function front_get_random_issuance_charts($num_chart,&$data_arr,&$num_charts_found){
-        global $g_mc;
-        $q = "select id,name,img,generated_on from ".TP."issuance_charts order by rand() limit 0,".$num_chart;
-        $res = mysql_query($q);
-        if(!$res){
-            return false;
-        }
-        $num_charts_found = mysql_num_rows($res);
-        if(0==$num_charts_found){
-            return true;
-        }
-        for($i=0;$i<$num_charts_found;$i++){
-            $data_arr[$i] = mysql_fetch_assoc($res);
-            $data_arr[$i]['name'] = $g_mc->db_to_view($data_arr[$i]['name']);
-        }
-        return true;
-    }
+    
 }
 $g_stat = new statistics();
 ?>

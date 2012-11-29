@@ -195,10 +195,11 @@ function goto_deal_detail(deal_id){
 }
 /************
 sng:21/oct/2011
+
+sng:27/nov/2012
+This function is not called in this file so we remove this
+function goto_showcase_chart(firm_id)
 **************/
-function goto_showcase_chart(firm_id){
-	window.location="showcase_firm_chart.php?id="+firm_id;
-}
 </script>
 <script src="js/logo_preference.js"></script>
 <div id="explanation">

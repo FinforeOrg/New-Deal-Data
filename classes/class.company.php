@@ -1334,17 +1334,10 @@ class company{
 		}
 		////////////////////////////////////////////////
 		//check firm_chart
-		$q = "select count(*) as cnt from ".TP."firm_chart where company_id='".$company_id."'";
-		$res = mysql_query($q);
-		if(!$res){
-			return false;
-		}
-		$row = mysql_fetch_assoc($res);
-		if($row['cnt'] > 0){
-			//better safe than sorry. We are not deleting the entry.
-			$msg = "Cannot delete the company. This company is associated with a firm chart";
-			return true;
-		}
+		/***********************
+		sng:27/nov/2012
+		We no longer have firm associated with pre-generated charts so we no longer need the check
+		**********************/
 		////////////////////////////////////////
 		//check top_firm_list
 		$q = "select count(*) as cnt from ".TP."top_firm_list where company_id='".$company_id."'";
