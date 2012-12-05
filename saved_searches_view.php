@@ -128,59 +128,121 @@ function saveLeagueTableNotification(notificationElement) {
 			</div>
 		
 		<div class="leaguechartsHeaderDiv"><p>League Tables Details</p></div>
-		
-			<?php if (count($mySavedSearches['leagueDetail'])) : ?>
-			<?php
-			/*******************
-			sng:10/oct/2011
-			we will show the 'Notify Me...' text for the first checkbox. For the rest, only Notify Me
-			*******************/
+		<?php
+		/*********************
+		sng:3/dec/2012
+		We also need to show the items which are marked as alerts. see the note on savedSearches::getAlertForUser, sng:3/dec/2012
+		Since we have 2 loops, we put a big IF and $is_first
+		*********************/
+		if((count($mySavedSearches['leagueDetail']) > 0)||(count($mySavedAlerts['leagueDetail']) > 0)){
 			$is_first = true;
 			?>
-				<?php foreach ($mySavedSearches['leagueDetail'] as $key=>$description) : ?>
-                                        <div class="leaguechartsContent">
-                                            <div class="leaguechartsContentleft">
-                                                <?php echo $description ?> 
-                                            </div>
-                                            <div class="leaguechartsContentRight">
-                                                    <ul>
-                                                    <li><a href="#" onClick="deleteSearch(<?php echo $key ?>,'leagueDetail')"><img src="images/ss_delete.gif" alt="" width="19" height="18" align="left" hspace="5px" vspace="2" /><span>Delete</span></a></li>
-                                                    <li><img src="images/ss_border.gif" alt="" width="1" height="17" /></li>
-                                                    <li><a href="#" onClick="openShareSearchPopup(<?php echo $key ?>,'leagueDetail')"><img src="images/ss_share.gif" alt="" width="15" height="15" align="left" hspace="5px" vspace="2" /><span>Share</span></a></li>
-                                                    <li><img src="images/ss_border.gif" alt="" width="1" height="17" /></li>
-                                                    <li><a href="league_table_detail.php?token=<?php echo base64_encode($key)?>"><img src="images/ss_view.gif" alt="" width="15" height="15" align="left" hspace="5px" vspace="2" /><span>View</span></a></li>
-                                                    </ul>
-                                            </div>
-                                            <?php if (isset($mySavedSearches['currentRanks'][$key])) : ?>
-                                            <div id="leaguechartsContentOptions" style="display:block; clear: all; padding-left: 15px;">
-                                                <input type="checkbox" id="notifyme_<?php echo $key ?>" value="<?php echo $key ?>" onclick="return saveLeagueTableNotification(this)" <?php if (isset($mySavedSearches['enabledNotifications'][$key]) && $mySavedSearches['enabledNotifications'][$key]) echo 'checked="checked"'?>/> <?php
-if($is_first){
-?>
-Notify Me, when my firm's Ranking changes (available for a top 10 ranking only) <?php echo sprintf("(Current Rank: %d)", $mySavedSearches['currentRanks'][$key])?>
-<?php
-$is_first = false;
-}else{
-?>
-Notify Me <?php echo sprintf("(Current Rank: %d)", $mySavedSearches['currentRanks'][$key])?>
-<?php
-}
-?>
-                                            </div>
-                                            <?php else : ?>
-                                            <div id="leaguechartsContentOptions" style="display:block; clear: all; padding-left: 15px;">
-                                                <input disabled="disabled" type="checkbox" id="notifyme_<?php echo $key ?>" value="<?php echo $key ?>" /> <?php if($is_first){?>Notify Me, when my firm's Ranking changes (available for a top 10 ranking only)<?php $is_first = false;}else{?>Notify Me<?php }?>
-                                            </div>                                            
-                                            <?php endif ?>
-					</div>
-				<?php endforeach ?>
-			<?php else : ?>
-			<div class="leaguechartsContent">
-				<div class="leaguechartsContentleft">You do not have any saved searches</div>
-			</div>
-            <?php endif ?>
+				<?php if (count($mySavedSearches['leagueDetail'])) : ?>
+				<?php
+				/*******************
+				sng:10/oct/2011
+				we will show the 'Notify Me...' text for the first checkbox. For the rest, only Notify Me
+				*******************/
+				
+				?>
+					<?php foreach ($mySavedSearches['leagueDetail'] as $key=>$description) : ?>
+											<div class="leaguechartsContent">
+												<div class="leaguechartsContentleft">
+													<?php echo $description ?> 
+												</div>
+												<div class="leaguechartsContentRight">
+														<ul>
+														<li><a href="#" onClick="deleteSearch(<?php echo $key ?>,'leagueDetail')"><img src="images/ss_delete.gif" alt="" width="19" height="18" align="left" hspace="5px" vspace="2" /><span>Delete</span></a></li>
+														<li><img src="images/ss_border.gif" alt="" width="1" height="17" /></li>
+														<li><a href="#" onClick="openShareSearchPopup(<?php echo $key ?>,'leagueDetail')"><img src="images/ss_share.gif" alt="" width="15" height="15" align="left" hspace="5px" vspace="2" /><span>Share</span></a></li>
+														<li><img src="images/ss_border.gif" alt="" width="1" height="17" /></li>
+														<li><a href="league_table_detail.php?token=<?php echo base64_encode($key)?>"><img src="images/ss_view.gif" alt="" width="15" height="15" align="left" hspace="5px" vspace="2" /><span>View</span></a></li>
+														</ul>
+												</div>
+												<?php if (isset($mySavedSearches['currentRanks'][$key])) : ?>
+												<div id="leaguechartsContentOptions" style="display:block; clear: all; padding-left: 15px;">
+													<input type="checkbox" id="notifyme_<?php echo $key ?>" value="<?php echo $key ?>" onclick="return saveLeagueTableNotification(this)" <?php if (isset($mySavedSearches['enabledNotifications'][$key]) && $mySavedSearches['enabledNotifications'][$key]) echo 'checked="checked"'?>/> <?php
+	if($is_first){
+	?>
+	Notify Me, when my firm's Ranking changes (available for a top 10 ranking only) <?php echo sprintf("(Current Rank: %d)", $mySavedSearches['currentRanks'][$key])?>
+	<?php
+	$is_first = false;
+	}else{
+	?>
+	Notify Me <?php echo sprintf("(Current Rank: %d)", $mySavedSearches['currentRanks'][$key])?>
+	<?php
+	}
+	?>
+												</div>
+												<?php else : ?>
+												<div id="leaguechartsContentOptions" style="display:block; clear: all; padding-left: 15px;">
+													<input disabled="disabled" type="checkbox" id="notifyme_<?php echo $key ?>" value="<?php echo $key ?>" /> <?php if($is_first){?>Notify Me, when my firm's Ranking changes (available for a top 10 ranking only)<?php $is_first = false;}else{?>Notify Me<?php }?>
+												</div>                                            
+												<?php endif ?>
+						</div>
+					<?php endforeach ?>
+				<?php endif ?>
+				<?php
+				/*********************
+				sng:3/dec/2012
+				We also need to show the items which are marked as alerts. see the note on savedSearches::getAlertForUser, sng:3/dec/2012
+				*********************/
+				?>
+				<?php if (count($mySavedAlerts['leagueDetail'])) : ?>
+				<?php
+				/*******************
+				sng:10/oct/2011
+				we will show the 'Notify Me...' text for the first checkbox. For the rest, only Notify Me
+				*******************/
+				?>
+					<?php foreach ($mySavedAlerts['leagueDetail'] as $key=>$description) : ?>
+											<div class="leaguechartsContent">
+												<div class="leaguechartsContentleft">
+													<?php echo $description ?> 
+												</div>
+												<div class="leaguechartsContentRight">
+														<ul>
+														<li><a href="#" onClick="deleteSearch(<?php echo $key ?>,'leagueDetail')"><img src="images/ss_delete.gif" alt="" width="19" height="18" align="left" hspace="5px" vspace="2" /><span>Delete</span></a></li>
+														<li><img src="images/ss_border.gif" alt="" width="1" height="17" /></li>
+														<li><a href="#" onClick="openShareSearchPopup(<?php echo $key ?>,'leagueDetail')"><img src="images/ss_share.gif" alt="" width="15" height="15" align="left" hspace="5px" vspace="2" /><span>Share</span></a></li>
+														<li><img src="images/ss_border.gif" alt="" width="1" height="17" /></li>
+														<li><a href="league_table_detail.php?token=<?php echo base64_encode($key)?>"><img src="images/ss_view.gif" alt="" width="15" height="15" align="left" hspace="5px" vspace="2" /><span>View</span></a></li>
+														</ul>
+												</div>
+												<?php if (isset($mySavedAlerts['currentRanks'][$key])) : ?>
+												<div id="leaguechartsContentOptions" style="display:block; clear: all; padding-left: 15px;">
+													<input type="checkbox" id="notifyme_<?php echo $key ?>" value="<?php echo $key ?>" onclick="return saveLeagueTableNotification(this)" <?php if (isset($mySavedAlerts['enabledNotifications'][$key]) && $mySavedAlerts['enabledNotifications'][$key]) echo 'checked="checked"'?>/> <?php
+	if($is_first){
+	?>
+	Notify Me, when my firm's Ranking changes (available for a top 10 ranking only) <?php echo sprintf("(Current Rank: %d)", $mySavedAlerts['currentRanks'][$key])?>
+	<?php
+	$is_first = false;
+	}else{
+	?>
+	Notify Me <?php echo sprintf("(Current Rank: %d)", $mySavedAlerts['currentRanks'][$key])?>
+	<?php
+	}
+	?>
+												</div>
+												<?php else : ?>
+												<div id="leaguechartsContentOptions" style="display:block; clear: all; padding-left: 15px;">
+													<input disabled="disabled" type="checkbox" id="notifyme_<?php echo $key ?>" value="<?php echo $key ?>" /> <?php if($is_first){?>Notify Me, when my firm's Ranking changes (available for a top 10 ranking only)<?php $is_first = false;}else{?>Notify Me<?php }?>
+												</div>                                            
+												<?php endif ?>
+						</div>
+					<?php endforeach ?>
+				
+				
+				<?php endif ?>
+				<?php
+				/************************************************************************/
+		}
+				?>
 			<div class="leaguechartsContent">
 			<a class="link_as_button" href="league_table_detail.php">Add league table analysis</a>
 			</div>
+			
+			
 		<?php
 		/********************
 		sng:7/apr/2011

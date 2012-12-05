@@ -106,9 +106,22 @@
           return $searches;
       }
       
-      function getAlertForUser($userId) {
-          return $this->getForUser($userId,1, 'deal');
-      }
+		function getAlertForUser($userId) {
+			/******************
+			sng:3/dec/2012
+			Ok, here is the problem. For League Table Details (tombstone_saved_searches, search_type of leagueDetail), if we check the
+			'notify me' checkbox, the ajax code set the forAlert to 1.
+			Problem is, in the listing, the function getForUser() collects only the records for which forAlert is 0.
+			That means, the if you check the 'notify me' checkbox, it just vanish.
+			
+			In the meanwhile, the alert listing code only get the records for 'deal' type.
+			What we do is, we get alert for all types
+			return $this->getForUser($userId,1, 'deal');
+			
+			Of course, we cannot touch the forAlert because that field is used by cron job to send notification
+			*************************/
+			return $this->getForUser($userId,1);
+		}
       
       function getById($searchId) {
           $q = "SELECT * FROM {$this->tableName} WHERE member_id = %d AND id = %d LIMIT 1";
