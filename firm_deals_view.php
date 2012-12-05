@@ -63,19 +63,10 @@ function goto_suggest_deal(){
 						<td>
 						<?php 
 							show_deal_type_for_listing($g_view['deal_data'][$j]['deal_cat_name'],$g_view['deal_data'][$j]['deal_subcat1_name'],$g_view['deal_data'][$j]['deal_subcat2_name']);
-							if(($g_view['deal_data'][$j]['deal_cat_name']=="M&A")&&($g_view['deal_data'][$j]['target_company_name']!="")){
-								/************************************************
-								sng:28/july/2010
-								check if the subtype is Completed or not
-								**********/
-								if(strtolower($g_view['deal_data'][$j]['deal_subcat1_name'])=="completed"){
-									echo ". Acquisition of ".$g_view['deal_data'][$j]['target_company_name'];
-								}else{
-									echo ". Proposed acquisition of ".$g_view['deal_data'][$j]['target_company_name'];
-								}
-								/******************************************/
-								
-							}
+							/************
+							sng:5/dec/2012
+							Now we have concept of participants. We no longer use target company field so we have removed 'Acquisition of' for M&A deals
+							*****************/
 							?>
 						</td>
 						<td><?php

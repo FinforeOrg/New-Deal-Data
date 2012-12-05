@@ -136,19 +136,10 @@ for($j=0;$j<$g_view['data_count'];$j++){
 	$date_data = $g_view['data'][$j]['date_of_deal'];
 	$worksheet->write($row, 5,  (float)(getDays1900($date_data)+2),$f_date);
 	$deal_type = $g_view['data'][$j]['deal_cat_name'];
-	if(($g_view['data'][$j]['deal_cat_name']=="M&A")&&($g_view['data'][$j]['target_company_name']!="")){
-		/************************************************
-		sng:28/july/2010
-		check if the subtype is Completed or not
-		**********/
-		if(strtolower($g_view['data'][$j]['deal_subcat1_name'])=="completed"){
-			$deal_type.=". Acquisition of ".$g_view['data'][$j]['target_company_name'];
-		}else{
-			$deal_type.=". Proposed acquisition of ".$g_view['data'][$j]['target_company_name'];
-		}
-		/******************************************/
-		//$deal_type.=". Acquisition of ".$g_view['data'][$j]['target_company_name'];
-	}
+	/************
+	sng:5/dec/2012
+	Now we have concept of participants. We no longer use target company field so we have removed 'Acquisition of' for M&A deals
+	*****************/
 	$worksheet->write($row,6,$deal_type);
 	
 	/***
