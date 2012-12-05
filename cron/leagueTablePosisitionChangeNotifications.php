@@ -9,6 +9,13 @@ require_once(dirname(dirname(__FILE__))."/classes/class.country.php");
 require_once(dirname(dirname(__FILE__))."/classes/class.account.php");
 require_once(dirname(dirname(__FILE__))."/classes/class.savedSearches.php");
 
+/********
+sng:5/dec/2012
+Let us use the mailer class. Sending email directly create issue
+**************/
+require_once("classes/class.mailer.php");
+$mailer = new mailer();
+
 $savedSearches  = new SavedSearches();
 $qSavedSearches = 'SELECT * 
       FROM __TP__saved_searches 
@@ -133,13 +140,23 @@ while ($row = mysql_fetch_assoc($qSavedSearchesRes)) {
  */
 function sendMail($to, $content)
 {
-    $subject = 'Company ranking change';
-
-    $headers = "From: no-reply@deal-data.com\r\n";
+	/************
+	sng:5/dec/2012
+	this sending email as it is is creating issue, so we are trying the mailer class
+	
+	$headers = "From: no-reply@deal-data.com\r\n";
     $headers .= "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";  
     
     return mail($to, $subject, $content, $headers);
+	***************/
+	global $mailer;
+	
+    $subject = 'Company ranking change';
+	$from_email = "no-reply@deal-data.com";
+	return $mailer->html_mail($to,$subject,$content,$from_email);
+
+    
 }
 
 function logMsg($msg) 
@@ -152,3 +169,4 @@ function getToken($row) {
     return base64_encode($token);
     
 }
+?>
