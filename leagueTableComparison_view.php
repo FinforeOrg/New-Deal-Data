@@ -155,33 +155,45 @@ if (is_array($dealsAdded) && sizeof($dealsAdded)) :?>
 <table width="100%" cellspacing="0" cellpadding="0" class="company">
     <tbody>
         <tr>
-            <th style="width:150px;">Company</th>
+            <th style="width:150px;">Participant</th>
             <th style="width:60px;">Date</th>
             <th>Type</th>
-            <th>Value (in million USD)</th>
+            <th><!--Value (in million USD)-->Size</th>
             <th style="width:170px;">Bank(s)</th>
             <th style="width:170px;">Law Firm(s)</th>
             <th style="width:170px;">&nbsp;</th>
         </tr>
         <?php foreach ($dealsAdded as $deal) : ?>
         <tr>
-            <td style="width:150px;"><a href="company.php?show_company_id=<?php echo $deal['company_id'];?>" target="_blank"><?php echo $deal['company_name'];?></a></td>
+            <td style="width:150px;">
+			<?php
+			/***************************
+			sng:5/dec/2012
+			We now have multiple companies per deal
+			<a href="company.php?show_company_id=<?php echo $deal['company_id'];?>" target="_blank"><?php echo $deal['company_name'];?></a>
+			******************************/
+			echo Util::deal_participants_to_csv_with_links($deal['participants']);
+			?>
+			</td>
             <td style="width:60px;"><?php echo $deal['date_of_deal'];?></td>
             <td>
             <?php
             echo $deal['deal_cat_name'];
-            if(($deal['deal_cat_name'] == "M&A") && ($deal['target_company_name'] != "")){
-                if(strtolower($deal['deal_subcat1_name']) == "completed"){
-                        echo '. Acquisition of ' . $deal['target_company_name'];
-                }else{
-                        echo '. Proposed acquisition of ' . $deal['target_company_name'];
-                }
-            }
+			/************
+			sng:5/dec/2012
+			Now we have concept of participants. We no longer use target company field so we have removed 'Acquisition of' for M&A deals
+			*****************/
+            
             ?>            
             </td>
             <td style="width:60px;">
             <?php
-            echo (0 == $deal['value_in_billion']) ? 'not disclosed' : convert_billion_to_million_for_display_round($deal['value_in_billion']);
+			/************
+			sng: 5/dec/2012
+			We now have fuzzy value for deal, so we use utility function
+			echo (0 == $deal['value_in_billion']) ? 'not disclosed' : convert_billion_to_million_for_display_round($deal['value_in_billion']);
+			***************/
+            echo convert_deal_value_for_display_round($deal['value_in_billion'],$deal['value_range_id'],$deal['fuzzy_value']);
             ?>                
             </td>
             <td style="width:170px;">
