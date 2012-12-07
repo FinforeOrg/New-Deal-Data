@@ -110,14 +110,19 @@ while ($row = mysql_fetch_assoc($qSavedSearchesRes)) {
         /**
          * Will be updated to today +1 in order to allow testing by running the cron manually.
          */
-        $updated = $savedSearches->updateTable(array('last_alert_date' => date('Y-m-d', strtotime("+1day")), 'currentRank' => $rank), $row['id']);
+		/**************************
+		sng:7/dec/2012
+		Storing +1 day is creating trouble.
+		Let us store the current date
+		***************************/
+        $updated = $savedSearches->updateTable(array('last_alert_date' => date('Y-m-d'), 'currentRank' => $rank), $row['id']);
         if ($updated) {
-            logMsg('Updated last_alert_date to ' . date('Y-m-d', strtotime("+1day")));
+            logMsg('Updated last_alert_date to ' . date('Y-m-d'));
             
             $insertQuery = 'INSERT INTO __TP__saved_searches_history 
                 (id, mem_id, parameters, start_date, end_date, places, old_rank, new_rank )
                 VALUES (NULL, %d, \'%s\', \'%s\', \'%s\', %d, %d, %d)';
-            $insertQuery = sprintf($insertQuery, $row['member_id'], $row['parameters'], $row['last_alert_date'], date('Y-m-d', strtotime("+1day")), $ranksMoved, $currentRank, $rank);
+            $insertQuery = sprintf($insertQuery, $row['member_id'], $row['parameters'], $row['last_alert_date'], date('Y-m-d'), $ranksMoved, $currentRank, $rank);
             
             if (!query($insertQuery)) {
                 logMsg('Adding to history FAILED');
