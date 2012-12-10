@@ -2420,9 +2420,13 @@ WHERE rgnm.name = '".mysql_real_escape_string($search_data['region'])."'";
 		
         for($k=0;$k<=$data_count-1;$k++){
             $data_arr[$k] = mysql_fetch_assoc($res);
+			/**************
+			sng:10/dec/2012
+			With the introduction of participants, we no longer use these
             $data_arr[$k]['company_name'] = $g_mc->db_to_view($data_arr[$k]['company_name']);
             $data_arr[$k]['target_company_name'] = $g_mc->db_to_view($data_arr[$k]['target_company_name']);
             $data_arr[$k]['seller_company_name'] = $g_mc->db_to_view($data_arr[$k]['seller_company_name']);
+			**************/
 			/**************
 			sng:17/jan/2012
 			if we do not have exact value or fuzzy value, the short caption is n/d for undisclosed
