@@ -1,5 +1,10 @@
 <?php
-echo "<pre>";
+/*************
+sng:10/dec/2012
+Since all the output is sent to the same file, we want to know where the listing for a particular date starts
+**************/
+logMsg(str_repeat('-', 15));
+logMsg(date('Y-m-d'));
 include(dirname(dirname(__FILE__))."/include/global.php"); 
 
 require_once(dirname(dirname(__FILE__))."/classes/class.company.php");
