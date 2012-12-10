@@ -8,6 +8,7 @@ require_once(dirname(dirname(__FILE__))."/classes/class.country.php");
 require_once(dirname(dirname(__FILE__))."/classes/class.account.php");
 require_once(dirname(dirname(__FILE__))."/classes/class.savedSearches.php");
 require_once(dirname(dirname(__FILE__))."/classes/class.mailer.php");
+
 $savedSearches = new SavedSearches();
 $memberTable = TP . 'member';
 
@@ -71,7 +72,10 @@ foreach($ret as $numAlert) {
         if ($dealCount) {
             $lastIdForDeal = getLatestDealId($deals);
             echo "Last alert id for deal for saved alert {$numAlert['id']} : {$numAlert['lastAlertId']} \n";
-            $template = file_get_contents(dirname(dirname(__FILE__))."/emailTemplates/searchAlert.html");
+            /***********
+			sng:6/dec/2012
+			We are not using the emailTemplates/searchalert.html here
+			************/
             $what = $numAlert['search_type'] == 'league' ? 'chart' : 'list';
             
             if (strlen($numAlert['work_email'])) {
@@ -79,8 +83,13 @@ foreach($ret as $numAlert) {
                 $q = "UPDATE {$savedSearchesTable} SET lastAlertId = $lastIdForDeal WHERE id = {$numAlert['id']}";    
                  echo "Updating saved alert {$numAlert['id']} last id to  : $lastIdForDeal \n";                                  
                  $result = mysql_query($q) or die(mysql_error());
+                 /*******
+				 sng:7/dec/2012
+				 Let us use the mailer class. Sending email directly create issue
+				 *********/
+				 $from_email = "no-reply@deal-data.com";
+				$mailSent = $mailer->html_mail($numAlert['work_email'],'New deals added ('.($savedSearches->cleanAndTranslate($numAlert['parameters'])). ")",$content,$from_email);
                  
-                $mailSent = sendHTMLemail($content,'no-reply@new.deal-data.com',$numAlert['work_email'], 'New deals added ('.($savedSearches->cleanAndTranslate($numAlert['parameters']). ")") );
                 if ($mailSent)
                     echo "Email sent to " .$numAlert['work_email'] . PHP_EOL ;
             } else {
