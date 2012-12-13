@@ -255,187 +255,54 @@
        * @param integer $savedSearch
        * @return array 
        */
-      function getCompanyRank($companyId, $savedSearch, $returnOnlyRank = true)
+	   /******************
+		sng:13/dec/2012
+		savedSearches::getgetForUser > call with no third arg so only rank is true
+		savedSearches::setLeagueTableNotificationAlertState > call with no third arg so only rank is true
+		cron/leagueTablePositionchangeNotifications.php > call with no third arg so only rank is true
+		
+		So basically every caller is expecting a number
+		
+		We can remove the third arg
+		function getCompanyRank($companyId, $savedSearch, $returnOnlyRank = true)
+		************/
+      function getCompanyRank($companyId, $savedSearch)
       {
+	  	require_once("classes/class.statistics.php");
+		$stat = new statistics();
+		
         if (!is_array($savedSearch)){
           $this->loadIntoPost(base64_encode($savedSearch));
         } else {
            $this->loadIntoPostByParams($savedSearch['parameters']);
         }
 
-        $queryWhereClauses = '';
-        //////////////////////////////////////////
-        //filter on transaction types
-        if($_POST['deal_cat_name'] != ''){
-            $queryWhereClauses .= " and deal_cat_name='".$_POST['deal_cat_name']."'";
-        }
-        if($_POST['deal_subcat1_name']!=""){
-            $queryWhereClauses .= " and deal_subcat1_name='".$_POST['deal_subcat1_name']."'";
-        }
-        if($_POST['deal_subcat2_name']!=""){
-            $queryWhereClauses .= " and deal_subcat2_name='".$_POST['deal_subcat2_name']."'";
-        }
-		/**************
-		sng:16/aug/2012
-		Now that we have participants for a deal, we do not check the deal_sector, deal_industry csv fields for the deal.
-		We check the sector/industry/country of the participants and consider only those deals
-		***************/
-        if($_POST['year'] != ''){
-            $year_tokens = explode('-',$_POST['year']);
-            $year_tokens_count = count($year_tokens);
-            if($year_tokens_count == 1){
-                //singleton year
-                $queryWhereClauses .= " and year(date_of_deal)='".$year_tokens[0]."'";
-            }
-            if($year_tokens_count == 2){
-                //range year
-                $queryWhereClauses .= " and year(date_of_deal)>='".$year_tokens[0]."' AND year(date_of_deal)<='".$year_tokens[1]."'";
-            }
-        }
+        $start_offset = 0;
+		$num_to_fetch = 11;
+		$data_arr = NULL;
+		$data_count = 0;
+		$rank = 0;
+		
+		$ok = $stat->front_generate_league_table_for_firms_paged($_POST,$start_offset,$num_to_fetch,$data_arr,$data_count);
+		if(!$ok){
+			return $rank;
+		}
+		
+		if($data_count==0){
+			return $rank;
+		}
 		/***********
-		sng:6/sep/2012
-		The deal size is like >=x or <=y
-		**************/
-		
-        if($_POST['deal_size']!=""){
-			$_POST['deal_size'] = Util::decode_deal_size($_POST['deal_size']);
-            $queryWhereClauses.=" and value_in_billion".$_POST['deal_size'];
-        }
-		/**************
-		sng:26/nov/2012
-		We need to exclude inactive deals
-		We exclude 'announced' Debt / Equity deals and M&A deals that are explicitly marked (in_calculation=0)
-		We use the alias t to mark the transaction table (just to be safe since other tables can have those fields)
-		****************/
-		$queryWhereClauses.=" and t.is_active='y' and t.in_calculation='1'";
-		
-        /**************
-		sng:16/aug/2012
-		Now that we have participants for a deal, we do not check the deal_country csv fields for the deal.
-		We check the hq_country of the participants and consider only those deals
-		
-		Also we checked but $company_filter is not used
-		***************/
-        $filter_by_company_attrib = "";
-		if(isset($_POST['country'])&&($_POST['country']!="")){
-			if($filter_by_company_attrib != ""){
-				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
-			}
-			$filter_by_company_attrib.="hq_country='".mysql_real_escape_string($_POST['country'])."'";
-		}else{
-			/**********
-			might check region. Associated with a region is one or more countries
-			We can use IN clause, that is hq_country IN (select country names for the given region), but it seems that
-			it is much faster if we first get the country names and then create the condition with OR, that is
-			(hq_country='Brazil' OR hq_country='Russia') etc
-			***********/
-			if(isset($_POST['region'])&&($_POST['region']!="")){
-				//get the country names for this region name
-				$region_q = "SELECT ctrym.name FROM ".TP."region_master AS rgnm LEFT JOIN ".TP."region_country_list AS rcl ON ( rgnm.id = rcl.region_id ) LEFT JOIN ".TP."country_master AS ctrym ON ( rcl.country_id = ctrym.id )
-WHERE rgnm.name = '".mysql_real_escape_string($_POST['region'])."'";
-				$region_q_res = mysql_query($region_q);
-				if(!$region_q_res){
-					
-					return false;
-				}
-				$region_q_res_cnt = mysql_num_rows($region_q_res);
-				$region_clause = "";
-				if($region_q_res_cnt > 0){
-					while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
-						$region_clause.="|hq_country='".mysql_real_escape_string($region_q_res_row['name'])."'";
-					}
-					$region_clause = substr($region_clause,1);
-					$region_clause = str_replace("|"," OR ",$region_clause);
-					$region_clause = "(".$region_clause.")";
-				}
-				if($region_clause!=""){
-					if($filter_by_company_attrib != ""){
-						$filter_by_company_attrib = $filter_by_company_attrib." AND ";
-					}
-					$filter_by_company_attrib.=$region_clause;
-				}
+		sng:13/dec/2012
+		If we get an array of records, we will have to scroll through each to get the record for that partner. The rank = counter+1
+		Of course, there may not be any record for the partner
+		************/
+		for($i=0;$i<$data_count;$i++){
+			if($data_arr[$i]['partner_id']==$companyId){
+				$rank = $i+1;
+				break;
 			}
 		}
-			
-		if(isset($_POST['sector'])&&($_POST['sector']!="")){
-			if($filter_by_company_attrib != ""){
-				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
-			}
-			$filter_by_company_attrib.="sector='".mysql_real_escape_string($_POST['sector'])."'";
-		}
-			
-		if(isset($_POST['industry'])&&($_POST['industry']!="")){
-			if($filter_by_company_attrib != ""){
-				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
-			}
-			$filter_by_company_attrib.="industry='".mysql_real_escape_string($_POST['industry'])."'";
-		}
-		/********************************************************/
-        $queryWhereClauses.=" GROUP BY partner_id";
-		
-		/**********************
-		sng:26/nov/2012
-		Let us tweak the ordering.
-		By default, let us rank by number of deals, then by total deal value
-		(if 2 firms has done same num of deals, then see who made more valuable deals)
-		
-		If the ranking is by total deal value, then order by total deal value, then by adjusted deal value
-		(if 2 firms has made same amount of money, then see who had more, if individual shares are considered)
-		
-		If the ranking is by total adjusted deal value, then order by total adjusted deal value, then by total deal value
-		(if 2 firms has made same amount of money individually, then see who has worked on more valuable deals)
-		*******************/
-        $ranking_by = "num_deals DESC, total_deal_value DESC";
-		
-        if($_POST['ranking_criteria']=="num_deals") $ranking_by = "num_deals DESC, total_deal_value DESC";
-        else if($_POST['ranking_criteria']=="total_deal_value") $ranking_by = "total_deal_value DESC, total_adjusted_deal_value DESC";
-        else if($_POST['ranking_criteria']=="total_adjusted_deal_value") $ranking_by = "total_adjusted_deal_value DESC, total_deal_value DESC";
-        if($ranking_by != ""){
-            $queryWhereClauses.=" ORDER BY ".$ranking_by;
-        }
-		
-        $query = '
-            select * from (
-                SELECT num_deals, partner_id, total_adjusted_deal_value, total_deal_value, name AS firm_name,  @rownum := @rownum + 1 AS rank
-                FROM (
-                    SELECT count( * ) AS num_deals, 
-                            partner_id, 
-                            sum( adjusted_value_in_billion ) AS total_adjusted_deal_value, 
-                            sum( value_in_billion ) AS total_deal_value  
-                   FROM __TP__transaction_partners AS p
-                   LEFT JOIN __TP__transaction AS t ON ( p.transaction_id = t.id )';
-		/***************
-		sng:13/aug/2012
-		snippet
-		Why inner join? We want to consider only those deals on the left which satisfy the conditions on the right
-		***********/
-		if($filter_by_company_attrib!=""){
-			$query.=" INNER JOIN (SELECT DISTINCT transaction_id from ".TP."transaction_companies as fca_tc left join ".TP."company as fca_c on(fca_tc.company_id=fca_c.company_id) where fca_c.type='company' AND ".$filter_by_company_attrib.") AS fca ON (t.id=fca.transaction_id) ";
-		}
-                   $query.=' WHERE partner_type = "%s"
-                       %s
-                   LIMIT 0, 11
-                )   AS stat
-                LEFT JOIN __TP__company AS c ON ( stat.partner_id = c.company_id )
-            ) as finalResult
-            WHERE partner_id = %d
-        ';
-        $query = sprintf($query, $_POST['partner_type'], $queryWhereClauses, $companyId);
-        $query = str_replace('__TP__', TP, $query);
-        mysql_query('set @rownum := 0');
-
-        if (!$res = mysql_query($query)) {
-		echo $query;
-            echo mysql_error();
-            return 0;
-        }
-        
-        $result = mysql_fetch_assoc($res);
-        if ($returnOnlyRank) {
-            return  $result['rank'];
-        }
-        
-        return $result;
+		return $rank;
       }
       
       
