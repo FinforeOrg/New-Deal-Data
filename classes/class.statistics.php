@@ -660,8 +660,11 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_param['region'])."'";
 		
 		sng:7/sep/2012
 		better pass through util::decode_deal_size
+		
+		sng:13/dec/2012
+		better check if set or not
         ********/
-        if($stat_param['deal_size']!=""){
+        if((isset($stat_param['deal_size']))&&($stat_param['deal_size']!="")){
 			$stat_param['deal_size'] = Util::decode_deal_size($stat_param['deal_size']);
             $q.=" and value_in_billion".$stat_param['deal_size'];
         }
