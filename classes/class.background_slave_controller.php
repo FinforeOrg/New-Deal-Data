@@ -108,10 +108,13 @@ class background_slave_controller{
 	
 	/**************
 	sng:16/oct/2012
+	
+	sng:17/dec/2012
+	We also append the note to the log
 	*********/
 	public function set_status_note($slave_name,$note){
 		$db = new db();
-		$updt_q = "update ".TP."background_slave_monitor set status_note='".mysql_real_escape_string($note)."' where slave_name='".mysql_real_escape_string($slave_name)."'";
+		$updt_q = "update ".TP."background_slave_monitor set status_note='".mysql_real_escape_string($note)."',status_log=concat(status_log,'\r\n','".mysql_real_escape_string($note)."') where slave_name='".mysql_real_escape_string($slave_name)."'";
 		$ok = $db->mod_query($updt_q);
 		if(!$ok){
 			return false;

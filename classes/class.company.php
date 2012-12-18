@@ -826,7 +826,19 @@ class company{
 	
 	
 	
+	/************
+	18/dec/2012
+	What to do for MNCs
+	With MNCs having branches in multiple countries, we will face problem
+	There could be multiple matching records with shortname
+	IBM, IN
+	IBM, US
+	IMB, CN
+	All are IBM but the country codes may be different.
 	
+	We might have to add the country code to the name
+	OR, we might have to check on name, country code, sector, industry
+	******************/
 	public function add_company($data_arr,$img_field_name,$image_destination_path,&$validation_passed,&$err_arr){
 	    $img_obj = new image_util();
 		

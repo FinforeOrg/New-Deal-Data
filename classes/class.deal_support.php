@@ -4,7 +4,10 @@ sng:31/may/2011
 
 This class will contain methods that provide value addition to transactions. This way, the transaction class is not bloated
 ********************/
-require_once("classes/db.php");
+/***********
+sng:18/dec/2012
+since we already include db.php in include/global. we do not need to load again
+*************/
 class deal_support{
 	/*******************
 	we are accepting reference so as not to create another array. But be careful and DO NOT change anything

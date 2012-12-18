@@ -15,5 +15,13 @@ $ok = mysql_select_db($g_config['db_name'], $conn);
 if(!$ok){
 	exit;
 }
+/*************
+sng:17/dec/2012
+We will not use the db class here. It does not use the connection resource while running the queries.
+Since these codes can run in parallel to other codes, we require the use of connection resource so that
+insert and last_insert_id give correct result
+
+But then some codes use it, so
+*******************/
 require_once(FILE_PATH."/classes/db.php");
 ?>
