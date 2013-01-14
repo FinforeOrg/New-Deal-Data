@@ -1833,6 +1833,28 @@ class member{
 		$msg = "Added to your admire list";
 		return true;
 	}
+	/****************
+	sng:14/jan/2013
+	A quick and dirty code to get the ids of all members that are recommended / admired by the given member
+	*****************/
+	public function front_get_recommended_admired_id_list($mem_id,&$data_arr,&$data_count){
+		
+		$db = new db();
+		$q = "SELECT recommended_mem_id AS mem_id FROM ".TP."recommend WHERE mem_id = '".$mem_id."' UNION SELECT admired_mem_id AS mem_id FROM ".TP."admire WHERE mem_id = '".$mem_id."'";
+		$ok = $db->select_query($q);
+		if(!$ok){
+			return false;
+		}
+		$data_count = $db->row_count();
+		if(0==$data_count){
+			return true;
+		}
+		$temp_recs = $db->get_result_set_as_array();
+		for($i=0;$i<$data_count;$i++){
+			$data_arr[] = $temp_recs[$i]['mem_id'];
+		}
+		return true;
+	}
 	/***
 	3/june/2010
 	ordering by year from ascending

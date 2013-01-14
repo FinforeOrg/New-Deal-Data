@@ -47,5 +47,14 @@ function add_colleague_to_deal(the_deal_id,the_partner_id){
 	},"json");
 }
 </script>
+<script>
+/*******
+sng:14/jan/2013
+We just take the mem_id. On the server side, we get the current firm of the member and decide whether to recommend as colleague or admire as competitor
+**********/
+function recommend_admire_member($mem_id){
+	$('#admire_recommend_result').html("added");
+}
+</script>
 
 <div id="team_member_content"></div>

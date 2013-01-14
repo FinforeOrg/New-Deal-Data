@@ -1,6 +1,24 @@
 <?php
 /*************
 sng:18/sep/2012
+
+sng: 14/jan/2013
+Since there are other bankers and lawyers shown here, this is a good place to show the admire/recommend links.
+Of course, we just put the 'like' button. If it is a colleague, it is added to my recommendation list, if it a member of another firm
+it is added to my admire list.
+
+However, I must be logged in to see this
+
+There are certain points here
+1) Banker can only admire/recommend banker, lawyer can only admire/recommend lawyer.
+So, if I am a banker, the column will appear only in the banker section etc.
+
+2) If I already admire or has recommended the member, the link will not appear. Just a text admire/recommend will appear
+So, we just get all the recommend / admire list of this member in an array and check against that
+
+3) Clicking the link sends ajax request. The code checks for duplicate.
+
+4) Upon completion, a status message is shown - X is now in your admiration / recommended list.
 **************/
 require_once("../include/global.php");
 require_once("classes/class.account.php");
@@ -29,6 +47,23 @@ if(!$ok){
 	<?php
 	return;
 }
+
+/***************
+sng:14/jan/2013
+Need the recommend/admire list for this member, assuming that he/she is logged in
+****************/
+require_once("classes/class.member.php");
+$recommed_admire_list = array();
+$recommed_admire_count = 0;
+if($g_account->is_site_member_logged()){
+	$ok = $g_mem->front_get_recommended_admired_id_list($_SESSION['mem_id'],$recommed_admire_list,$recommed_admire_count);
+	if(!$ok){
+		?>
+		<p>Error while fetching recommend / admire list</p>
+		<?php
+		return;
+	}
+}
 ?>
 <h2>Bankers involved in this deal</h2>
 <table cellpadding="0" cellspacing="0" class="company" style="width:100%;">
@@ -38,11 +73,24 @@ if(!$ok){
 <th>Firm</th>
 <th>Credit ($m)</th>
 <th>Adjusted Credit for the member ($m)</th>
+<?php
+/************
+sng: 14/jan/2013
+The admire/recommend part
+****************/
+if($g_account->is_site_member_logged()){
+	if($_SESSION['member_type']=="banker"){
+		?>
+		<th>Admire / Recommend</th>
+		<?php
+	}
+}
+?>
 </tr>
 <?php
 if(0==$g_view['deal_bankers_count']){
 ?>
-<tr><td colspan="5">None found</td></tr>
+<tr><td colspan="6">None found</td></tr>
 <?php
 }else{
 	for($i=0;$i<$g_view['deal_bankers_count'];$i++){
@@ -53,6 +101,28 @@ if(0==$g_view['deal_bankers_count']){
 		<td><?php echo $g_view['deal_bankers'][$i]['firm_name'];?></td>
 		<td><?php echo convert_billion_to_million_for_display($g_view['deal_bankers'][$i]['value_in_billion']);?></td>
 		<td><?php echo convert_billion_to_million_for_display($g_view['deal_bankers'][$i]['adjusted_value_in_billion']);?></td>
+		<?php
+		/************
+		sng: 14/jan/2013
+		The admire/recommend part
+		we check if this member is already in the list or not
+		****************/
+		if($g_account->is_site_member_logged()){
+			if($_SESSION['member_type']=="banker"){
+				?>
+				<td>
+				<?php
+				if(in_array($g_view['deal_bankers'][$i]['member_id'],$recommed_admire_list)){
+					?>Already admired/recommended<?php
+				}else{
+					?><input onclick="return recommend_admire_member(<?php echo $g_view['deal_bankers'][$i]['member_id'];?>);" class="btn_auto" type="button" value="LIKE" /><?php
+				}
+				?>
+				</td>
+				<?php
+			}
+		}
+		?>
 		</tr>
 		<?php
 	}
@@ -68,11 +138,24 @@ if(0==$g_view['deal_bankers_count']){
 <th>Firm</th>
 <th>Credit ($m)</th>
 <th>Adjusted Credit for the member ($m)</th>
+<?php
+/************
+sng: 14/jan/2013
+The admire/recommend part
+****************/
+if($g_account->is_site_member_logged()){
+	if($_SESSION['member_type']=="lawyer"){
+		?>
+		<th>Admire / Recommend</th>
+		<?php
+	}
+}
+?>
 </tr>
 <?php
 if(0==$g_view['deal_lawyers_count']){
 ?>
-<tr><td colspan="5">None found</td></tr>
+<tr><td colspan="6">None found</td></tr>
 <?php
 }else{
 	for($i=0;$i<$g_view['deal_lawyers_count'];$i++){
@@ -83,12 +166,42 @@ if(0==$g_view['deal_lawyers_count']){
 		<td><?php echo $g_view['deal_lawyers'][$i]['firm_name'];?></td>
 		<td><?php echo convert_billion_to_million_for_display($g_view['deal_lawyers'][$i]['value_in_billion']);?></td>
 		<td><?php echo convert_billion_to_million_for_display($g_view['deal_lawyers'][$i]['adjusted_value_in_billion']);?></td>
+		<?php
+		/************
+		sng: 14/jan/2013
+		The admire/recommend part
+		we check if this member is already in the list or not
+		****************/
+		if($g_account->is_site_member_logged()){
+			if($_SESSION['member_type']=="lawyer"){
+				?>
+				<td>
+				<?php
+				if(in_array($g_view['deal_lawyers'][$i]['member_id'],$recommed_admire_list)){
+					?>Already admired/recommended<?php
+				}else{
+					?><input onclick="return recommend_admire_member(<?php echo $g_view['deal_lawyers'][$i]['member_id'];?>);" class="btn_auto" type="button" value="LIKE" /><?php
+				}
+				?>
+				</td>
+				<?php
+			}
+		}
+		?>
 		</tr>
 		<?php
 	}
 }
 ?>
 </table>
+<?php
+/*************
+sng:14/jan/2013
+Need an area to show result of admire/recommend
+**************/
+?>
+<div class="msg_txt" id="admire_recommend_result"></div>
+
 <?php
 /*******************
 sng:19/sep/2012
