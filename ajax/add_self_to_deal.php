@@ -14,9 +14,19 @@ include("../include/global.php");
 require_once("classes/class.account.php");
 require_once("classes/class.transaction_member.php");
 
+/************************
+sng:15/jan/2013
+Since we are expecting json, we cannot use simple echo
+*******************/
+$result = array();
+$result['mem_added'] = 0;
+$result['msg'] = 0;
+
 if(!$g_account->is_site_member_logged()){
-	echo "You need to login first";
-	return;
+	$result['mem_added'] = 0;
+	$result['msg'] = "You need to login first";
+	echo json_encode($result);
+	exit;
 }
 $trans_mem = new transaction_member();
 /***********************************************/
@@ -26,9 +36,7 @@ $partner_id = $_POST['partner_id'];
 $mem_added = false;
 $msg = "";
 
-$result = array();
-$result['mem_added'] = 0;
-$result['msg'] = 0;
+
 
 $success = $trans_mem->add_deal_partner_team_member($deal_id,$partner_id,$this_member,$mem_added,$msg);
 if(!$success){

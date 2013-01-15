@@ -1855,6 +1855,90 @@ class member{
 		}
 		return true;
 	}
+	
+	/********************
+	sng:15/jan/2013
+	A unified method to admire competitor / recommend colleague
+	
+	this_mem_id: who is doing the recommend/admire
+	other_mem_id: the member being admired/recommended
+	added: whether added to admire/recommend list
+	msg: any message returned to caller
+	
+	Get the current company of the members. If those are same, it is recommending a colleague, else admiring a competitor
+	********************/
+	public function front_admire_recommend($this_mem_id,$other_mem_id,&$added,&$msg){
+		
+		$db = new db();
+		$q = "select member_type,company_id from ".TP."member where mem_id='".mysql_real_escape_string($this_mem_id)."'";
+		$ok = $db->select_query($q);
+		if(!$ok){
+			return false;
+		}
+		if(!$db->has_row()){
+			$added = false;
+			$msg = "Member not found";
+			return true;
+		}
+		$row = $db->get_row();
+		$this_member_type = $row['member_type'];
+		$this_company = $row['company_id'];
+		if(($this_member_type!="banker")&&($this_member_type!="lawyer")){
+			$added = false;
+			$msg = "Only for bankers and lawyers";
+			return true;
+		}
+		
+		$q = "select member_type,company_id from ".TP."member where mem_id='".mysql_real_escape_string($other_mem_id)."'";
+		$ok = $db->select_query($q);
+		if(!$ok){
+			return false;
+		}
+		if(!$db->has_row()){
+			$added = false;
+			$msg = "Member not found";
+			return true;
+		}
+		$row = $db->get_row();
+		$other_member_type = $row['member_type'];
+		$other_company = $row['company_id'];
+		if(($other_member_type!="banker")&&($other_member_type!="lawyer")){
+			$added = false;
+			$msg = "Only for bankers and lawyers";
+			return true;
+		}
+		
+		if($this_company==$other_company){
+			//same company so colleague, recommend
+			$table = "recommend";
+			$field = "recommended_mem_id";
+		}else{
+			$table = "admire";
+			$field = "admired_mem_id";
+		}
+		
+		$q = "select count(*) as cnt from ".TP.$table." where mem_id='".mysql_real_escape_string($this_mem_id)."' and ".$field."='".mysql_real_escape_string($other_mem_id)."'";
+		$ok = $db->select_query($q);
+		if(!$ok){
+			return false;
+		}
+		$row = $db->get_row();
+		if($row['cnt']>0){
+			//already in the list
+			$added = false;
+			$msg = "Already in your admire/recommend list";
+			return true;
+		}
+		$q = "insert into ".TP.$table." set mem_id='".mysql_real_escape_string($this_mem_id)."',".$field."='".mysql_real_escape_string($other_mem_id)."'";
+		$ok = $db->mod_query($q);
+		if(!$ok){
+			return false;
+		}
+		
+		$added = true;
+		$msg = "Added";
+		return true;
+	}
 	/***
 	3/june/2010
 	ordering by year from ascending

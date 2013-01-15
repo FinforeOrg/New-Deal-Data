@@ -106,6 +106,9 @@ if(0==$g_view['deal_bankers_count']){
 		sng: 14/jan/2013
 		The admire/recommend part
 		we check if this member is already in the list or not
+		
+		sng: 15/jan/2013
+		We must also check that I am not liking myself
 		****************/
 		if($g_account->is_site_member_logged()){
 			if($_SESSION['member_type']=="banker"){
@@ -114,8 +117,10 @@ if(0==$g_view['deal_bankers_count']){
 				<?php
 				if(in_array($g_view['deal_bankers'][$i]['member_id'],$recommed_admire_list)){
 					?>Already admired/recommended<?php
-				}else{
+				}elseif($g_view['deal_bankers'][$i]['member_id']!=$_SESSION['mem_id']){
 					?><input onclick="return recommend_admire_member(<?php echo $g_view['deal_bankers'][$i]['member_id'];?>);" class="btn_auto" type="button" value="LIKE" /><?php
+				}else{
+					//This is my record
 				}
 				?>
 				</td>
@@ -171,6 +176,9 @@ if(0==$g_view['deal_lawyers_count']){
 		sng: 14/jan/2013
 		The admire/recommend part
 		we check if this member is already in the list or not
+		
+		sng: 15/jan/2013
+		We must also check that I am not liking myself
 		****************/
 		if($g_account->is_site_member_logged()){
 			if($_SESSION['member_type']=="lawyer"){
@@ -179,8 +187,10 @@ if(0==$g_view['deal_lawyers_count']){
 				<?php
 				if(in_array($g_view['deal_lawyers'][$i]['member_id'],$recommed_admire_list)){
 					?>Already admired/recommended<?php
-				}else{
+				}elseif($g_view['deal_lawyers'][$i]['member_id']!=$_SESSION['mem_id']){
 					?><input onclick="return recommend_admire_member(<?php echo $g_view['deal_lawyers'][$i]['member_id'];?>);" class="btn_auto" type="button" value="LIKE" /><?php
+				}else{
+					//This is my record
 				}
 				?>
 				</td>

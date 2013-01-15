@@ -52,8 +52,18 @@ function add_colleague_to_deal(the_deal_id,the_partner_id){
 sng:14/jan/2013
 We just take the mem_id. On the server side, we get the current firm of the member and decide whether to recommend as colleague or admire as competitor
 **********/
-function recommend_admire_member($mem_id){
-	$('#admire_recommend_result').html("added");
+function recommend_admire_member(mem_id){
+	$('#admire_recommend_result').html("");
+	$.blockUI({ message: '<h1>adding to recommend / admire list...</h1><img src="images/loader.gif" />' });
+	$.post("ajax/admire_recommend_member.php", {member_id:""+mem_id+""}, function(data){
+		$.unblockUI();
+		if(data.mem_added===0){
+			//failed
+			$('#admire_recommend_result').html(data.msg);
+		}else{
+			update_members();
+		}
+	},"json");
 }
 </script>
 
