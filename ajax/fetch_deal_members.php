@@ -219,14 +219,19 @@ In previous workflow, we added ourself to the team of specific bank/lawfirm.
 Here we are just adding to the deal. We assume that we want to add ourself as a team member of our current firm. Of course, it can happen that
 our current firm is not associated with the deal.
 Also, we will not be able to add ourself as a team member of a firm where I used to work and that firm is associated with the deal.
+
+sng:16/jan/2013
+If I am added myself to the deal, I should not see the button
 **********************/
 ?>
 <div style="text-align:center; margin-top:10px;">
 <?php
 if($g_account->is_site_member_logged()){
-?>
-<input onclick="return add_self_to_deal(<?php echo $g_view['deal_id'];?>,<?php echo $_SESSION['company_id'];?>);" class="btn_auto" type="button" value="ADD YOURSELF TO THIS DEAL" />
-<?php
+	if(!is_member_in_deal($_SESSION['mem_id'])){
+		?><input onclick="return add_self_to_deal(<?php echo $g_view['deal_id'];?>,<?php echo $_SESSION['company_id'];?>);" class="btn_auto" type="button" value="ADD YOURSELF TO THIS DEAL" /><?php
+	}else{
+		//already in team
+	}
 }else{
 ?>
 <p>You need to login to add yourself to deal</p>
@@ -272,3 +277,26 @@ jQuery('#team_member_name').devbridge_autocomplete({
 	}
 });
 </script>
+<?php
+/****************
+sng:16/jan/2013
+We need a way to see whether a particular member is already in the deal team or not.
+For now, we do not write any method in the member class. We just check the list here.
+If the list is empty, then of course, we assume that the member is not in the deal
+******************/
+function is_member_in_deal($mem_id){
+	global $g_view;
+	
+	for($i=0;$i<$g_view['deal_bankers_count'];$i++){
+		if($g_view['deal_bankers'][$i]['member_id']==$mem_id){
+			return true;
+		}
+	}
+	for($i=0;$i<$g_view['deal_lawyers_count'];$i++){
+		if($g_view['deal_lawyers'][$i]['member_id']==$mem_id){
+			return true;
+		}
+	}
+	//not found in any list so
+	return false;
+}
