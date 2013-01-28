@@ -136,8 +136,16 @@ and the code in the view page triggers a chart creation.
               <div class="radio_cat" style="font-size:10px;">
                 <?php
                     $i = 1;
-                    foreach($categories as $categoryName=>$subCats) :?>   
+                    foreach($categories as $categoryName=>$subCats) :?>
+					<?php
+				/*************
+				sng:26/jan/2013
+				HACK
+				We want to show only Equities, but only the subtype and sub sub type. We just need to hide the type part. However, we do send the data via hidden element
+				***************   
                 <input type="radio" id="deal_cat_name<?php echo $i?>" name="deal_cat_name" value="<?php echo $categoryName?>" onClick="categoryChanged(<?php echo $i?>)" <?php if($_POST['deal_cat_name']==$categoryName){?>checked<?php }?>/><label for="deal_cat_name<?php echo $i?>"><?php echo $categoryName?></label>
+				****************/?>
+				<input type="hidden" name="deal_cat_name" value="<?php echo $categoryName?>" />
                 <?php $i++;endforeach?>
                 </div>
               <?php 
@@ -159,7 +167,16 @@ and the code in the view page triggers a chart creation.
                     $i = 1;$j = 1;$k = 1;
                     foreach($categories as $subCategoryName=>$subCats) :?>
               <?php foreach  ($subCats as $subCatName => $subSubCats) : ?>
-              <div class="radio_subsubcat <?php echo "parent_$k"?>" style="font-size:10px;margin-top:5px; display:<?php if($_POST['deal_cat_name']==$subCategoryName && $_POST['deal_subcat1_name']==$subCatName){?>block<?php } else {?> none <?php }?>;" id="subSubCatsForCat<?php echo $j?>">   
+			  <?php
+				 /*************
+				 sng:26/jan/2013
+				 HACK
+				 We also need to show the 'Common Equity' sub sub types to be visible
+				 ******************
+              <div class="radio_subsubcat <?php echo "parent_$k"?>" style="font-size:10px;margin-top:5px; display:<?php if($_POST['deal_cat_name']==$subCategoryName && $_POST['deal_subcat1_name']==$subCatName){?>block<?php } else {?> none <?php }?>;" id="subSubCatsForCat<?php echo $j?>">
+			  *********************/?>
+			  <div class="radio_subsubcat <?php echo "parent_$k"?>" style="font-size:10px;margin-top:5px; display:block;" id="subSubCatsForCat<?php echo $j?>">
+			  <?php /******************************************************************/?>   
                 <?php foreach ($subSubCats as $key=>$name) : ?>
                 <?php if ($name == 'n/a') continue ?>
                 <input type="radio" id="deal_subSubCat_name<?php echo $i?>" name="deal_subcat2_name" value="<?php echo $name?>" <?php if($_POST['deal_subcat2_name']==$name){?>checked<?php }?>/><label for="deal_subSubCat_name<?php echo $i?>"><?php echo $name?></label>

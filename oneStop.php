@@ -81,6 +81,26 @@ if (!isset($_POST['submit'])) {
     foreach ($categories as $category) {
         if (in_array($category['id'], $prohibitedCategories))
             continue;
+		/**********************************************
+		sng:26/jan2013
+		HACK
+		We want to exclude Debt and M&A
+		
+		we want to include subtype of 'Common Equity' only
+		
+		We want to include sub sub type of IPOs and Secondaries only
+		*************/
+		if(("Debt"==$category['type'])||("M&A"==$category['type'])){
+			continue;
+		}
+		
+		if($category['subtype1']!="Common Equity"){
+			continue;
+		}
+		if(("IPOs"!=$category['subtype2'])&&("Secondaries"!=$category['subtype2'])){
+			continue;
+		}
+		/********************************/
        if (!in_array($category['subtype1'], $alreadyAddedTypes)) {
             $lbl = $category['subtype1'];
             if ($lbl == 'Completed') {
@@ -98,7 +118,10 @@ if (!isset($_POST['submit'])) {
             $sortedCategories[$category['type']][] = array('name'=>$category['subtype2'], 'id' => $category['id'], 'class' => 'sub-subtype'); 
         }
     };
-    
+    /*********************
+	sng:26/jan/2013
+	We only want Equities
+	**************
     if (isset($sortedCategories['M&A']) && sizeOf($sortedCategories['M&A'])) {
         foreach ($sortedCategories['M&A'] as $maDeal) {
             $tmp[$maDeal['id']] = $maDeal['name'];
@@ -107,6 +130,7 @@ if (!isset($_POST['submit'])) {
     //$sortedCategories['M&A'][] = array('name'=>'Completed', 'id' => 18); 
     $sortedCategories['M&A'][] = array('name'=>'Completed & Pending', 'id' => '0', 'class' => 'subtype'); 
     //dump($sortedCategories);
+	*******************/
     $sortedIndustries = array();
     foreach ($industries as $industry) {
        $sortedIndustries[$industry['sector']][] =  $industry;

@@ -6,22 +6,23 @@ Minimum files needed to run a script.
 This is used by cron codes who does not require session and run in background mode
 
 NOT FOR NORMAL FILES
-**************************/
-$conn = mysql_connect($g_config['db_host'], $g_config['db_user'], $g_config['db_password']);
-if(!$conn){
-	exit;
-}
-$ok = mysql_select_db($g_config['db_name'], $conn);
-if(!$ok){
-	exit;
-}
-/*************
-sng:17/dec/2012
-We will not use the db class here. It does not use the connection resource while running the queries.
-Since these codes can run in parallel to other codes, we require the use of connection resource so that
-insert and last_insert_id give correct result
 
-But then some codes use it, so
-*******************/
-require_once(FILE_PATH."/classes/db.php");
+sng:22/jan/2013
+We now use the improved classes/class.db.php which use mysqli and use the link identifier
+
+Also, we will now call this file to load everything, including the config file
+
+It is a good practise to set the file path and use absolute path to include another file. It is quick and explicit, no need for hunting
+
+Note on dirname(__FILE__)
+Even if we call this from test/src/t.php, the value is D:\wamp\www\new_deal_data\include
+which is location of this file (never mind from where this is included). Therefore, we can easily set the path.
+**************************/
+define('FILE_PATH',dirname(dirname(__FILE__)));
+
+require_once(FILE_PATH."/include/config.php");
+require_once(FILE_PATH."/classes/class.db.php");
+/********
+We do not create any db object here. Everybody should crate their own object
+**********/
 ?>

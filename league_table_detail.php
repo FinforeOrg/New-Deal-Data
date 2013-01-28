@@ -8,6 +8,10 @@ require_once("check_mem_login.php");
 //////////////////////////////////////////
 //support for filters
 require_once("classes/class.transaction.php");
+
+require_once("classes/class.transaction_support.php");
+$trans_support = new transaction_support();
+
 require_once("classes/class.country.php");
 require_once("classes/class.company.php");
 require_once("classes/class.statistics.php");
@@ -46,7 +50,15 @@ if(!$success){
 /////////////////////////////////////////////
 require_once("default_metatags.php");
 //////////////////////
-$categories = $g_trans->getCategoryTree();
+/**************
+sng:28/jan/2013
+We will now use the method from transaction_support
+
+sng:26/jan/2013
+HACK
+We just want a restricted set, so we use the hack version
+**********************/
+$categories = $trans_support->hack_get_category_tree();
 $g_view['page_heading'] = "League Table";
 $g_view['content_view'] = "league_table_detail_view.php";
 require("content_view.php");

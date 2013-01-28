@@ -1,6 +1,8 @@
 <?php
 /**********************
 Stuff that are related to deals like currency, stock exchange, type/subtype etc
+
+We can move some functions from deal_support
 ***********/
 class transaction_support{
 	/***********
@@ -23,6 +25,23 @@ class transaction_support{
         //var_Dump($ret);
         return $ret;
     }
+	/*************************
+	sng:26/jan/2013
+	HACK
+	For now, we only have IPO and Additional (Secondaries) Equity deals. These are grouped under Common Equity.
+	Client want only those buttons to appear.
+	HACK
+	************************/
+	public function hack_get_category_tree(){
+		$ret = array();
+		$ret['Equity']['Common Equity'][] = "IPOs";
+		$ret['Equity']['Common Equity'][] = "Secondaries";
+		return $ret;
+	}
+	
+	
+	
+	
 	/******************
 	sng:19/nov/2012
 	client wants to arrange the sub-sub-type as per the specified display order
@@ -132,5 +151,10 @@ class transaction_support{
 		$data_arr = $db->get_row();
 		return true;
 	}
+	
+	/***********************************
+	FUTURE
+	get deal value filter section from classes/class.deal_support.php and update all the references
+	**********************************/
 }
 ?>

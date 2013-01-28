@@ -35,14 +35,26 @@ require("simple_submission.php");
 <!--//////////////////////////////////5 deals from each deal type////////////////////////////////-->
 <div style="display: block; width:100%;" id="results" >
 <table cellpadding="0" cellspacing="0" class="company" style="width:auto;">
-<tr><td colspan="7" style="border:0"><strong>M&amp;A Deals: 5 Most Recent</strong></td></tr>
-<tr><td colspan="7" style="height:15px;border-left:0px;border-right:0px;border-top:0px;"></td></tr>
 <?php
-$g_view['data_count'] = $g_view['ma_data_count'];
-$g_view['data'] = $g_view['ma_data'];
-require("index_new_snippet.php");
+/********************
+sng:18/jan/2013
+At this point, client wants to start with Equity deals, so wants to hide the M&A section.
+However, we check the count and hide if the count is zero
+*********************/
+if($g_view['ma_data_count'] > 0){
+	?>
+	<tr><td colspan="7" style="border:0"><strong>M&amp;A Deals: 5 Most Recent</strong></td></tr>
+	<tr><td colspan="7" style="height:15px;border-left:0px;border-right:0px;border-top:0px;"></td></tr>
+	<?php
+	$g_view['data_count'] = $g_view['ma_data_count'];
+	$g_view['data'] = $g_view['ma_data'];
+	require("index_new_snippet.php");
+	?>
+	<tr><td colspan="7" style="height:15px;border-left:0px;border-right:0px;border-bottom:0px;"></td></tr>
+	<?php
+}
 ?>
-<tr><td colspan="7" style="height:15px;border-left:0px;border-right:0px;border-bottom:0px;"></td></tr>
+
 <tr><td colspan="7" style="border:0"><strong>Equity Deals: 5 Most Recent</strong></td></tr>
 <tr><td colspan="7" style="height:15px;height:15px;border-left:0px;border-right:0px;border-top:0px;"></td></tr>
 <?php
@@ -51,12 +63,21 @@ $g_view['data'] = $g_view['eq_data'];
 require("index_new_snippet.php");
 ?>
 <tr><td colspan="7" style="height:15px;border-left:0px;border-right:0px;border-bottom:0px;"></td></tr>
-<tr><td colspan="7" style="border:0"><strong>Debt Deals: 5 Most Recent</strong></td></tr>
-<tr><td colspan="7" style="height:15px;height:15px;border-left:0px;border-right:0px;border-top:0px;"></td></tr>
 <?php
-$g_view['data_count'] = $g_view['dbt_data_count'];
-$g_view['data'] = $g_view['dbt_data'];
-require("index_new_snippet.php");
+/********************
+sng:18/jan/2013
+At this point, client wants to start with Equity deals, so wants to hide the Debt section.
+However, we check the count and hide if the count is zero
+*********************/
+if($g_view['dbt_data_count'] > 0){
+	?>
+	<tr><td colspan="7" style="border:0"><strong>Debt Deals: 5 Most Recent</strong></td></tr>
+	<tr><td colspan="7" style="height:15px;height:15px;border-left:0px;border-right:0px;border-top:0px;"></td></tr>
+	<?php
+	$g_view['data_count'] = $g_view['dbt_data_count'];
+	$g_view['data'] = $g_view['dbt_data'];
+	require("index_new_snippet.php");
+}
 ?>
 </table>
 <?php

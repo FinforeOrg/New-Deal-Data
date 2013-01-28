@@ -220,6 +220,7 @@ function goto_showcase_chart(firm_id)
         <table width="100%" border="0" cellspacing="6" cellpadding="0">
           <tr>
             <td align="left" valign="top" style="width:120px;">Type of Transaction:</td>
+
             <td align="left" valign="top">&nbsp;</td>
           </tr>
           <tr>
@@ -506,6 +507,3 @@ if($g_view['data_count'] == 0){
         </table>
     </div>
     <div id="backgroundPopup"></div>
-
-
-

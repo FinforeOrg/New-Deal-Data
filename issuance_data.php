@@ -16,7 +16,16 @@ This is now open to all
 $_SESSION['after_login'] = "issuance_data.php";
 require_once("check_mem_login.php");
 ***********************************************************/
+/**********
+sng:26/jan/2013
 require_once("classes/class.transaction.php");
+It seems, we are using the big transaction class just to get the category tree.
+We can now get it from the transaction_support class.
+If we face any problem we will again include the transaction class
+**************/
+require_once("classes/class.transaction_support.php");
+$trans_support = new transaction_support();
+
 require_once("classes/class.country.php");
 require_once("classes/class.company.php");
 require_once("classes/class.account.php");
@@ -100,7 +109,16 @@ if(!isset($_POST['month_division_list'])||($_POST['month_division_list']=="")){
 /*********************************************/
 $g_view['page_heading'] = "Issuance Data";
 $g_view['content_view'] = "issuance_data_view.php";
-$categories = $g_trans->getCategoryTree(); 
+/**********
+sng:26/jan/2013
+using transaction_support instead of transaction
+$categories = $g_trans->getCategoryTree();
+
+sng:26/jan/2013
+HACK
+We just want a restricted set, so we use the hack version
+***************/
+$categories = $trans_support->hack_get_category_tree(); 
 $g_view['show_help'] = true;
 require("content_view.php");
 ?>

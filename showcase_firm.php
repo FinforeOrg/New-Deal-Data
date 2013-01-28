@@ -36,6 +36,12 @@ require_once("classes/class.oneStop.php");
 require_once("classes/class.deal_support.php");
 $deal_support = new deal_support();
 $savedSearches = new SavedSearches();
+/***********
+sng:26/jan/2013
+We include transaction_support because we will migrate some codes from deal_support and transaction to transaction_support
+***************/
+require_once("classes/class.transaction_support.php");
+$trans_support = new transaction_support();
 //////////////////////////////////////
 if (isset($_GET['from']) && $_GET['from'] == 'savedSearches') {
 	/************************************
@@ -192,7 +198,12 @@ if (isset($_GET['from']) && $_GET['from'] == 'savedSearches') {
     if(!$success){
         die("Cannot get industry list");
     }
+	/**********
+	sng:26/jan/2013
+	using transaction_support instead of transaction
     $categories = $g_trans->getCategoryTree();
+	***********/
+	$categories = $trans_support->get_category_tree();
 	/***********************************************************
 	sng:12/nov/2011
 	We need the deal size options like in league table
