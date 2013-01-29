@@ -3,6 +3,11 @@
 sng:17/jan/2012
 
 simple submission view, embedded in home page
+
+sng:29/jan/2013
+deal subtype Additional is Secondaries
+deal subtype IPO is IPOs
+deal subtype Equity is Common Equity
 *******************/
 ?>
 <style type="text/css">
@@ -316,11 +321,11 @@ function update_note_box_label(){
 		box_label = "Enter additional details here (e.g. maturity, coupon, format, pricing, fees):";
 	}else if((curr_cat == "equity")&&(curr_sub_cat=="convertible")){
 		box_label = "Enter additional details here (e.g. maturity, coupon, format, pricing, fees, underlying, dividend protection mechanism):";
-	}else if((curr_cat == "equity")&&(curr_sub_cat=="equity")&&(curr_sub_sub_cat=="additional")){
+	}else if((curr_cat == "equity")&&(curr_sub_cat=="common equity")&&(curr_sub_sub_cat=="secondaries")){
 		box_label = "Enter additional details here (e.g. pricing, discount, primary/ secondary, fees, seller):";
-	}else if((curr_cat == "equity")&&(curr_sub_cat=="equity")&&(curr_sub_sub_cat=="ipo")){
+	}else if((curr_cat == "equity")&&(curr_sub_cat=="common equity")&&(curr_sub_sub_cat=="ipos")){
 		box_label = "Enter additional details here (e.g. pricing, primary/ secondary, greenshoe, fees, seller):";
-	}else if((curr_cat == "equity")&&(curr_sub_cat=="equity")&&(curr_sub_sub_cat=="rights issue")){
+	}else if((curr_cat == "equity")&&(curr_sub_cat=="common equity")&&(curr_sub_sub_cat=="rights issue")){
 		box_label = "Enter additional details here (e.g. terms, TERP, key dates, fees, rump, underwriting:";
 	}else if((curr_cat == "m&a")&&(curr_sub_cat=="pending")){
 		box_label = "Enter additional details here (e.g. target, seller, buyer, termination fees, conditions, premium, valuation):";

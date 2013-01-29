@@ -5,6 +5,11 @@ The user has to login to see this pane
 
 sng:11/nov/2011
 Allow all
+
+sng:29/jan/2013
+deal subtype Additional is Secondaries
+deal subtype IPO is IPOs
+deal subtype Equity is Common Equity
 **********/
 //if(!$g_account->is_site_member_logged()){
 	?>
@@ -38,9 +43,9 @@ Here you can see the details of the deal and can send your suggestions / correct
 if(strtolower($g_view['deal_data']['deal_cat_name']) == "m&a") require("deal_page_detail_ma.php");
 elseif((strtolower($g_view['deal_data']['deal_cat_name']) == "debt")&&(strtolower($g_view['deal_data']['deal_subcat1_name']) == "bond")) require("deal_page_detail_bond.php");
 elseif((strtolower($g_view['deal_data']['deal_cat_name']) == "debt")&&(strtolower($g_view['deal_data']['deal_subcat1_name']) == "loan")) require("deal_page_detail_loan.php");
-elseif((strtolower($g_view['deal_data']['deal_cat_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat1_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat2_name'])=="rights issue")) require("deal_page_detail_equity_rights.php");
-elseif((strtolower($g_view['deal_data']['deal_cat_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat1_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat2_name'])=="ipo")) require("deal_page_detail_equity_ipo.php");
-elseif((strtolower($g_view['deal_data']['deal_cat_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat1_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat2_name'])=="additional")) require("deal_page_detail_equity_additional.php");
+elseif((strtolower($g_view['deal_data']['deal_cat_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat1_name'])=="common equity")&&(strtolower($g_view['deal_data']['deal_subcat2_name'])=="rights issue")) require("deal_page_detail_equity_rights.php");
+elseif((strtolower($g_view['deal_data']['deal_cat_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat1_name'])=="common equity")&&(strtolower($g_view['deal_data']['deal_subcat2_name'])=="ipos")) require("deal_page_detail_equity_ipo.php");
+elseif((strtolower($g_view['deal_data']['deal_cat_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat1_name'])=="common equity")&&(strtolower($g_view['deal_data']['deal_subcat2_name'])=="secondaries")) require("deal_page_detail_equity_additional.php");
 elseif((strtolower($g_view['deal_data']['deal_cat_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat1_name'])=="preferred")) require("deal_page_detail_equity_preferred.php");
 elseif((strtolower($g_view['deal_data']['deal_cat_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat1_name'])=="convertible")) require("deal_page_detail_equity_convertible.php");
 ?>

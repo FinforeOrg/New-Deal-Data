@@ -1,3 +1,11 @@
+<?php
+/********************
+sng:29/jan/2013
+deal subtype Additional is Secondaries
+deal subtype IPO is IPOs
+deal subtype Equity is Common Equity
+*********************/
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -65,9 +73,9 @@ elseif((strtolower($g_view['data']['deal_cat_name']) == "debt")&&(strtolower($g_
 elseif((strtolower($g_view['data']['deal_cat_name']) == "debt")&&(strtolower($g_view['data']['deal_subcat1_name']) == "loan")) require("deal_suggestion_detail_loan.php");
 elseif((strtolower($g_view['data']['deal_cat_name']) == "equity")&&(strtolower($g_view['data']['deal_subcat1_name']) == "convertible")) require("deal_suggestion_detail_eq_convertible.php");
 elseif((strtolower($g_view['data']['deal_cat_name']) == "equity")&&(strtolower($g_view['data']['deal_subcat1_name']) == "preferred")) require("deal_suggestion_detail_eq_preferred.php");
-elseif((strtolower($g_view['data']['deal_cat_name']) == "equity")&&(strtolower($g_view['data']['deal_subcat1_name']) == "equity")&&(strtolower($g_view['data']['deal_subcat2_name']) == "additional")) require("deal_suggestion_detail_eq_additional.php");
-elseif((strtolower($g_view['data']['deal_cat_name']) == "equity")&&(strtolower($g_view['data']['deal_subcat1_name']) == "equity")&&(strtolower($g_view['data']['deal_subcat2_name']) == "ipo")) require("deal_suggestion_detail_eq_ipo.php");
-elseif((strtolower($g_view['data']['deal_cat_name']) == "equity")&&(strtolower($g_view['data']['deal_subcat1_name']) == "equity")&&(strtolower($g_view['data']['deal_subcat2_name']) == "rights issue")) require("deal_suggestion_detail_eq_rights.php");
+elseif((strtolower($g_view['data']['deal_cat_name']) == "equity")&&(strtolower($g_view['data']['deal_subcat1_name']) == "common equity")&&(strtolower($g_view['data']['deal_subcat2_name']) == "secondaries")) require("deal_suggestion_detail_eq_additional.php");
+elseif((strtolower($g_view['data']['deal_cat_name']) == "equity")&&(strtolower($g_view['data']['deal_subcat1_name']) == "common equity")&&(strtolower($g_view['data']['deal_subcat2_name']) == "ipos")) require("deal_suggestion_detail_eq_ipo.php");
+elseif((strtolower($g_view['data']['deal_cat_name']) == "equity")&&(strtolower($g_view['data']['deal_subcat1_name']) == "common equity")&&(strtolower($g_view['data']['deal_subcat2_name']) == "rights issue")) require("deal_suggestion_detail_eq_rights.php");
 ?>
 <tr><td colspan="2"><strong>Partners</strong></td></tr>
 <tr>

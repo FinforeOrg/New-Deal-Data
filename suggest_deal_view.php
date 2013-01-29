@@ -3,6 +3,11 @@
 sng:29/sep/2011
 we now include jquery in the container view
 <script type="text/javascript" src="js/jquery-1.2.1.pack.js"></script>
+
+sng:29/jan/2013
+deal subtype Additional is Secondaries
+deal subtype IPO is IPOs
+deal subtype Equity is Common Equity
 ******************************/
 ?>
 <script type="text/javascript" src="js/datepicker.js"></script>
@@ -232,12 +237,12 @@ function show_hide_deal_subsubtype_specific_block(){
 	deal_subsubtype = deal_subsubtype.toLowerCase();
 	
 	if(deal_type=="equity"){
-		if(deal_subtype=="equity"){
-			if(deal_subsubtype=="ipo"){
+		if(deal_subtype=="common equity"){
+			if(deal_subsubtype=="ipos"){
 				document.getElementById("equity_ipo_specific").className = "opt_show";
 				return;
 			}
-			if(deal_subsubtype=="additional"){
+			if(deal_subsubtype=="secondaries"){
 				document.getElementById("equity_additional_specific").className = "opt_show";
 				return;
 			}
@@ -284,12 +289,12 @@ function show_hide_all_deal_specific_blocks(){
 		return;
 	}
 	if(deal_type=="equity"){
-		if(deal_subtype=="equity"){
-			if(deal_subsubtype=="ipo"){
+		if(deal_subtype=="common equity"){
+			if(deal_subsubtype=="ipos"){
 				document.getElementById("equity_ipo_specific").className = "opt_show";
 				return;
 			}
-			if(deal_subsubtype=="additional"){
+			if(deal_subsubtype=="secondaries"){
 				document.getElementById("equity_additional_specific").className = "opt_show";
 				return;
 			}

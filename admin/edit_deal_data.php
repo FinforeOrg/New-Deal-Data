@@ -9,6 +9,11 @@ include the proper file to do additional validation and build query.
 Then this file calls methods to perform the edit.
 
 This way we have more flexibility
+
+sng:29/jan/2013
+deal subtype Additional is Secondaries
+deal subtype IPO is IPOs
+deal subtype Equity is Common Equity
 **************************************/
 $validation_passed = true;
 $edit_q = "";
@@ -161,9 +166,9 @@ elseif((strtolower($_POST['deal_cat_name'])=="debt")&&(strtolower($_POST['deal_s
 elseif((strtolower($_POST['deal_cat_name'])=="debt")&&(strtolower($_POST['deal_subcat1_name'])=="bond")) require("edit_deal_data_bond.php");
 elseif((strtolower($_POST['deal_cat_name'])=="equity")&&(strtolower($_POST['deal_subcat1_name'])=="convertible")) require("edit_deal_data_convertible.php");
 elseif((strtolower($_POST['deal_cat_name'])=="equity")&&(strtolower($_POST['deal_subcat1_name'])=="preferred")) require("edit_deal_data_preferred.php");
-elseif((strtolower($_POST['deal_cat_name'])=="equity")&&(strtolower($_POST['deal_subcat1_name'])=="equity")&&(strtolower($_POST['deal_subcat2_name'])=="additional")) require("edit_deal_data_eq_additional.php");
-elseif((strtolower($_POST['deal_cat_name'])=="equity")&&(strtolower($_POST['deal_subcat1_name'])=="equity")&&(strtolower($_POST['deal_subcat2_name'])=="ipo")) require("edit_deal_data_eq_ipo.php");
-elseif((strtolower($_POST['deal_cat_name'])=="equity")&&(strtolower($_POST['deal_subcat1_name'])=="equity")&&(strtolower($_POST['deal_subcat2_name'])=="rights issue")) require("edit_deal_data_eq_rights.php");
+elseif((strtolower($_POST['deal_cat_name'])=="equity")&&(strtolower($_POST['deal_subcat1_name'])=="common equity")&&(strtolower($_POST['deal_subcat2_name'])=="secondaries")) require("edit_deal_data_eq_additional.php");
+elseif((strtolower($_POST['deal_cat_name'])=="equity")&&(strtolower($_POST['deal_subcat1_name'])=="common equity")&&(strtolower($_POST['deal_subcat2_name'])=="ipos")) require("edit_deal_data_eq_ipo.php");
+elseif((strtolower($_POST['deal_cat_name'])=="equity")&&(strtolower($_POST['deal_subcat1_name'])=="common equity")&&(strtolower($_POST['deal_subcat2_name'])=="rights issue")) require("edit_deal_data_eq_rights.php");
 /*******************************************************************/
 $newLogos = array();
 if (is_array($_SESSION['logos'])) {
@@ -243,14 +248,21 @@ if($_POST['value_in_billion']!=$_POST['current_value_in_billion']){
 /********************************************
 sng:21/may/2010
 try to update the note
+Signature has changed, beside, we may not allow admin to change the note
+Also, this has moved to transaction_note
 **********************************/
-$g_trans->update_note($_POST['deal_id'],$_POST['note']);
+$g_trans->set_note($_POST['deal_id'],$_POST['note']);
 //never mind if there is error, this is not that important
 /*******************
 sng:4/feb/2011
 try to update the private note
+
+sng:4/oct/2012
+Moved the method to another class and changed the method name
 ********/
-$g_trans->update_private_note($_POST['deal_id'],$_POST['deal_private_note']);
+require_once("classes/class.transaction_note.php");
+$trans_note = new transaction_note();
+$trans_note->set_private_note($_POST['deal_id'],$_POST['deal_private_note']);
 //never mind if error
 /********************************************
 sng:8/jul/2010

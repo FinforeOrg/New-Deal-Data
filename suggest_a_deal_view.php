@@ -1,4 +1,10 @@
 <?php
+/***************
+sng:29/jan/2013
+deal subtype Additional is Secondaries
+deal subtype IPO is IPOs
+deal subtype Equity is Common Equity
+****************/
 require_once("include/global.php");
 require_once("classes/db.php");
 $db = new db();
@@ -468,7 +474,7 @@ var _requiredFields = {
 			'bank1'
         ]
 	},
-    'Additional' : {
+    'Secondaries' : {
         'step1' : [
             'closed_date'  
         ],
@@ -479,7 +485,7 @@ var _requiredFields = {
             'bank1'
         ]
     },    
-    'IPO' : {
+    'IPOs' : {
         'step1' : [
 			'closed_date'
         ],
@@ -611,7 +617,7 @@ $(function() {
                 ]
                 
             },
-            'IPO' :
+            'IPOs' :
             {
                 'edit' : 
                     {
@@ -678,7 +684,7 @@ $(function() {
                 ]
                 
             },
-            'Additional' :
+            'Secondaries' :
             {
                 'edit' : 
                     {
@@ -1081,11 +1087,11 @@ function update_note_box_label(){
 		note_box_label = "Enter additional details here (e.g. terms, redemption, ratings, puts/ calls):";
 	}else if((curr_cat == "equity")&&(curr_sub_cat=="convertible")){
 		note_box_label = "Enter additional details here (e.g. terms, redemption, ratings, puts/ calls, dividend protection mechanism):";
-	}else if((curr_cat == "equity")&&(curr_sub_cat=="equity")&&(curr_sub_sub_cat=="additional")){
+	}else if((curr_cat == "equity")&&(curr_sub_cat=="common equity")&&(curr_sub_sub_cat=="secondaries")){
 		note_box_label = "Enter additional details here (e.g. selling shareholders):";
-	}else if((curr_cat == "equity")&&(curr_sub_cat=="equity")&&(curr_sub_sub_cat=="ipo")){
+	}else if((curr_cat == "equity")&&(curr_sub_cat=="common equity")&&(curr_sub_sub_cat=="ipos")){
 		note_box_label = "Enter additional details here (e.g. selling shareholders, greenshoe):";
-	}else if((curr_cat == "equity")&&(curr_sub_cat=="equity")&&(curr_sub_sub_cat=="rights issue")){
+	}else if((curr_cat == "equity")&&(curr_sub_cat=="common equity")&&(curr_sub_sub_cat=="rights issue")){
 		note_box_label = "Enter additional details here (e.g. underwriting, existing shareholders, rump):";
 	}else if((curr_cat == "m&a")&&(curr_sub_cat=="pending")){
 		note_box_label = "Enter additional details here (e.g. termination fees, conditions):";

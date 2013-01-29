@@ -1,6 +1,11 @@
 <?php
 /***
 used in admin to get the form elements to edit deal data for different deal types
+
+sng:29/jan/2013
+deal subtype Additional is Secondaries
+deal subtype IPO is IPOs
+deal subtype Equity is Common Equity
 ********/
 require_once("../../include/global.php");
 
@@ -44,15 +49,15 @@ if((strtolower($deal_cat_name) == "equity")&&(strtolower($deal_subcat1_name) == 
 }
 
 
-if((strtolower($deal_cat_name) == "equity")&&(strtolower($deal_subcat1_name) == "equity")&&(strtolower($deal_subcat2_name)=="additional")){
+if((strtolower($deal_cat_name) == "equity")&&(strtolower($deal_subcat1_name) == "common equity")&&(strtolower($deal_subcat2_name)=="secondaries")){
 	include("../deal_data_eq_additional.php");
 	return;
 }
-if((strtolower($deal_cat_name) == "equity")&&(strtolower($deal_subcat1_name) == "equity")&&(strtolower($deal_subcat2_name)=="ipo")){
+if((strtolower($deal_cat_name) == "equity")&&(strtolower($deal_subcat1_name) == "common equity")&&(strtolower($deal_subcat2_name)=="ipos")){
 	include("../deal_data_eq_ipo.php");
 	return;
 }
-if((strtolower($deal_cat_name) == "equity")&&(strtolower($deal_subcat1_name) == "equity")&&(strtolower($deal_subcat2_name)=="rights issue")){
+if((strtolower($deal_cat_name) == "equity")&&(strtolower($deal_subcat1_name) == "common equity")&&(strtolower($deal_subcat2_name)=="rights issue")){
 	include("../deal_data_eq_rights.php");
 	return;
 }

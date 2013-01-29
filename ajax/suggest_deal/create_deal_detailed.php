@@ -15,6 +15,12 @@ return;
 /************
 in the suggestion, the dates are in m/d/y format. The database is y-m-d format
 ***************/
+/**************
+sng:29/jan/2013
+deal subtype Additional is Secondaries
+deal subtype IPO is IPOs
+deal subtype Equity is Common Equity
+****************/
 function fotmat_date_for_suggestion($date){
 	return date("Y-m-d",strtotime($date));
 }
@@ -355,11 +361,11 @@ if(strtolower($_POST['deal_cat_name']) == "m&a"){
 	include("suggestion_eq_convertible.php");
 }elseif(strtolower($_POST['deal_cat_name'])=="equity"&&strtolower($_POST['deal_subcat1_name'])=="preferred"){
 	include("suggestion_eq_preferred.php");
-}elseif(strtolower($_POST['deal_cat_name'])=="equity"&&strtolower($_POST['deal_subcat1_name'])=="equity"&&strtolower($_POST['deal_subcat2_name'])=="additional"){
+}elseif(strtolower($_POST['deal_cat_name'])=="equity"&&strtolower($_POST['deal_subcat1_name'])=="common equity"&&strtolower($_POST['deal_subcat2_name'])=="secondaries"){
 	include("suggestion_eq_additional.php");
-}elseif(strtolower($_POST['deal_cat_name'])=="equity"&&strtolower($_POST['deal_subcat1_name'])=="equity"&&strtolower($_POST['deal_subcat2_name'])=="ipo"){
+}elseif(strtolower($_POST['deal_cat_name'])=="equity"&&strtolower($_POST['deal_subcat1_name'])=="common equity"&&strtolower($_POST['deal_subcat2_name'])=="ipos"){
 	include("suggestion_eq_ipo.php");
-}elseif(strtolower($_POST['deal_cat_name'])=="equity"&&strtolower($_POST['deal_subcat1_name'])=="equity"&&strtolower($_POST['deal_subcat2_name'])=="rights issue"){
+}elseif(strtolower($_POST['deal_cat_name'])=="equity"&&strtolower($_POST['deal_subcat1_name'])=="common equity"&&strtolower($_POST['deal_subcat2_name'])=="rights issue"){
 	include("suggestion_eq_rights.php");
 }else{
 	

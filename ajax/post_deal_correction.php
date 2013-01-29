@@ -2,6 +2,11 @@
 /****
 even though this is called in ajax, we need to check if the caller has logged in or not
 The return data is in json
+
+sng:29/jan/2013
+deal subtype Additional is Secondaries
+deal subtype IPO is IPOs
+deal subtype Equity is Common Equity
 *******/
 require_once("../include/global.php");
 require_once("classes/class.account.php");
@@ -38,11 +43,11 @@ if($deal_cat_name == "M&A"){
 	include("post_deal_correction_eq_convertible.php");
 }elseif((strtolower($_POST['deal_cat_name'])=="equity")&&(strtolower($_POST['deal_subcat1_name'])=="preferred")){
 	include("post_deal_correction_eq_preferred.php");
-}elseif((strtolower($_POST['deal_cat_name'])=="equity")&&(strtolower($_POST['deal_subcat1_name'])=="equity")&&(strtolower($_POST['deal_subcat2_name'])=="additional")){
+}elseif((strtolower($_POST['deal_cat_name'])=="equity")&&(strtolower($_POST['deal_subcat1_name'])=="common equity")&&(strtolower($_POST['deal_subcat2_name'])=="secondaries")){
 	include("post_deal_correction_eq_additional.php");
-}elseif((strtolower($_POST['deal_cat_name'])=="equity")&&(strtolower($_POST['deal_subcat1_name'])=="equity")&&(strtolower($_POST['deal_subcat2_name'])=="ipo")){
+}elseif((strtolower($_POST['deal_cat_name'])=="equity")&&(strtolower($_POST['deal_subcat1_name'])=="common equity")&&(strtolower($_POST['deal_subcat2_name'])=="ipos")){
 	include("post_deal_correction_eq_ipo.php");
-}elseif((strtolower($_POST['deal_cat_name'])=="equity")&&(strtolower($_POST['deal_subcat1_name'])=="equity")&&(strtolower($_POST['deal_subcat2_name'])=="rights issue")){
+}elseif((strtolower($_POST['deal_cat_name'])=="equity")&&(strtolower($_POST['deal_subcat1_name'])=="common equity")&&(strtolower($_POST['deal_subcat2_name'])=="rights issue")){
 	include("post_deal_correction_eq_rights.php");
 }
 //run query

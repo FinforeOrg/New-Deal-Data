@@ -6,6 +6,11 @@ This is a bit different. This fetches the deal data and the suggestions and crea
 
 This is called in ajax. That means, we will have to fetch the extra details, but only related to additional data
 regarding the deal
+
+sng:29/jan/2013
+deal subtype Additional is Secondaries
+deal subtype IPO is IPOs
+deal subtype Equity is Common Equity
 *******************/
 require_once("../../include/global.php");
 require_once("classes/class.transaction.php");
@@ -120,9 +125,9 @@ if(0==$g_view['suggestion_data_count']){
 if(strtolower($g_view['deal_data']['deal_cat_name']) == "m&a") require("fetch_additional_detail_ma.php");
 elseif((strtolower($g_view['deal_data']['deal_cat_name']) == "debt")&&(strtolower($g_view['deal_data']['deal_subcat1_name']) == "bond")) require("fetch_additional_detail_bond.php");
 elseif((strtolower($g_view['deal_data']['deal_cat_name']) == "debt")&&(strtolower($g_view['deal_data']['deal_subcat1_name']) == "loan")) require("fetch_additional_detail_loan.php");
-elseif((strtolower($g_view['deal_data']['deal_cat_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat1_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat2_name'])=="rights issue")) require("fetch_additional_detail_equity_rights.php");
-elseif((strtolower($g_view['deal_data']['deal_cat_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat1_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat2_name'])=="ipo")) require("fetch_additional_detail_equity_ipo.php");
-elseif((strtolower($g_view['deal_data']['deal_cat_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat1_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat2_name'])=="additional")) require("fetch_additional_detail_equity_additional.php");
+elseif((strtolower($g_view['deal_data']['deal_cat_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat1_name'])=="common equity")&&(strtolower($g_view['deal_data']['deal_subcat2_name'])=="rights issue")) require("fetch_additional_detail_equity_rights.php");
+elseif((strtolower($g_view['deal_data']['deal_cat_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat1_name'])=="common equity")&&(strtolower($g_view['deal_data']['deal_subcat2_name'])=="ipos")) require("fetch_additional_detail_equity_ipo.php");
+elseif((strtolower($g_view['deal_data']['deal_cat_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat1_name'])=="common equity")&&(strtolower($g_view['deal_data']['deal_subcat2_name'])=="secondaries")) require("fetch_additional_detail_equity_additional.php");
 elseif((strtolower($g_view['deal_data']['deal_cat_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat1_name'])=="preferred")) require("fetch_additional_detail_equity_preferred.php");
 elseif((strtolower($g_view['deal_data']['deal_cat_name'])=="equity")&&(strtolower($g_view['deal_data']['deal_subcat1_name'])=="convertible")) require("fetch_additional_detail_equity_preferred.php");
 

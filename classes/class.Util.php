@@ -315,8 +315,11 @@ class Util {
 			/*******************
 			show what kind of Equity.
 			Check the deal_subcat1_name. If it is Equity again, go for the deal_subcat2_name
+			
+			sng:29/jan/2013
+			deal subtype Equity is Common Equity
 			************************/
-			if(strtolower($data['deal_subcat1_name'])=="equity"){
+			if(strtolower($data['deal_subcat1_name'])=="common equity"){
 				if(($data['deal_subcat2_name']!="")&&($data['deal_subcat2_name']!="n/a")){
 					$str = $data['deal_subcat2_name'];
 				}else{
