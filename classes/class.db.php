@@ -115,9 +115,14 @@ class db{
 		//for single row query
 		return mysqli_fetch_assoc($this->result_obj);
 	}
-	
+	/************
+	we should not use this now. The caller will not know that we are using
+	mysqli result and require mysqli_fetch_assoc.
+	rather, we use another class for this
+	*************/
 	public function get_result_set(){
-		return $this->result_set;
+		//return $this->result_obj;
+		return new db_result($this->result_obj);
 	}
 	
 	public function get_result_set_as_array(){
@@ -132,6 +137,27 @@ class db{
 		$this->num_rows = 0;
 		$this->result_obj = NULL;
 		$this->error = "";
+	}
+	
+	public function escape_string($str){
+		return mysqli_real_escape_string($this->link,$str);
+	}
+}
+
+class db_result{
+	private $result_obj;
+	private $num_rows;
+	
+	public function __construct($obj){
+		$this->result_obj = $obj;
+		$this->num_rows = mysqli_num_rows($this->result_obj);
+	}
+	public function row_count(){
+		return $this->num_rows;
+	}
+	public function get_row(){
+		//for single row query
+		return mysqli_fetch_assoc($this->result_obj);
 	}
 }
 ?>
