@@ -72,21 +72,21 @@ class co_codes{
 		$source = self::$co_codes_url.self::$full_company_file;
 		$destination = FILE_PATH.self::$full_company_file_local_destination;
 		
-		//$ok = self::fetch_and_store_remote_file($source,$destination);
-		//if(!$ok){
-		//	self::$debug->print_r("error fetching co-codes company data file\r\n");
-		//	return false;
-		//}
+		$ok = self::fetch_and_store_remote_file($source,$destination);
+		if(!$ok){
+			self::$debug->print_r("error fetching co-codes company data file\r\n");
+			return false;
+		}
 		self::$debug->print_r("fetched co-codes company data file\r\n");
 		/***************
 		check integrity of the downloaded file
 		**************/
-		//$local_hash = self::get_hashcode_of_local_file($destination);
-		//$remote_hash = $this->get_hashcode_of_file(self::$full_company_file);
-		//if($local_hash!==$remote_hash){
-		//	self::$debug->print_r("file mangled during download\r\n");
-		//	return false;
-		//}
+		$local_hash = self::get_hashcode_of_local_file($destination);
+		$remote_hash = $this->get_hashcode_of_file(self::$full_company_file);
+		if($local_hash!==$remote_hash){
+			self::$debug->print_r("file mangled during download\r\n");
+			return false;
+		}
 		self::$debug->print_r("verified integrity of the file\r\n");
 		/****************
 		now process the csv file
@@ -100,7 +100,7 @@ class co_codes{
 		/*******************
 		after the parsing, we remove the downloaded file. No need to clutter the server
 		********************/
-		//unlink($destination);
+		unlink($destination);
 		self::$debug->print_r("removed the company data file\r\n");
 		/**********
 		now transfer
@@ -111,6 +111,10 @@ class co_codes{
 			return false;
 		}
 		return true;
+	}
+	
+	public function get_all_equity_deal_data(){
+		return false;
 	}
 	
 	public function get_hashcode_of_file($remote_file_path_name){
