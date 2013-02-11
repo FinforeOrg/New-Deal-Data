@@ -22,6 +22,7 @@ define('FILE_PATH',dirname(dirname(__FILE__)));
 
 require_once(FILE_PATH."/include/config.php");
 require_once(FILE_PATH."/classes/class.db.php");
+require_once(FILE_PATH."/classes/class.debug.php");
 /********
 We do not create any db object here. Everybody should crate their own object
 **********/
