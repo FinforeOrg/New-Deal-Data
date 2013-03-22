@@ -3750,9 +3750,9 @@ class member{
 		mysql_query($q);
 		/*************************************
 		for transaction suggested, we do not delete the suggestion, just erase the member id (so now it become annonymous suggestion
+		sng:15/mar/2013
+		We no longer use transaction_suggested table
 		**********/
-		$q = "update ".TP."transaction_suggested set suggested_by='0' where suggested_by='".$mem_id."'";
-		mysql_query($q);
 		/***************************************
 		for transaction note suggestions, we do not delete the note but erase the member id
 		sng:20/mar/2012

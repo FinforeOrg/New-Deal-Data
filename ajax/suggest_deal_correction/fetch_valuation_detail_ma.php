@@ -1,7 +1,7 @@
 <tr>
 <td>Deal Size (in USD, million):</td>
 <td>
-<?php echo convert_deal_value_for_display_round($g_view['deal_data']['value_in_billion'],$g_view['deal_data']['value_range_id'],$g_view['deal_data']['fuzzy_value']);?>
+<?php echo $val_in_million;?>
 </td>
 
 <?php
@@ -58,7 +58,7 @@ if(0==$g_view['suggestion_data_count']){
 <tr>
 <td>Local Currency per 1 USD:</td>
 <td>
-<?php if($deal_local_currency=="USD") echo 1; else echo $g_view['deal_data']['exchange_rate'];?>
+<?php echo $exchange_rate;?>
 </td>
 
 <?php
@@ -82,7 +82,7 @@ if(0==$g_view['suggestion_data_count']){
 <tr>
 <td>Deal Size (in million, local currency):</td>
 <td>
-<?php if($g_view['deal_data']['value_in_billion_local_currency']==""||$g_view['deal_data']['value_in_billion_local_currency']==0.0) echo "n/a"; else echo convert_billion_to_million_for_display_round($g_view['deal_data']['value_in_billion_local_currency'])." million ".$deal_local_currency;?>
+<?php echo $val_in_million_local;?>
 </td>
 
 <?php
@@ -106,7 +106,11 @@ if(0==$g_view['suggestion_data_count']){
 <tr>
 <td>Stake acquired (%):</td>
 <td>
-<?php if($g_view['deal_data']['acquisition_percentage']==""||$g_view['deal_data']['acquisition_percentage']==0.0) echo "n/a"; else echo $g_view['deal_data']['acquisition_percentage']."%";?>
+<?php
+if($g_view['original_data_count'] > 0){
+	if($g_view['original_data_arr'][0]['acquisition_percentage']==""||$g_view['original_data_arr'][0]['acquisition_percentage']==0.0) echo "n/a"; else echo $g_view['original_data_arr'][0]['acquisition_percentage']."%";
+}
+?>
 </td>
 
 <?php
@@ -142,7 +146,11 @@ for($q=0;$q<$num_mid_cols;$q++){
 <tr>
 <td>Enterprise Value (in million, local currency):</td>
 <td>
-<?php if($g_view['deal_data']['enterprise_value_million_local_currency']==""||$g_view['deal_data']['enterprise_value_million_local_currency']==0.0) echo "n/a"; else echo convert_million_for_display_round($g_view['deal_data']['enterprise_value_million_local_currency'])." million ".$deal_local_currency;?>
+<?php
+if($g_view['original_data_count'] > 0){
+	if($g_view['original_data_arr'][0]['enterprise_value_million_local_currency']==""||$g_view['original_data_arr'][0]['enterprise_value_million_local_currency']==0.0) echo "n/a"; else echo convert_million_for_display_round($g_view['original_data_arr'][0]['enterprise_value_million_local_currency'])." million ". $deal_local_currency;
+}
+?>
 </td>
 
 <?php
@@ -166,7 +174,11 @@ if(0==$g_view['suggestion_data_count']){
 <tr>
 <td>Total Debt (in million, local currency):</td>
 <td>
-<?php if($g_view['deal_data']['total_debt_million_local_currency']==""||$g_view['deal_data']['total_debt_million_local_currency']==0.0) echo "n/a"; else echo convert_million_for_display_round($g_view['deal_data']['total_debt_million_local_currency'])." million ".$deal_local_currency;?>
+<?php
+if($g_view['original_data_count'] > 0){
+	if($g_view['original_data_arr'][0]['total_debt_million_local_currency']==""||$g_view['original_data_arr'][0]['total_debt_million_local_currency']==0.0) echo "n/a"; else echo convert_million_for_display_round($g_view['original_data_arr'][0]['total_debt_million_local_currency'])." million ". $deal_local_currency;
+}
+?>
 </td>
 
 <?php
@@ -190,7 +202,11 @@ if(0==$g_view['suggestion_data_count']){
 <tr>
 <td>Cash (in million, local currency):</td>
 <td>
-<?php if($g_view['deal_data']['cash_million_local_currency']==""||$g_view['deal_data']['cash_million_local_currency']==0.0) echo "n/a"; else echo convert_million_for_display_round($g_view['deal_data']['cash_million_local_currency'])." million ".$deal_local_currency;?>
+<?php
+if($g_view['original_data_count'] > 0){
+	if($g_view['original_data_arr'][0]['cash_million_local_currency']==""||$g_view['original_data_arr'][0]['cash_million_local_currency']==0.0) echo "n/a"; else echo convert_million_for_display_round($g_view['original_data_arr'][0]['cash_million_local_currency'])." million ". $deal_local_currency;
+}
+?>
 </td>
 
 <?php
@@ -214,7 +230,11 @@ if(0==$g_view['suggestion_data_count']){
 <tr>
 <td>Adjustments (in million, local currency):</td>
 <td>
-<?php if($g_view['deal_data']['adjustments_million_local_currency']==""||$g_view['deal_data']['adjustments_million_local_currency']==0.0) echo "n/a"; else echo convert_million_for_display_round($g_view['deal_data']['adjustments_million_local_currency'])." million ".$deal_local_currency;?>
+<?php
+if($g_view['original_data_count'] > 0){
+	if($g_view['original_data_arr'][0]['adjustments_million_local_currency']==""||$g_view['original_data_arr'][0]['adjustments_million_local_currency']==0.0) echo "n/a"; else echo convert_million_for_display_round($g_view['original_data_arr'][0]['adjustments_million_local_currency'])." million ". $deal_local_currency;
+}
+?>
 </td>
 
 <?php
@@ -238,7 +258,11 @@ if(0==$g_view['suggestion_data_count']){
 <tr>
 <td>Net Debt (in million, local currency):</td>
 <td>
-<?php if($g_view['deal_data']['net_debt_in_million_local_currency']==""||$g_view['deal_data']['net_debt_in_million_local_currency']==0.0) echo "n/a"; else echo convert_million_for_display_round($g_view['deal_data']['net_debt_in_million_local_currency'])." million ".$deal_local_currency;?>
+<?php
+if($g_view['original_data_count'] > 0){
+	if($g_view['original_data_arr'][0]['net_debt_in_million_local_currency']==""||$g_view['original_data_arr'][0]['net_debt_in_million_local_currency']==0.0) echo "n/a"; else echo convert_million_for_display_round($g_view['original_data_arr'][0]['net_debt_in_million_local_currency'])." million ". $deal_local_currency;
+}
+?>
 </td>
 
 <?php
@@ -262,7 +286,11 @@ if(0==$g_view['suggestion_data_count']){
 <tr>
 <td>Equity Value (in million, local currency):</td>
 <td>
-<?php if($g_view['deal_data']['implied_equity_value_in_million_local_currency']==""||$g_view['deal_data']['implied_equity_value_in_million_local_currency']==0.0) echo "n/a"; else echo convert_million_for_display_round($g_view['deal_data']['implied_equity_value_in_million_local_currency'])." million ".$deal_local_currency;?>
+<?php
+if($g_view['original_data_count'] > 0){
+	if($g_view['original_data_arr'][0]['implied_equity_value_in_million_local_currency']==""||$g_view['original_data_arr'][0]['implied_equity_value_in_million_local_currency']==0.0) echo "n/a"; else echo convert_million_for_display_round($g_view['original_data_arr'][0]['implied_equity_value_in_million_local_currency'])." million ". $deal_local_currency;
+}
+?>
 </td>
 
 <?php
@@ -298,7 +326,11 @@ for($q=0;$q<$num_mid_cols;$q++){
 <tr>
 <td>Dividend, Other (in million, local currency):</td>
 <td>
-<?php if($g_view['deal_data']['dividend_on_top_of_equity_million_local_curency']==""||$g_view['deal_data']['dividend_on_top_of_equity_million_local_curency']==0.0) echo "n/a"; else echo convert_million_for_display_round($g_view['deal_data']['dividend_on_top_of_equity_million_local_curency'])." million ".$deal_local_currency;?>
+<?php
+if($g_view['original_data_count'] > 0){
+	if($g_view['original_data_arr'][0]['dividend_on_top_of_equity_million_local_curency']==""||$g_view['original_data_arr'][0]['dividend_on_top_of_equity_million_local_curency']==0.0) echo "n/a"; else echo convert_million_for_display_round($g_view['original_data_arr'][0]['dividend_on_top_of_equity_million_local_curency'])." million ". $deal_local_currency;
+}
+?>
 </td>
 
 <?php
@@ -322,7 +354,11 @@ if(0==$g_view['suggestion_data_count']){
 <tr>
 <td>Share Price (in local currency):</td>
 <td>
-<?php if($g_view['deal_data']['deal_price_per_share']==""||$g_view['deal_data']['deal_price_per_share']==0.0) echo "n/a"; else echo $g_view['deal_data']['deal_price_per_share']." ".$deal_local_currency;?>
+<?php
+if($g_view['original_data_count'] > 0){
+	if($g_view['original_data_arr'][0]['deal_price_per_share']==""||$g_view['original_data_arr'][0]['deal_price_per_share']==0.0) echo "n/a"; else echo $g_view['original_data_arr'][0]['deal_price_per_share']." ". $deal_local_currency;
+}
+?>
 </td>
 
 <?php
@@ -346,7 +382,11 @@ if(0==$g_view['suggestion_data_count']){
 <tr>
 <td>Num of shares (in million):</td>
 <td>
-<?php if($g_view['deal_data']['total_shares_outstanding_million']==""||$g_view['deal_data']['total_shares_outstanding_million']==0.0) echo "n/a"; else echo convert_million_for_display_round($g_view['deal_data']['total_shares_outstanding_million'])." million";?>
+<?php
+if($g_view['original_data_count'] > 0){
+	if($g_view['original_data_arr'][0]['total_shares_outstanding_million']==""||$g_view['original_data_arr'][0]['total_shares_outstanding_million']==0.0) echo "n/a"; else echo convert_million_for_display_round($g_view['original_data_arr'][0]['total_shares_outstanding_million'])." million";
+}
+?>
 </td>
 
 <?php

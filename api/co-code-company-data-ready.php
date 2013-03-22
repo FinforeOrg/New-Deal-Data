@@ -1,4 +1,8 @@
 <?php
+/************
+THIS WILL CHANGE SO NOT USED
+**********/
+die();
 /**************
 sng:26/oct/2012
 Quick and dirty method so that the cron job at co-codes.com can notify us that it has dumped the data

@@ -150,14 +150,24 @@ if(0==$g_view['suggestion_data_count']){
 	?><td style="padding-right:10px;padding-left:10px;"></td><?php
 }else{
 	for($q=0;$q<$g_view['suggestion_data_count'];$q++){
-		$work_email = $g_view['suggestion_data_arr'][$q]['work_email'];
-		$tokens = explode('@',$work_email);
-		$work_email_suffix = $tokens[1];
+		/***********************
+		sng:18/mar/2013
+		Now that we import data from co-codes, those are considered as admin submission
+		****************/
+		if($g_view['suggestion_data_arr'][$q]['suggested_by']==0){
+			$suggested_by = "Admin";
+		}else{
+			$work_email = $g_view['suggestion_data_arr'][$q]['work_email'];
+			$tokens = explode('@',$work_email);
+			$work_email_suffix = $tokens[1];
+			$suggested_by = $g_view['suggestion_data_arr'][$q]['member_type'].'@'.$work_email_suffix;
+		}
+		
 		?>
 		<td style="padding-right:10px;padding-left:10px;">
 		<div class="hr_div"></div>
 		<div class="deal-edit-snippet-footer">Submitted <?php echo date('jS M Y',strtotime($g_view['suggestion_data_arr'][$q]['date_suggested']));?></div>
-		<div class="deal-edit-snippet-footer"><?php echo $g_view['suggestion_data_arr'][$q]['member_type'].'@'.$work_email_suffix;?></div>
+		<div class="deal-edit-snippet-footer"><?php echo $suggested_by;?></div>
 		</td>
 		<?php
 	}

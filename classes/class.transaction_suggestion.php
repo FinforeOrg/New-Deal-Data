@@ -1619,7 +1619,7 @@ class transaction_suggestion{
 		
 		
 		$report_date = date("Y-m-d");
-		$q = "insert into ".TP."transaction_edit_suggestion_detail set deal_id='".$deal_id."', suggested_by='".$mem_id."', date_suggested='".$report_date."'".$q;
+		$q = "insert into ".TP."transaction_suggestions_detail set deal_id='".$deal_id."', suggested_by='".$mem_id."', date_suggested='".$report_date."'".$q;
 		
 		$ok = $db->mod_query($q);
 		if(!$ok){
@@ -1730,7 +1730,7 @@ class transaction_suggestion{
 		/**************************************************/
 		
 		$report_date = date("Y-m-d");
-		$q = "insert into ".TP."transaction_edit_suggestion_valuation set deal_id='".$deal_id."', suggested_by='".$mem_id."', date_suggested='".$report_date."'".$q;
+		$q = "insert into ".TP."transaction_suggestions_valuation set deal_id='".$deal_id."', suggested_by='".$mem_id."', date_suggested='".$report_date."'".$q;
 		
 		$ok = $db->mod_query($q);
 		if(!$ok){
@@ -2268,7 +2268,7 @@ class transaction_suggestion{
 		
 		$db = new db();
         
-		$q = "select t.*,takeover_name,vrm.short_caption as fuzzy_value_short_caption,vrm.display_text as fuzzy_value,m.work_email,m.member_type from ".TP."transaction_edit_suggestion_detail as t left join ".TP."takeover_type_master as k on(t.takeover_id=k.takeover_id) LEFT JOIN ".TP."transaction_value_range_master as vrm ON (t.value_range_id=vrm.value_range_id) left join ".TP."member as m on(t.suggested_by=m.mem_id) where t.deal_id='".$deal_id."'";
+		$q = "select t.*,takeover_name,vrm.short_caption as fuzzy_value_short_caption,vrm.display_text as fuzzy_value,m.work_email,m.member_type from ".TP."transaction_suggestions_detail as t left join ".TP."takeover_type_master as k on(t.takeover_id=k.takeover_id) LEFT JOIN ".TP."transaction_value_range_master as vrm ON (t.value_range_id=vrm.value_range_id) left join ".TP."member as m on(t.suggested_by=m.mem_id) where t.deal_id='".$deal_id."'";
          
         $result = $db->select_query($q);
         
@@ -2287,14 +2287,27 @@ class transaction_suggestion{
 		return true;
 	}
 	
-	public function fetch_valuation($deal_id,&$data_arr,&$data_count){
+	/******************
+	sng:18/mar/2013
+	Now we have original data and corrective suggestions
+	***************/
+	public function fetch_valuation($deal_id,$get_original,&$data_arr,&$data_count){
 		
 		$db = new db();
-        
-		/*$q = "select t.*,vrm.short_caption as fuzzy_value_short_caption,vrm.display_text as fuzzy_value,m.work_email,m.member_type from ".TP."transaction_edit_suggestion_valuation as t LEFT JOIN ".TP."transaction_value_range_master as vrm ON (t.value_range_id=vrm.value_range_id) left join ".TP."member as m on(t.suggested_by=m.mem_id) where t.deal_id='".$deal_id."'";*/
-        
-		$q = "select v.*,m.work_email,m.member_type from ".TP."transaction_edit_suggestion_valuation as v left join ".TP."member as m on(v.suggested_by=m.mem_id) where v.deal_id='".$deal_id."'";
+		/*******************************
+		sng:18/mar/2013
+		We do not bother with fuzzy value in the suggestion
+        $q = "select t.*,vrm.short_caption as fuzzy_value_short_caption,vrm.display_text as fuzzy_value,m.work_email,m.member_type from ".TP."transaction_suggestions_valuation as t LEFT JOIN ".TP."transaction_value_range_master as vrm ON (t.value_range_id=vrm.value_range_id) left join ".TP."member as m on(t.suggested_by=m.mem_id) where t.deal_id='".$deal_id."'";
+		**********************************/
 		
+		$q = "select v.*,m.work_email,m.member_type from ".TP."transaction_suggestions_valuation as v left join ".TP."member as m on(v.suggested_by=m.mem_id) where v.deal_id='".$deal_id."'";
+		
+		if($get_original){
+			$q.=" and is_correction='n'";
+		}else{
+			$q.=" and is_correction='y'";
+		}
+        
         $result = $db->select_query($q);
         
         if(!$result){

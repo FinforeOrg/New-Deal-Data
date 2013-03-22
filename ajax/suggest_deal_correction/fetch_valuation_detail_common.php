@@ -22,7 +22,13 @@ if(0==$g_view['suggestion_data_count']){
 <tr>
 <td>Local Currency per 1 USD:</td>
 <td>
-<?php if($deal_local_currency=="USD") echo 1; else echo $g_view['deal_data']['exchange_rate'];?>
+<?php
+/*********
+sng:18/mar/2013
+we now calculate this in fetch_valuation_details.php
+************/
+echo $exchange_rate;
+?>
 </td>
 
 <?php
@@ -48,7 +54,7 @@ if(0==$g_view['suggestion_data_count']){
 <?php
 if((strtolower($g_view['deal_data']['deal_cat_name']) == "debt")&&(strtolower($g_view['deal_data']['deal_subcat1_name']) == "loan")){?>Facility Size (in million, local currency):<?php }else{?>Deal Size (in million, local currency): <?php }?></td>
 <td>
-<?php if($g_view['deal_data']['value_in_billion_local_currency']==""||$g_view['deal_data']['value_in_billion_local_currency']==0.0) echo "n/a"; else echo convert_billion_to_million_for_display_round($g_view['deal_data']['value_in_billion_local_currency'])." million ".$deal_local_currency;?>
+<?php echo $val_in_million_local;?>
 </td>
 
 <?php
@@ -75,7 +81,7 @@ if(0==$g_view['suggestion_data_count']){
 if((strtolower($g_view['deal_data']['deal_cat_name']) == "debt")&&(strtolower($g_view['deal_data']['deal_subcat1_name']) == "loan")){?>Facility Size (in USD, million):<?php }else{?>Deal Size (in USD, million): <?php }?>
 </td>
 <td>
-<?php echo convert_deal_value_for_display_round($g_view['deal_data']['value_in_billion'],$g_view['deal_data']['value_range_id'],$g_view['deal_data']['fuzzy_value']);?>
+<?php echo $val_in_million;?>
 </td>
 
 <?php
