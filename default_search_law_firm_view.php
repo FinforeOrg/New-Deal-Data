@@ -1,14 +1,20 @@
+<?php
+/************************
+sng:29/mar/2013
+We add another col - List - that list the deals by this law firm
+*********************/
+?>
 <h3><?php echo $g_view['law_firm_search_heading'];?></h3>
 <table width="100%" cellpadding="0" cellspacing="0" class="company">
 <tr>
 <th>Name</th>
-<th colspan="2">&nbsp;</th>
+<th colspan="3">&nbsp;</th>
 </tr>
 <?php
 if(0==$g_view['law_firm_data_count']){
 	?>
 	<tr>
-	<td colspan="3">
+	<td colspan="4">
 	No law firms found.
 	</td>
 	</tr>
@@ -26,6 +32,9 @@ if(0==$g_view['law_firm_data_count']){
 		</td>
 		<td>
 		<a class="link_as_button" href="showcase_firm.php?id=<?php echo $g_view['law_firm_data'][$j]['company_id'];?>&from=savedSearches">Credentials</a>
+		</td>
+		<td>
+		<a class="link_as_button" href="firm_deals.php?id=<?php echo $g_view['law_firm_data'][$j]['company_id'];?>">List</a>
 		</td>
 		</tr>
 		<?php
@@ -61,7 +70,7 @@ if(0==$g_view['law_firm_data_count']){
 	if($g_view['law_firm_total_data_count'] > $g_view['law_firm_data_count']){
 		?>
 		<tr>
-		<td colspan="3" style="text-align:right;">
+		<td colspan="4" style="text-align:right;">
 		
 			<a class="link_as_button" href="#" onclick="return search_law_firm();">Show All</a>
 			
