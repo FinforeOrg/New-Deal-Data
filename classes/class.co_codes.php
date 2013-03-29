@@ -1514,19 +1514,27 @@ class co_codes{
 				
 				sng:20/mar/2013
 				**********/
+				/************
+				sng:22/mar/2013
+				by default, we assume that we can sync
+				one error and we set to false
+				*****************/
+				$mark_as_synced = true;
 				if($recompute_tombstone_points_for_banks){
 					$ok_bank = $this->trans_obj->recompute_tombstone_points_for_deal($co_code_deal_data['deal_id'],"bank");
 					if(!$ok_bank){
 						self::$debug->print_r("cannot recompute tombstone points for deal ".$co_code_deal_data['deal_id']);
+						$mark_as_synced = false;
 					}
 				}
 				if($recompute_tombstone_points_for_law_firms){
 					$ok_law_firm = $this->trans_obj->recompute_tombstone_points_for_deal($co_code_deal_data['deal_id'],"law firm");
 					if(!$ok_law_firm){
 						self::$debug->print_r("cannot recompute tombstone points for deal ".$co_code_deal_data['deal_id']);
+						$mark_as_synced = false;
 					}
 				}
-				if((!$ok_bank)||(!$ok_law_firm)){
+				if(!$mark_as_synced){
 					/****************
 					sng:22/mar/2013
 					we do not sync
