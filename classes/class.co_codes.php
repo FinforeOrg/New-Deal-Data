@@ -25,6 +25,8 @@ class co_codes{
 	
 	private static $allowed_img_extensions = array("gif","png","jpg","jpeg");
 	
+	private static $num_logo_refetch_attempt = 3;
+	
 	private static $img_obj;
 	
 	public static $debug;
@@ -113,6 +115,110 @@ class co_codes{
 			return false;
 		}
 		self::$debug->print_r("sync'ed the nasdaq eq data");
+		return true;
+	}
+	
+	/****************************
+	sng:1/apr/2013
+	I assure you that this code is needed. This is not April Fool code
+	
+	When we are processing the company csv file, we try to fetch the logo. If that fails, we store the logo name in co_codes_company_refetch_logo.
+	Later we try to fetch the logo again.
+	We try three times
+	***************/
+	public function fetch_errored_logos(){
+		$q = "select * from ".TP."co_codes_company_refetch_logo where num_attempt<".self::$num_logo_refetch_attempt;
+		$ok = $this->db->select_query($q);
+		if(!$ok){
+			return false;
+		}
+		$logo_results = $this->db->get_result_set();
+		$logo_cnt = $logo_results->row_count();
+		if(0==$logo_cnt){
+			self::$debug->print_r("no logos to refetch");
+			return true;
+		}
+		for($i=0;$i<$logo_cnt;$i++){
+			$logo_data = $logo_results->get_row();
+			$co_codes_company_id = $logo_data['co_codes_company_id'];
+			$co_codes_company_logo_url = $logo_data['logo_url'];
+			/******************
+			now check co_codes_company to see if we got the logo or not. It may happen that the next day, the logo could be downloaded properly.
+			***************/
+			$q = "select logo from ".TP."co_codes_company where id='".$co_codes_company_id."'";
+			$ok = $this->db->select_query($q);
+			if(!$ok){
+				continue;
+			}
+			if(!$this->db->has_row()){
+				/********
+				hmm, no such record? deleted?better safe than sorry
+				**********/
+				self::$debug->print_r("co_codes_company id ".$co_codes_company_id." found in co_codes_company_refetch_logo not there in co_codes_company");
+				return false;
+			}
+			$row = $this->db->get_row();
+			if($row['logo']!=""){
+				/************
+				logo is there, so remove the entry from co_codes_company_refetch_logo
+				***************/
+				$q = "delete from ".TP."co_codes_company_refetch_logo WHERE co_codes_company_id='".$co_codes_company_id."'";
+				$this->db->mod_query($q);
+				continue;
+			}else{
+				/**************
+				logo is not there, so try to refetch
+				**************/
+				$logo_name = "";
+				$logo_refetch_needed = false;
+				$logo_ok = self::download_logo($co_codes_company_logo_url,$logo_name,$logo_refetch_needed);
+				if(!$logo_ok){
+					/**************
+					error, what do we do?, increase count or ignore or throw error?
+					well, throw error
+					******************/
+					self::$debug->print_r("cannot refetch logo for ".$co_codes_company_id." from url ".$co_codes_company_logo_url);
+					return false;
+				}
+				/***************
+				Now? if refetch needed then we do that
+				******************/
+				if($logo_refetch_needed){
+					/************
+					update count
+					*************/
+					$q = "update ".TP."co_codes_company_refetch_logo set num_attempt=num_attempt+1 WHERE co_codes_company_id='".$co_codes_company_id."'";
+					$this->db->mod_query($q);
+					continue;
+				}
+				/********************
+				But if it comes here? refetch needed is false so we check logo_name. If that is blank, we delete the entry (I mean
+				if there was error, we would have got refetch eq true
+				*********************/
+				if(""==$logo_name){
+					$q = "delete from ".TP."co_codes_company_refetch_logo WHERE co_codes_company_id='".$co_codes_company_id."'";
+					$this->db->mod_query($q);
+					continue;
+				}
+				/**************************
+				so we have logo. we update the co_codes_company table and set in_sync to n
+				that will trigger a refresh in the next run
+				and in the meanwhile, we delete the entry
+				**********************/
+				$q = "update ".TP."co_codes_company set logo='".$logo_name."',in_sync='n' WHERE id='".$co_codes_company_id."'";
+				$ok = $this->db->mod_query($q);
+				if(!$ok){
+					continue;
+				}
+				/*********************
+				updated, so remove the entry
+				***************/
+				$q = "delete from ".TP."co_codes_company_refetch_logo WHERE co_codes_company_id='".$co_codes_company_id."'";
+				$this->db->mod_query($q);
+				continue;
+			}
+			/******************************************************/
+		}
 		return true;
 	}
 	
@@ -825,7 +931,23 @@ class co_codes{
 				*************/
 				return true;
 			}
-			$logo_q = "insert into ".TP."co_codes_company_refetch_logo set co_codes_company_id='".$co_codes_company_id."',logo_url='".$data_arr['logo_url']."'";
+			/*********************
+			sng:1/apr/2013
+			No this is not april fool joke. Duplication can happen. Of course, we have set unique key on co_codes_company_id
+			so insert with duplicate co_codes_company_id will fail.
+			However, we can do better, we can update the record
+			
+			How can there be duplicate?
+			Say on 1/apr the code fails to fetch logo for record 1.
+			The record is inserted
+			
+			On 2/Apr, the logo was changed, the timestamp in csv changed. During import, the code again fails to fetch logo for record 1.
+			The record is inserted again
+			
+			Without the unique constraint and update clause, the blind insert will insert 2 records for id=1
+			However, the update clause will not work without unique index
+			**************************/
+			$logo_q = "insert into ".TP."co_codes_company_refetch_logo set co_codes_company_id='".$co_codes_company_id."',logo_url='".$data_arr['logo_url']."',num_attempt='0' on duplicate key update logo_url='".$data_arr['logo_url']."',num_attempt='0'";
 			$this->db->mod_query($logo_q);
 		}
 		return true;

@@ -23,6 +23,11 @@ if($co_code===false){
 $co_code->get_all_company_data();
 
 $co_code->get_all_equity_deal_data();
+
+/************
+sng:1/apr/2013
+************/
+$co_code->fetch_errored_logos();
 /**********************************************
 include the proper classes and trigger email
 ****/
