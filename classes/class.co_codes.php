@@ -3289,7 +3289,11 @@ class transaction_proxy{
 			$deal_q.=",last_edited='".$date_time_now."'";
 			$deal_q = substr($deal_q,1);
 			$q = "update ".TP."transaction set ".$deal_q." WHERE id='".$deal_id."'";
-			
+			/*****************************
+			DELETE DELETE DELETE
+			*****/
+			self::$debug->print_r($q);
+			/**********************************/
 			$ok = $this->db->mod_query($q);
 			if(!$ok){
 				return false;
@@ -3311,7 +3315,11 @@ class transaction_proxy{
 		if($deal_extra_q!=""){
 			$deal_extra_q = substr($deal_extra_q,1);
 			$q = "update ".TP."transaction_extra_detail set ".$deal_extra_q." WHERE transaction_id='".$deal_id."'";
-			
+			/***************************
+			DELETE DELETE DELETE
+			******/
+			self::$debug->print_r($deal_extra_q);
+			/*******************************/
 			$ok = $this->db->mod_query($q);
 			if(!$ok){
 				//does not matter
@@ -3352,6 +3360,11 @@ class transaction_proxy{
 		if(!in_array($suggested_deal_company_id,$curr_deal_company_ids)){
 		
 			$q = "insert into ".TP."transaction_companies set transaction_id='".$deal_id."',company_id='".$suggested_deal_company_id."'";
+			/************************
+			DELETE DELETE DELETE
+			******/
+			self::$debug->print_r($q);
+			/*****************************/
 			$ok = $this->db->mod_query($q);
 			if(!$ok){
 				/**************
@@ -3870,6 +3883,11 @@ class transaction_proxy{
 		if($insert_q!=""){
 			$insert_q = substr($insert_q,1);
 			$insert_q = "insert into ".TP."transaction_partners (transaction_id,partner_id,role_id,partner_type) values ".$insert_q;
+			/************************
+			DELETE DELETE DELETE
+			******/
+			self::$debug->print_r($insert_q);
+			/*****************************/
 			$ok = $this->db->mod_query($insert_q);
 			if(!$ok){
 				return false;
@@ -3892,6 +3910,11 @@ class transaction_proxy{
 		foreach($curr_banks as $curr_firm){
 			if($curr_firm['has_changed']=='y'){
 				$updt_q = "update ".TP."transaction_partners set role_id='".$curr_firm['role_id']."' WHERE id='".$curr_firm['id']."'";
+				/************************
+				DELETE DELETE DELETE
+				******/
+				self::$debug->print_r($updt_q);
+				/*****************************/
 				$ok = $this->db->mod_query($updt_q);
 				if(!$ok){
 					return false;
@@ -3914,6 +3937,11 @@ class transaction_proxy{
 		foreach($curr_law_firms as $curr_firm){
 			if($curr_firm['has_changed']=='y'){
 				$updt_q = "update ".TP."transaction_partners set role_id='".$curr_firm['role_id']."' WHERE id='".$curr_firm['id']."'";
+				/************************
+				DELETE DELETE DELETE
+				******/
+				self::$debug->print_r($updt_q);
+				/*****************************/
 				$ok = $this->db->mod_query($updt_q);
 				if(!$ok){
 					return false;
@@ -3951,6 +3979,11 @@ class transaction_proxy{
 				now delete the partner for the deal
 				***********/
 				$del_q = "delete from ".TP."transaction_partners WHERE id='".$curr_firm['id']."'";
+				/************************
+				DELETE DELETE DELETE
+				******/
+				self::$debug->print_r($del_q);
+				/*****************************/
 				$ok = $this->db->mod_query($del_q);
 				if(!$ok){
 					return false;
@@ -3989,6 +4022,11 @@ class transaction_proxy{
 				now delete the partner for the deal
 				***********/
 				$del_q = "delete from ".TP."transaction_partners WHERE id='".$curr_firm['id']."'";
+				/************************
+				DELETE DELETE DELETE
+				******/
+				self::$debug->print_r($del_q);
+				/*****************************/
 				$ok = $this->db->mod_query($del_q);
 				if(!$ok){
 					return false;
