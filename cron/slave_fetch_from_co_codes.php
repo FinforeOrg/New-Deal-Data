@@ -69,6 +69,7 @@ if($db!==false){
 			$mailer->SetFrom('no-reply@deal-data.com','deal-data.com');
 			$mailer->AddAddress("stefan@fractalexperience.com");
 			$mailer->AddAddress("unified.sng@gmail.com");
+			$mailer->AddAddress("shane.a.leonard@gmail.com");
 			$mailer->Subject = "data import from co-code report";
 			$mailer->IsHTML(false);
 			$mailer->Body = "See attachment";
