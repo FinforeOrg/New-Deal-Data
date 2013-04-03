@@ -40,7 +40,11 @@ if(!$ok){
 
 $g_view['deal_lawyers'] = NULL;
 $g_view['deal_lawyers_count'] = 0;
-$ok = $trans_mem->get_all_deal_members_by_type($g_view['deal_id'],'lawyers',$g_view['deal_lawyers'],$g_view['deal_lawyers_count']);
+/********************
+sng:3/apr/2013
+the type is lawyer not lawyers
+****************/
+$ok = $trans_mem->get_all_deal_members_by_type($g_view['deal_id'],'lawyer',$g_view['deal_lawyers'],$g_view['deal_lawyers_count']);
 if(!$ok){
 	?>
 	<p>Error while fetching records</p>

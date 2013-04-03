@@ -12,7 +12,7 @@ class transaction_member{
 	public function get_all_deal_members_by_type($deal_id,$member_type,&$data_arr,&$data_count){
 		$db = new db();
 		$q = "select pm.*,m.f_name,m.l_name,t.value_in_billion,t.value_range_id,c.name as firm_name from ".TP."transaction_partner_members as pm left join ".TP."member as m on(pm.member_id=m.mem_id) left join ".TP."transaction as t on(pm.transaction_id=t.id) left join ".TP."company as c on(pm.partner_id=c.company_id) where transaction_id='".(int)$deal_id."' and pm.member_type='".mysql_real_escape_string($member_type)."'";
-        
+		
         $ok = $db->select_query($q);
         if(!$ok){
 			echo $db->error();
@@ -161,6 +161,11 @@ class transaction_member{
         $partner_adjusted_value_in_billion = $row['adjusted_value_in_billion'];
         ///////////////////////////////////////////////
         //now get the sum of weight for all the members for this deal and partner
+		/*********************
+		sng:3/apr/2013
+		By storing the designation weight here, we can do a quick sum. However, we are making a big assumption.
+		Designation weight ONCE set IS NOT ALTERED ever.
+		*******************/
         $q = "select sum(deal_share_weight) as sum_weight from ".TP."transaction_partner_members where transaction_id='".$deal_id."' and partner_id='".$deal_partner_id."'";
         $ok = $db->select_query($q);
         if(!$ok){
