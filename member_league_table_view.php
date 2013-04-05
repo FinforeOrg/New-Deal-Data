@@ -52,18 +52,17 @@ $(function() {
     $('#submit').button();
 
     $('#generate').button().click(function(data){
-		alert("generate");return;
         var myData = $('#leagueTableForm').serialize();
         $("#chart1").html('');
         $("#chart1").addClass('loading');
         $.post(
-            'ajax/league_table_creator.php?version=2',
+            'ajax/individual_league_table_creator.php',
             myData,
             function(returned) {
                 //console.log(returned);
                  $("#chart1").removeClass('loading');
                  $('#script').html(returned);
-                 //
+                 generateCaption();
             }
         );
     });
@@ -420,11 +419,11 @@ Let us hide download for now
 $(document).ready(function() {
 	$(".loading").hide();
 	$("#leftSide").show();
-	alert("initial display");return;
-	$.post('ajax/league_table_creator.php?version=2',
+	$.post('ajax/individual_league_table_creator.php',
 		$('#leagueTableForm').serialize(),
 		function(returned) {
 			$('#script').html(returned);
+			generateCaption();
 		}
 	)
 });

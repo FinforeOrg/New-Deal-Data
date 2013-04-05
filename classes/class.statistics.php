@@ -729,10 +729,109 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_param['region'])."'";
         return true;
     }
     
+	/*********************
+    sng:5/apr/2013
+    Our output is list of names, stat value. We show the full name of the member
+    ********/
+    public function generate_member_ranking($stat_params,&$data_arr,&$max_value,&$num_values){
+		/*******
+		We would like to use generate_top_individuals_paged
+		******/
+		/****************
+		ranking_criteria: if not set, we return false
+		*******************/
+		if(!isset($stat_params['ranking_criteria'])){
+			return false;
+		}else{
+			if(($stat_params['ranking_criteria']!="num_deals")&&($stat_params['ranking_criteria']!="total_deal_value")&&($stat_params['ranking_criteria']!="total_adjusted_deal_value")){
+				return false;
+			}
+		}
+		/**********************
+		num_values: ok, this is just data count, so we just pass the var as the 5th arg and we get the data
+		We take 10 records using LIMIT
+		******************/
+		$start_offset = 0;
+		$num_to_fetch = 10;
+		$temp_data = NULL;
+			
+		$ok = $this->generate_top_individuals_paged($stat_params,$start_offset,$num_to_fetch,$temp_data,$num_values);
+		if(!$ok){
+			return false;
+		}
+		if($num_values == 0){
+			return true;
+		}
+		/***********************
+		stat_value:
+		value: is same as stat_value
+		We need only one. LT code selects all 3 
+		num_deals - count( tp.transaction_id )
+		total_deal_value - sum( t.value_in_billion )
+		total_adjusted_deal_value - sum( adjusted_value_in_billion )
+		
+		This depends upon ranking_criteria. We already checked that it exists and set correctly
+		*********************/
+		$stat_key = 'nope';
+		if($stat_params['ranking_criteria']=="num_deals"){
+			$stat_key = "num_deals";
+		}elseif($stat_params['ranking_criteria']=="total_deal_value"){
+			$stat_key = "total_deal_value";
+		}elseif($stat_params['ranking_criteria']=="total_adjusted_deal_value"){
+			$stat_key = "total_adjusted_deal_value";
+		}
+		
+		$max_value = "";
+		for($i=0;$i<$num_values;$i++){
+			$row = $temp_data[$i];
+			$data_arr[$i] = array();
+			$data_arr[$i]['name'] = $row['f_name']." ".$row['l_name'];
+			$data_arr[$i]['value'] = $row[$stat_key];
+			/************
+			If the stat value is total deal value or total adjusted deal value, we already get
+			the data in rounded format
+			***************/
+			
+			
+			if($max_value == ""){
+				$max_value = $data_arr[$i]['value'];
+			}else{
+				if($data_arr[$i]['value'] > $max_value){
+					$max_value = $data_arr[$i]['value'];
+				}
+			}
+		}
+		@session_start();
+		$_SESSION['lastGeneratedRankings'] = $data_arr;
+		
+		return true;
+	}
     /*****
     generate league table for individuals
+	sng:5/apr/2013
+	This will have to be rewritten since the tables changed.
     ****/
     public function generate_top_individuals_paged($stat_param,$start_offset,$num_to_fetch,&$data_arr,&$data_count){
+		$data_count = 10;
+		$data_arr = array();
+		
+		$data_arr[] = array("f_name"=>"loi","l_name"=>"kae","num_deals"=>"34");
+		$data_arr[] = array("f_name"=>"jou","l_name"=>"nue","num_deals"=>"40");
+		
+		$data_arr[] = array("f_name"=>"loi","l_name"=>"kae","num_deals"=>"34");
+		$data_arr[] = array("f_name"=>"jou","l_name"=>"nue","num_deals"=>"40");
+		
+		$data_arr[] = array("f_name"=>"loi","l_name"=>"jet","num_deals"=>"50");
+		
+		$data_arr[] = array("f_name"=>"jou","l_name"=>"nue","num_deals"=>"40");
+		
+		$data_arr[] = array("f_name"=>"loi","l_name"=>"kae","num_deals"=>"34");
+		$data_arr[] = array("f_name"=>"jou","l_name"=>"nue","num_deals"=>"40");
+		
+		$data_arr[] = array("f_name"=>"loi","l_name"=>"kae","num_deals"=>"34");
+		$data_arr[] = array("f_name"=>"jou","l_name"=>"nue","num_deals"=>"40");
+		return true;
+		
         global $g_mc;
         ///////////////////////////////////////////////////////
         //filter on company of the transaction

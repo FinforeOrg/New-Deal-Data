@@ -1,38 +1,36 @@
 <?php
 /****
-called in ajax code, to generate league table fro individual
+called in ajax code, to generate league table
+
+sng:5/apr/2013
+We now want to show chart and member names, so we use the code of league table
+
+sng:1/may/2010
+We need to store the ranking criteria also, so that, the renderer
+can set the stat value label format for the chart
 ***/
-include("../include/global.php");
+require_once("../include/global.php");
 require_once("classes/class.statistics.php");
+require_once("classes/class.leagueTableChart.php");
 ///////////////////////////////////////
-//the data are in $_POST
-//We need the top 10, so we start from 0 and get 10
-$g_view['data'] = array();
-$g_view['data_count'] = 0;
-$success = $g_stat->generate_top_individuals_paged($_POST,0,10,$g_view['data'],$g_view['data_count']);
-if(!$success){
-	echo "Cannot get the top 10";
-	return;
+//the data are in $_POST, so
+$g_view['chart_data'] = array();
+$g_view['chart_data']['max_value'] = 0;
+$g_view['chart_data']['stat_count'] = 0;
+$g_view['chart_data']['stat_data'] = array();
+$g_view['chart_data']['ranking_criteria'] = $_POST['ranking_criteria'];
+
+/***********
+sng:23/jul/2012
+We cannot send conditions like >=23. The sanitizer will erase it. We base64_encode it in the forms and decode it here
+*****************/
+if(isset($_POST['deal_size'])){
+	$_POST['deal_size'] = base64_decode($_POST['deal_size']);
 }
-////////////////////////
-if(0==$g_view['data_count']){
-	echo "None found";
-	return;
-}
-/////////////////////////////////////
+
+$chart = new leagueTableChart($_POST);
+$chart->setName((!isset($_REQUEST['chartName']) ? 'chart1' : $_REQUEST['chartName']));
+$chart->get_individual_league_table_html();
+
+exit();
 ?>
-<table width="100%" cellpadding="0" cellspacing="0" border="0">
-<?php
-for($i=0;$i<$g_view['data_count'];$i++){
-	?>
-	<tr>
-	<td><?php echo $i+1;?></td>
-	<td>
-	<a href="profile.php?mem_id=<?php echo $g_view['data'][$i]['member_id'];?>"><?php echo $g_view['data'][$i]['f_name'];?> <?php echo $g_view['data'][$i]['l_name'];?></a>
-	</td>
-	<td><?php echo $g_view['data'][$i]['firm_name'];?></td>
-	</tr>
-	<?php
-}
-?>
-</table>

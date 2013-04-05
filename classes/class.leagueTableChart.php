@@ -219,5 +219,137 @@ MARKUP;
             echo $markup;
         }
     }
+	
+	public function get_individual_league_table_html($return = false) {
+        $this->getIndividualStatData();
+        $this->parseIndividualData();
+        
+        $markup = <<<MARKUP
+        <script class="code" type="text/javascript">
+        
+        $(document).ready(function() {
+            $.jqplot.config.enablePlugins = true;
+            line = [#VALUES#]; 
+            plot = $.jqplot('#CHARTNAME#', [line], {
+                title:'#NAME#',
+                seriesDefaults: {
+                    showMarker:false, 
+                    pointLabels:{location:'n', ypadding:3, labels:[#POINTLABELS#]},
+                    renderer:$.jqplot.BarRenderer,
+                    color:'#7b7b7b'
+                },
+                grid: {
+                    background: '#ffffff',
+                    borderWidth: 0.0,
+                    drawGridLines: false ,
+                    shadow: false
+                },
+                markerOptions: {
+                    shadow: false  
+                },
+                axesDefaults:{
+                    tickOptions: {
+                        showGridline: false,
+                        showMark: false
+                    }
+                },
+                axes:{
+                    xaxis:{
+                        renderer:$.jqplot.CategoryAxisRenderer,
+                        ticks:[#LABELS#],
+						tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+                        tickOptions:{
+							angle: -90,
+                            showGridline:false
+                        }                   
+                    }, 
+                    yaxis:{
+                        min:0, 
+                        tickOptions:{
+                            showGridline:false
+                        }
+                    }
+                },
+                highlighter: {sizeAdjust: 7.5},
+                cursor: {show: false}
+
+            });  
+            try {
+                plot.redraw();
+            } catch (e) {
+                //do nothing
+            }
+        });
+
+        </script>
+MARKUP;
+        $markup = str_replace(array(
+            '#CHARTNAME#',
+            '#POINTLABELS#',
+            '#VALUES#',
+            '#LABELS#',
+            '#NAME#'
+        ), array(
+            $this->name,
+            $this->pointLabels,
+            $this->values,
+            $this->labels,
+            $this->title
+        ), $markup);
+        
+        if ($return) {
+            return $markup;
+        } else {
+            echo $markup;
+        }
+    }
+	
+	public function getIndividualStatData() {
+        $statData = array();
+        $maxValue = 0;
+        $statCount = 0;
+        $this->statistics->generate_member_ranking($this->data, $statData, $maxValue, $statCount);
+        
+        $this->statData = $statData;
+        return;
+    }
+	
+	public function parseIndividualData() {
+        if (!sizeOf($this->statData)) {
+            return false;
+        }
+        
+        foreach ($this->statData as $key => $values) {
+            $index =  $values['name'];
+			
+            if (isset($newData[$index])) {
+                $index .= ' ';
+            }
+           $newData[$index] =  (float) $values['value']; 
+        }
+        
+        $this->properLabeledRankings = $newData;
+        
+        $labels = array_keys($newData);
+        $this->values = join(',' , array_values($newData));
+        
+        $pLabels =   array_values($newData);
+        foreach($pLabels as $key2=>$pointLabel) {
+            if ($pointLabel != 0) {
+                if ($_POST['ranking_criteria'] != 'num_deals') {
+                   $pointLabels[] = "'$" . $pointLabel . "bn'" ; 
+                } else {
+                   $pointLabels[] =  "'$pointLabel'";
+                }                 
+            }
+        }  
+        
+        foreach($labels as $label) {
+            $nlabels[] = "'$label'"; 
+        }
+        
+        $this->labels = join(',', $nlabels);            
+        $this->pointLabels = join(',', $pointLabels);        
+    }
 }
 
