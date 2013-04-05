@@ -184,8 +184,14 @@
 		child_level = block_level+1;
 		
 		/**************
+		sng:4/apr/2013
+		Now we are testing and need to add members to deals. We want to add ghost members and see if those can be added to deal as colleague.
+		No we cannot.
+		Client has told to leave this for now.
+		*****
         d.add(block_level,0,'Ghost Member','');
         d.add(child_level,block_level,'List','ghost_member_list.php');child_level++;
+		d.add(child_level,block_level,'Add','ghost_member_add.php');child_level++;
          
         block_level = child_level;
 		child_level = block_level+1;
