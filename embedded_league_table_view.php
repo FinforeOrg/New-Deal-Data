@@ -178,7 +178,7 @@ Top firms now require login, so let us remove this
 </tr>
 </tbody>
 </table><?php */?>
-<div style="display: none;"> <pre> <?php var_dump($_POST)?></pre></div>
+<div style="display: none;"> <pre> <?php /*var_dump($_POST);*/?></pre></div>
 <form method="post" id="leagueTableForm" action='league_table_detail.php'>
 <table width="100%" border="0" cellspacing="5" cellpadding="5" class="registercontent">
 <tr>
