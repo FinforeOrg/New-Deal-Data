@@ -43,6 +43,14 @@ $(function(){
 <link rel="stylesheet" type="text/css" href="css/apprise.css" />
 <script src="js/blockUI.js" type="text/javascript"></script>
 <?php
+/************
+sng:5/apr/2013
+We have introduced member league tables
+
+Also, we would like to show full name under the bars. To do that, we will rotate the text.
+To do that, we need to include some additional plugins in some order.
+see source of http://www.jqplot.com/deploy/dist/examples/waterfall.html
+***************/
     $pagesWithCharts = array(
         'leagueTableComparisonHistory_details_view.php',
         'oneStop_resultsView.php',
@@ -53,7 +61,8 @@ $(function(){
         'issuance_data_view.php',
         'ma_metrics_view.php',
 		'league_table_view.php',
-		'index_new_view.php'
+		'index_new_view.php',
+		'member_league_table_view.php'
     );
     if (in_array($g_view['content_view'], $pagesWithCharts)) { ?>
   <!--[if IE]><script language="javascript" type="text/javascript" src="js/jqplot/excanvas.min.js"></script><![endif]-->
@@ -63,7 +72,10 @@ $(function(){
   <script language="javascript" type="text/javascript" src="js/jqplot/jquery.jqplot.js"></script>
   <script language="javascript" type="text/javascript" src="js/jqplot/plugins/jqplot.barRenderer.min.js"></script>
   <script language="javascript" type="text/javascript" src="js/jqplot/plugins/jqplot.categoryAxisRenderer.min.js"></script>
-  <script language="javascript" type="text/javascript" src="js/jqplot/plugins/jqplot.pointLabels.min.js"></script>           
+  <script language="javascript" type="text/javascript" src="js/jqplot/plugins/jqplot.canvasAxisTickRenderer.min.js"></script>
+  <script language="javascript" type="text/javascript" src="js/jqplot/plugins/jqplot.canvasTextRenderer.min.js"></script>
+  <script language="javascript" type="text/javascript" src="js/jqplot/plugins/jqplot.pointLabels.min.js"></script> 
+            
 <?php } ?>
 
 
