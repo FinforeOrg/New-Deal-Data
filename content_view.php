@@ -226,8 +226,21 @@ function content_view_alert(alert_txt){
 					<div class="drop3columns dropcontent dropfirst" style="width:164px;"><!-- Begin Item Container -->
 						<div class="col_3">
 							<ul>
+								<?php
+								/***********************
+								sng:5/apr/2013
+								Here is the original comment
 								
+								sng:3/jun/2010
+			  					client: remove the "Bankers" and "Lawyers" pages.
+								We can add them back in in a few months once we have started to generate traffic to the site and start having a large user base.
+								Please keep the functionality for "Bankers" and "Lawyers"
 								
+								So, these are back again, but the site has changed
+			   					*********************/
+								?>
+								<li><a href="bankers_league_table.php">Bankers</a></li>
+								<li><a href="lawyers_league_table.php">Lawyers</a></li>
 								<li><a href="competitor_credentials.php">Competitors' Credentials</a></li>
 							</ul>
 						</div>
