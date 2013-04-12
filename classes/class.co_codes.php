@@ -1085,7 +1085,13 @@ class co_codes{
 					if(!array_key_exists($co_code_company_data['industry'],$co_code_industry_name_mapping)){
 						/******************
 						not in our list, not in mapping, we let co-codes know about this
+						
+						sng:11/apr/2013
+						We also store this in database so that, when admin set the mapping, we can update the records
 						*****************/
+						$industry_q = "insert into ".TP."co_codes_unmaped_industry_companies set co_codes_company_id='".$co_code_company_data['curr_co_codes_id']."',co_codes_industry_name='".$co_code_company_data['industry']."' on duplicate key update co_codes_industry_name='".$co_code_company_data['industry']."'";
+						$this->db->mod_query($industry_q);
+						
 						self::$debug->print_r("unknown industry ".$co_code_company_data['industry']." for ".$co_code_company_data['curr_co_codes_id']);
 					}else{
 						/********************
@@ -3471,9 +3477,80 @@ class transaction_proxy{
 			}
 		}
 		/********************
-		666 Then we will have to update the adjusted value for the members
+		sng:12/apr/2013
+		Then we will have to update the adjusted value for the members of this bank/law firm who were in this deal
 		*********************/
+		$partner_q = "select partner_id from ".TP."transaction_partners where transaction_id='".$deal_id."' and partner_type='".$partner_type."'";
+		$ok = $this->db->select_query($partner_q);
+		if(!$ok){
+			return false;
+		}
+		$partner_row_cnt = $this->db->row_count();
+		if($partner_row_cnt > 0){
+			for($i=0;$i<$partner_row_cnt;$i++){
+				$partner_row = $this->db->get_row();
+				$deal_partner_id = $partner_row['partner_id'];
+				$ok = $this->update_deal_team_members_adjusted_value($deal_id,$deal_partner_id);
+				if(!$ok){
+					return false;
+				}
+			}
+		}else{
+			/******************
+			no rows, no partners of this type so no members, nothing to recompute
+			************/
+		}
+		/**********************************************/
 		return true;
+	}
+	/************
+	sng:12/apr/2013
+	************/
+	private function update_deal_team_members_adjusted_value($deal_id,$deal_partner_id){
+		//get the adjusted value for the partner company
+        $q = "select adjusted_value_in_billion from ".TP."transaction_partners where transaction_id='".$deal_id."' and partner_id='".$deal_partner_id."'";
+        $ok = $this->db->select_query($q);
+        if(!$ok){
+            return false;
+        }
+        $cnt = $this->db->row_count();
+        if($cnt == 0){
+            //no such deal and partner
+            return false;
+        }
+        ////////////////////////////////////
+        $row = $this->db->get_row();
+        $partner_adjusted_value_in_billion = $row['adjusted_value_in_billion'];
+        ///////////////////////////////////////////////
+        //now get the sum of weight for all the members for this deal and partner
+		/*********************
+		sng:3/apr/2013
+		By storing the designation weight here, we can do a quick sum. However, we are making a big assumption.
+		Designation weight ONCE set IS NOT ALTERED ever.
+		*******************/
+        $q = "select sum(deal_share_weight) as sum_weight from ".TP."transaction_partner_members where transaction_id='".$deal_id."' and partner_id='".$deal_partner_id."'";
+        $ok = $this->db->select_query($q);
+        if(!$ok){
+            return false;
+        }
+        $row = $this->db->get_row();
+        $sum_wt = $row['sum_weight'];
+        /***
+        sng:12/may/2010
+        if there are no members then there is no weights and sum is zero, so in that case we do not proceed
+        ********/
+        if(0==$sum_wt){
+            return true;
+        }
+        $ratio = $partner_adjusted_value_in_billion/$sum_wt;
+        //update the members
+        $q = "update ".TP."transaction_partner_members set adjusted_value_in_billion=deal_share_weight*".$ratio." where transaction_id='".$deal_id."' and partner_id='".$deal_partner_id."'";
+        
+        $ok = $this->db->mod_query($q);
+        if(!$result){
+            return false;
+        }
+        return true;
 	}
 	
 	private function process_firms($firm_data_arr,$deal_id,$deal_value_in_billion,$date_added){
