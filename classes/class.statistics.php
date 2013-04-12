@@ -831,131 +831,160 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_param['region'])."'";
 		$data_arr[] = array("f_name"=>"loi","l_name"=>"kae","num_deals"=>"34");
 		$data_arr[] = array("f_name"=>"jou","l_name"=>"nue","num_deals"=>"40");
 		return true;
+		/**********************************************************************/
+		/********************
+		sng:13/aug/2012
+		Now we have one or more participants for a deal. We no longer check the deal_country/deal_sector/deal_industry csv fields for a deal.
+		We now check the hq_country/sector/industry or the participants and consider only those deals
+		*******************/
+		$filter_by_company_attrib = "";
+        
+		if(isset($stat_param['country'])&&($stat_param['country']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="hq_country='".mysql_real_escape_string($stat_param['country'])."'";
+		}else{
+			/**********
+			might check region. Associated with a region is one or more countries
+			We can use IN clause, that is hq_country IN (select country names for the given region), but it seems that
+			it is much faster if we first get the country names and then create the condition with OR, that is
+			(hq_country='Brazil' OR hq_country='Russia') etc
+			***********/
+			if(isset($stat_param['region'])&&($stat_param['region']!="")){
+				//get the country names for this region name
+				$region_q = "SELECT ctrym.name FROM ".TP."region_master AS rgnm LEFT JOIN ".TP."region_country_list AS rcl ON ( rgnm.id = rcl.region_id ) LEFT JOIN ".TP."country_master AS ctrym ON ( rcl.country_id = ctrym.id )
+WHERE rgnm.name = '".mysql_real_escape_string($stat_param['region'])."'";
+				$region_q_res = mysql_query($region_q);
+				if(!$region_q_res){
+					
+					return false;
+				}
+				$region_q_res_cnt = mysql_num_rows($region_q_res);
+				$region_clause = "";
+				if($region_q_res_cnt > 0){
+					while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
+						$region_clause.="|hq_country='".mysql_real_escape_string($region_q_res_row['name'])."'";
+					}
+					$region_clause = substr($region_clause,1);
+					$region_clause = str_replace("|"," OR ",$region_clause);
+					$region_clause = "(".$region_clause.")";
+				}
+				if($region_clause!=""){
+					if($filter_by_company_attrib != ""){
+						$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+					}
+					$filter_by_company_attrib.=$region_clause;
+				}
+			}
+		}
 		
-        global $g_mc;
-        ///////////////////////////////////////////////////////
-        //filter on company of the transaction
-        $company_filter = "";
-        $company_filter_clause = "";
-        /*************************************************************************************
-        sng:1/dec/2010
-        Now when country is present, we check the transaction::deal_country field
-        Same for region
-        so we do not check the company of the country doing the deal
-        
-        if($stat_param['country']!=""){
-            $company_filter_clause.=" and hq_country='".$stat_param['country']."'";
-        }else{
-            //hq country not specified, so we cna check for region
-            if($stat_param['region']!=""){
-                $company_filter_clause.=" and hq_country IN (SELECT cm.name FROM ".TP."region_master AS rm LEFT JOIN ".TP."region_country_list AS rcl ON ( rm.id = rcl.region_id ) LEFT JOIN ".TP."country_master AS cm ON ( rcl.country_id = cm.id ) WHERE rm.name = '".$stat_param['region']."')";
-            }
-        }
-        ***************************************************************************************/
-        /*************************************************************************************
-        sng:3/dec/2010
-        Now when sector and industry is present, we search in the transaction table
-        if($stat_param['sector']!=""){
-            $company_filter_clause.=" and sector='".$stat_param['sector']."'";
-        }
-        ****************************************************************************************/
-        if($company_filter_clause != ""){
-            $company_filter.=" and company_id IN (select company_id from ".TP."company where 1=1".$company_filter_clause.")";
-        }
-        
-        ///////////////////////////////////////////////
-        //remember that a banker can change firm, so do not do anything with partner id, but group by member id
-        
-        $q = "SELECT num_deals, member_id, total_adjusted_deal_value, total_deal_value, f_name,l_name,profile_img,c.name as firm_name,c.company_id as firm_id FROM ( SELECT count( * ) AS num_deals, member_id,sum( adjusted_value_in_billion ) AS total_adjusted_deal_value, sum( value_in_billion ) AS total_deal_value FROM ".TP."transaction_partner_members AS p LEFT JOIN ".TP."transaction AS t ON ( p.transaction_id = t.id ) WHERE member_type = '".$stat_param['member_type']."'";
-        //////////////////////////////////////////
-        //filter on transaction types
-        if($stat_param['deal_cat_name']!=""){
+		if(isset($stat_param['sector'])&&($stat_param['sector']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="sector='".mysql_real_escape_string($stat_param['sector'])."'";
+		}
+		
+		if(isset($stat_param['industry'])&&($stat_param['industry']!="")){
+			if($filter_by_company_attrib != ""){
+				$filter_by_company_attrib = $filter_by_company_attrib." AND ";
+			}
+			$filter_by_company_attrib.="industry='".mysql_real_escape_string($stat_param['industry'])."'";
+		}
+		
+		/***********
+		remember that a banker can change firm, so do not do anything with partner id, but group by member id
+		*************/
+		$q = "SELECT num_deals, member_id, total_adjusted_deal_value, total_deal_value, f_name,l_name,profile_img,c.name as firm_name,c.company_id as firm_id FROM ( SELECT count( * ) AS num_deals, member_id, sum( adjusted_value_in_billion ) AS total_adjusted_deal_value, sum( value_in_billion ) AS total_deal_value FROM ".TP."transaction_partner_members AS p LEFT JOIN ".TP."transaction AS t ON ( p.transaction_id = t.id )";
+		
+		/***************
+		sng:13/aug/2012
+		snippet
+		Why inner join? We want to consider only those deals on the left which satisfy the conditions on the right
+		***********/
+		if($filter_by_company_attrib!=""){
+			$q.=" INNER JOIN (SELECT DISTINCT transaction_id from ".TP."transaction_companies as fca_tc left join ".TP."company as fca_c on(fca_tc.company_id=fca_c.company_id) where fca_c.type='company' AND ".$filter_by_company_attrib.") AS fca ON (t.id=fca.transaction_id) ";
+		}
+		$q.=" WHERE member_type = '".$stat_param['member_type']."'";
+		/*****************
+		filter on transaction types
+		*********/
+		if(isset($stat_param['deal_cat_name'])&&($stat_param['deal_cat_name']!="")){
             $q.=" and deal_cat_name='".$stat_param['deal_cat_name']."'";
         }
-        if($stat_param['deal_subcat1_name']!=""){
+		if(isset($stat_param['deal_subcat1_name'])&&($stat_param['deal_subcat1_name']!="")){
             $q.=" and deal_subcat1_name='".$stat_param['deal_subcat1_name']."'";
         }
-        if($stat_param['deal_subcat2_name']!=""){
+		if(isset($stat_param['deal_subcat2_name'])&&($stat_param['deal_subcat2_name']!="")){
             $q.=" and deal_subcat2_name='".$stat_param['deal_subcat2_name']."'";
         }
-        if($stat_param['year']!=""){
-            $q.=" and year(date_of_deal)='".$stat_param['year']."'";
-        }
-        /***************************************************************************
-        sng:3/dec/2010
-        Now when sector or industry is prsent, we search in the transaction table
-        *************/
-        if($stat_param['sector']!=""){
-            $q." and deal_sector like '%".$stat_param['sector']."%'";
-        }
-        if($stat_param['industry']!=""){
-            $q." and deal_industry like '%".$stat_param['industry']."%'";
-        }
-        /********************************************************************************/
-        /**************************************************************************************
-        sng:1/dec/2010
-        Now when country is present, we check the transaction::deal_country field
-        Same for region
-        *********************/
-        $country_filter = "";
-        if($stat_param['country']!=""){
-            //country specified, we do not consider region
-            $country_filter.="deal_country LIKE '%".$stat_param['country']."%'";
-        }else{
-            //country not specified, check for region
-            if($stat_param['region']!=""){
-                //get the country names for this region name
-                $region_q = "select cm.name from ".TP."region_master as rm left join ".TP."region_country_list as rc on(rm.id=rc.region_id) left join ".TP."country_master as cm on(rc.country_id=cm.id) where rm.name='".$stat_param['region']."'";
-                $region_q_res = mysql_query($region_q);
-                if(!$region_q_res){
-                    return false;
-                }
-                
-                /*****************
-                sng:1/Dec/2010
-                No more the country of the HQ of the company doing the deal. Now use deal_country (which is a csv)
-                So now that we have got the individual countries of the region. let us create a OR clause and
-                for each country of the region, try to match it in deal_country. Since any one country from the region needs to
-                match, we use a OR
-                So say, region is BRIC. Then country filter is 
-                (deal_country like '%Brazil%' OR deal_country like '%Russia%' OR deal_country like '%India%' OR deal_country like '%China%')
-                
-                ****/
-                $region_q_res_cnt = mysql_num_rows($region_q_res);
-                $region_clause = "";
-                if($region_q_res_cnt > 0){
-                    while($region_q_res_row = mysql_fetch_assoc($region_q_res)){
-                        $region_clause.="|deal_country LIKE '%".$region_q_res_row['name']."%'";
-                    }
-                    $region_clause = substr($region_clause,1);
-                    $region_clause = str_replace("|"," OR ",$region_clause);
-                    $country_filter = "(".$region_clause.")";
-                }
+		
+		/**********************
+        sng:11/jun/2010
+        The year can be in a range like 2009-2010 or it may be a single like 2009
+        *******/
+        if(isset($stat_param['year'])&&($stat_param['year']!="")){
+            $year_tokens = explode("-",$stat_param['year']);
+            $year_tokens_count = count($year_tokens);
+            if($year_tokens_count == 1){
+                //singleton year
+                $q.=" and year(date_of_deal)='".$year_tokens[0]."'";
             }
+            if($year_tokens_count == 2){
+                //range year
+                $q.=" and year(date_of_deal)>='".$year_tokens[0]."' AND year(date_of_deal)<='".$year_tokens[1]."'";
+            }
+            
         }
-        if($country_filter!=""){
-            $q.=" and ".$country_filter;
+		
+		/****************************
+        sng:23/july/2010
+        The deal size can be blank or <=valuein billion or >=value in billion
+		
+		sng:7/sep/2012
+		better pass through util::decode_deal_size
+		
+		sng:13/dec/2012
+		better check if set or not
+        ********/
+        if((isset($stat_param['deal_size']))&&($stat_param['deal_size']!="")){
+			$stat_param['deal_size'] = Util::decode_deal_size($stat_param['deal_size']);
+            $q.=" and value_in_billion".$stat_param['deal_size'];
         }
-        /*********************************************************************************************/
-        
-        //////////////////////
-
-        if($company_filter!=""){
-            $q.=$company_filter;
-        }
-        /////////////////////////////////////////////
-        $q.=" GROUP BY member_id";
-        ///////////////////////////////////////
-        //the ranking ordering
-        $ranking_by = "";
-        if($stat_param['ranking_criteria']=="num_deals") $ranking_by = "num_deals";
-        else if($stat_param['ranking_criteria']=="total_deal_value") $ranking_by = "total_deal_value";
-        else if($stat_param['ranking_criteria']=="total_adjusted_deal_value") $ranking_by = "total_adjusted_deal_value";
+		
+		/**************
+		sng:5/sep/2012
+		We need to exclude inactive deals
+		We exclude 'announced' Debt / Equity deals and M&A deals that are explicitly marked (in_calculation=0)
+		We use the alias t to mark the transaction table (just to be safe since other tables can have those fields)
+		****************/
+		$q.=" and t.is_active='y' and t.in_calculation='1'";
+		$q.=" GROUP BY member_id";
+		/*******************************
+		the ranking ordering
+		
+		sng:23/nov/2012
+		Let us tweak the ordering.
+		By default, let us rank by number of deals, then by total deal value
+		(if 2 firms has done same num of deals, then see who made more valuable deals)
+		
+		If the ranking is by total deal value, then order by total deal value, then by adjusted deal value
+		(if 2 firms has made same amount of money, then see who had more, if individual shares are considered)
+		
+		If the ranking is by total adjusted deal value, then order by total adjusted deal value, then by total deal value
+		(if 2 firms has made same amount of money individually, then see who has worked on more valuable deals)
+		*******/
+		$ranking_by = "num_deals DESC, total_deal_value DESC";
+        if($stat_param['ranking_criteria']=="num_deals") $ranking_by = "num_deals DESC, total_deal_value DESC";
+        else if($stat_param['ranking_criteria']=="total_deal_value") $ranking_by = "total_deal_value DESC, total_adjusted_deal_value DESC";
+        else if($stat_param['ranking_criteria']=="total_adjusted_deal_value") $ranking_by = "total_adjusted_deal_value DESC, total_deal_value DESC";
         if($ranking_by != ""){
-            $q.=" ORDER BY ".$ranking_by." DESC";
+            $q.=" ORDER BY ".$ranking_by;
         }
-        $q.=" limit ".$start_offset.",".$num_to_fetch.") AS stat LEFT JOIN ".TP."member AS m ON ( stat.member_id = m.mem_id ) left join ".TP."company as c on(m.company_id=c.company_id)";
-        //echo $q;
+		
+		$q.=" limit ".$start_offset.",".$num_to_fetch.") AS stat LEFT JOIN ".TP."member AS m ON ( stat.member_id = m.mem_id ) left join ".TP."company as c on(m.company_id=c.company_id)";
+		
         $res = mysql_query($q);
         if(!$res){
             //echo mysql_error();
@@ -965,12 +994,9 @@ WHERE rgnm.name = '".mysql_real_escape_string($stat_param['region'])."'";
         if(0 == $data_count){
             return true;
         }
-        /////////////////////////
+        
         for($i = 0;$i<$data_count; $i++){
             $data_arr[$i] = mysql_fetch_assoc($res);
-            $data_arr[$i]['firm_name'] = $g_mc->db_to_view($data_arr[$i]['firm_name']);
-            $data_arr[$i]['f_name'] = $g_mc->db_to_view($data_arr[$i]['f_name']);
-            $data_arr[$i]['l_name'] = $g_mc->db_to_view($data_arr[$i]['l_name']);
             //convert the figures correct to 2 dec place, do not convert to million
             $data_arr[$i]['total_adjusted_deal_value'] = round($data_arr[$i]['total_adjusted_deal_value'],2);
             $data_arr[$i]['total_deal_value'] = round($data_arr[$i]['total_deal_value'],2);
